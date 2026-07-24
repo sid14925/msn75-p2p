@@ -94,27 +94,51 @@ html, body {
 .xp-btn.primary { font-weight: bold; }
 .xp-btn:disabled { color: #999; cursor: default; box-shadow: none; }
 
+/* ---------- menüsor (fő- és csevegőablak) ---------- */
+.menubar {
+  display: flex;
+  background: #f4f8fc;
+  border-bottom: 1px solid #d9e6f2;
+  padding: 1px 4px;
+  position: relative;
+  flex: 0 0 auto;
+}
+.menubar .m-item { padding: 3px 8px; cursor: default; color: #222; }
+.menubar .m-item:hover, .menubar .m-item.open { background: #dcecfb; color: #000; }
+.menu-pop {
+  position: absolute;
+  top: 22px;
+  background: #fff;
+  border: 1px solid #8ab1d8;
+  box-shadow: 2px 2px 6px rgba(0,0,0,.25);
+  min-width: 190px;
+  z-index: 500;
+  display: none;
+  padding: 2px;
+}
+.menu-pop .mp-item { padding: 4px 18px 4px 22px; cursor: default; white-space: nowrap; }
+.menu-pop .mp-item:hover { background: #dcecfb; }
+.menu-pop .mp-item.dis { color: #a0a0a0; }
+.menu-pop .mp-item.checked::before { content: '✔ '; margin-left: -14px; }
+.menu-pop .mp-sep { border-top: 1px solid #dbe6f0; margin: 2px 4px; }
+
 /* ---------- Bejelentkező ablak ---------- */
 #loginWin { width: 356px; left: 50%; top: 50%; transform: translate(-50%, -52%); }
-#loginWin .win-body {
-  background: #fff;
-  align-items: center;
-  padding: 0 0 0 0;
-}
+#loginWin .win-body { background: #fff; align-items: center; }
 .login-top {
   width: 100%;
-  padding: 18px 0 10px;
+  padding: 16px 0 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   background: linear-gradient(180deg, #ffffff 0%, #f2f8fe 100%);
 }
-.login-top img.bfly { width: 96px; height: auto; }
+.login-top img.bfly { width: 90px; height: auto; }
 .login-top .logo-fallback { font-size: 26px; }
 .login-brand { font-size: 17px; color: #4d6e9b; margin-top: 4px; letter-spacing: .2px; }
 .login-brand b { color: #24466f; }
 .login-form { width: 100%; padding: 8px 34px 6px; }
-.fld { width: 100%; margin-bottom: 9px; }
+.fld { width: 100%; margin-bottom: 8px; }
 .fld label { display: block; color: #333; margin-bottom: 3px; }
 .fld input, .fld select {
   width: 100%;
@@ -147,27 +171,45 @@ html, body {
 
 /* ---------- Fő ablak ---------- */
 #mainWin {
-  width: 285px;
-  height: 600px;
-  max-height: calc(100vh - 24px);
-  left: 22px; top: 12px;
+  width: 300px;
+  height: 640px;
+  max-height: calc(100vh - 20px);
+  left: 22px; top: 10px;
   display: none;
 }
 #mainWin .win-body { background: #fff; }
+
+.brand-band {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: linear-gradient(180deg, #ffffff, #eef5fc);
+  border-bottom: 1px solid #e2edf7;
+}
+.brand-band .expander {
+  color: #7fa8d0;
+  border: 1px solid #c3d6e8;
+  border-radius: 50%;
+  width: 15px; height: 15px;
+  font-size: 9px;
+  line-height: 13px;
+  text-align: center;
+  background: #fff;
+}
+.brand-band img { width: 18px; height: auto; }
+.brand-text { font-size: 13px; color: #4d6e9b; }
+.brand-text b { color: #1a3e6e; }
+.brand-b2 { margin-left: 3px; color: #3b5a82; }
 
 .main-head {
   background:
     radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.85) 0%, rgba(255,255,255,0) 45%),
     linear-gradient(180deg, #fdfeff 0%, #e2eefa 55%, #cfe2f5 100%);
   border-bottom: 1px solid var(--line);
-  padding: 9px 10px 7px;
+  padding: 8px 10px 6px;
   display: flex;
   gap: 9px;
-  position: relative;
-}
-.main-head .bfly-corner {
-  position: absolute; right: 8px; top: 7px;
-  width: 30px; height: auto; opacity: .95;
 }
 .dp {
   border: 1px solid #98b7d8;
@@ -179,28 +221,28 @@ html, body {
 }
 .dp img, .dp svg { display: block; }
 .dp-48 { width: 52px; height: 52px; }
-.dp-48 img, .dp-48 svg { width: 46px; height: 46px; }
+.dp-48 img, .dp-48 svg { width: 46px; height: 46px; object-fit: cover; }
 .me-info { flex: 1; min-width: 0; padding-top: 2px; }
-.me-line { display: flex; align-items: center; gap: 3px; cursor: pointer; max-width: 165px; }
+.me-line { display: flex; align-items: center; gap: 3px; cursor: pointer; max-width: 185px; }
 .me-line:hover { text-decoration: underline; text-decoration-color: #4a71a3; }
 .me-name { font-weight: bold; font-size: 12px; color: #24466f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .me-st { color: #4a71a3; white-space: nowrap; }
 .me-line .drop { color: #4a71a3; font-size: 9px; }
-.me-status-sel { display: none; margin-top: 2px; font-family: inherit; font-size: 11px; max-width: 160px; }
+.me-status-sel { display: none; margin-top: 2px; font-family: inherit; font-size: 11px; max-width: 170px; }
 .pm-line {
   margin-top: 3px;
   color: #7a8ba0;
   font-style: italic;
   border: 1px solid transparent;
   padding: 1px 2px;
-  max-width: 175px;
+  max-width: 190px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   cursor: text;
 }
 .pm-line:hover { border-color: #b5cbe4; background: #fff; }
 .pm-input {
   margin-top: 3px;
-  width: 175px;
+  width: 190px;
   height: 18px;
   font-family: inherit; font-size: 11px; font-style: italic;
   border: 1px solid #7f9db9;
@@ -213,7 +255,7 @@ html, body {
   display: flex; align-items: center; gap: 4px;
   white-space: nowrap;
 }
-.me-id-line b { overflow: hidden; text-overflow: ellipsis; max-width: 108px; }
+.me-id-line b { overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
 .copy-btn {
   border: 1px solid #8ab1d8; border-radius: 2px; background: #eaf4fd;
   font-size: 9px; cursor: pointer; padding: 0 4px; height: 14px;
@@ -221,9 +263,41 @@ html, body {
 }
 .copy-btn:hover { background: #d5e9fb; }
 
-.main-tools {
-  background: linear-gradient(180deg, #f7fafd, #e2eefa);
+.today-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  background: linear-gradient(180deg, #eef5fc, #dfecf9);
   border-bottom: 1px solid #cbdcee;
+}
+.today-row img { width: 14px; height: auto; }
+.today-row svg { width: 14px; height: 14px; }
+.today-link { color: #1a3e6e; font-weight: bold; cursor: default; }
+
+.info-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffd5;
+  border-bottom: 1px solid #d8d29a;
+  padding: 3px 8px;
+  color: #3b5a82;
+}
+.info-banner .ib-i {
+  background: #2a70e0; color: #fff;
+  border-radius: 50%; width: 13px; height: 13px;
+  font-size: 10px; font-weight: bold; font-style: italic;
+  text-align: center; line-height: 13px;
+  flex: 0 0 auto;
+  font-family: Georgia, serif;
+}
+.info-banner .ib-text { flex: 1; text-decoration: underline; cursor: default; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.info-banner .ib-x { cursor: pointer; color: #8a8a5a; padding: 0 2px; }
+
+.main-tools {
+  background: #fff;
+  border-bottom: 1px solid #e6eef6;
   padding: 3px 8px;
   display: flex; gap: 10px;
   align-items: center;
@@ -236,26 +310,69 @@ html, body {
 .tool-ic:hover { background: #dcecfb; border-color: #a9cdf0; }
 .tool-ic svg { width: 15px; height: 15px; }
 
+.main-body-row { flex: 1; display: flex; overflow: hidden; }
+.tabstrip {
+  width: 30px;
+  flex: 0 0 auto;
+  background: linear-gradient(90deg, #dceafa, #eef5fc);
+  border-right: 1px solid #cbdcee;
+  padding-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+}
+.tabstrip .tab {
+  width: 26px; height: 28px;
+  border: 1px solid #b7cde8;
+  border-radius: 4px 0 0 4px;
+  background: linear-gradient(180deg, #fff, #e4eefb);
+  display: flex; align-items: center; justify-content: center;
+  cursor: default;
+}
+.tabstrip .tab.active { background: #fff; border-right-color: #fff; }
+.tabstrip .tab svg, .tabstrip .tab img { width: 18px; height: 18px; }
+
 #contactArea { flex: 1; overflow-y: auto; padding: 4px 0; background: #fff; }
 .grp-head {
   color: var(--deep); font-weight: bold;
   padding: 5px 8px 3px;
   cursor: pointer;
-}
-.grp-head .arrow { display: inline-block; width: 12px; color: #5588bb; font-size: 9px; }
-.contact {
   display: flex; align-items: center; gap: 5px;
-  padding: 2px 10px 2px 22px;
+}
+.grp-head .box {
+  width: 11px; height: 11px;
+  border: 1px solid #7f9db9;
+  background: #fff;
+  color: #444;
+  font-size: 9px; line-height: 9px;
+  text-align: center;
+  font-weight: normal;
+}
+.contact {
+  display: flex; align-items: center; gap: 6px;
+  padding: 2px 10px 2px 24px;
   cursor: pointer;
   border: 1px solid transparent;
 }
 .contact:hover { background: #eaf3fc; border-color: #bcd8f2; }
-.contact .buddy { flex: 0 0 auto; width: 14px; height: 14px; }
+.contact .c-thumb {
+  width: 34px; height: 34px;
+  border: 1px solid #98b7d8;
+  background: #fff;
+  padding: 1px;
+  flex: 0 0 auto;
+}
+.contact .c-thumb img, .contact .c-thumb svg { width: 30px; height: 30px; object-fit: cover; display: block; }
+.contact .buddy { flex: 0 0 auto; width: 15px; height: 15px; }
 .contact .c-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #000; }
 .contact .c-pm { color: #93a5b8; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
 .contact.offline .c-name { color: #8a8a8a; }
 .contact .c-x { visibility: hidden; color: #b04030; font-weight: bold; cursor: pointer; padding: 0 3px; }
 .contact:hover .c-x { visibility: visible; }
+.contact.blockedc .c-name { color: #b04030; text-decoration: line-through; }
+.contact .c-blk { visibility: hidden; cursor: pointer; padding: 0 3px; font-size: 10px; }
+.contact:hover .c-blk { visibility: visible; }
 
 .add-form { border-top: 1px solid #cbdcee; background: #f4f9fe; padding: 8px; display: none; }
 .add-form.open { display: block; }
@@ -265,6 +382,53 @@ html, body {
   font-family: inherit; font-size: 11px;
 }
 .add-form .row { display: flex; gap: 6px; justify-content: flex-end; }
+
+.banner-box {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  background: #fff;
+  border-top: 1px solid #e6eef6;
+  display: flex;
+  justify-content: center;
+}
+.banner-inner {
+  width: 100%;
+  height: 44px;
+  border: 1px solid #7f9db9;
+  border-radius: 3px;
+  background: linear-gradient(135deg, #16408f 0%, #2a70e0 55%, #4a9be8 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.banner-inner img { height: 28px; width: auto; }
+.banner-t1 { font-size: 16px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,.4); }
+.banner-t2 { font-size: 10px; opacity: .9; }
+
+.search-row {
+  display: flex;
+  gap: 6px;
+  padding: 5px 10px;
+  background: linear-gradient(180deg, #eef5fc, #dfecf9);
+  border-top: 1px solid #cbdcee;
+  align-items: center;
+}
+.search-row input {
+  flex: 1;
+  height: 21px;
+  border: 1px solid #7f9db9;
+  padding: 0 5px;
+  font-family: inherit; font-size: 11px;
+}
+.search-btn {
+  border: none; background: none;
+  color: #1a3e6e; font-weight: bold;
+  font-family: inherit; font-size: 11px;
+  cursor: pointer;
+}
+.search-btn:hover { text-decoration: underline; }
 
 .main-foot {
   border-top: 1px solid #cbdcee;
@@ -278,33 +442,8 @@ html, body {
 #netState.bad { color: #c03020; font-weight: bold; }
 
 /* ---------- Csevegőablak ---------- */
-.chatwin { width: 520px; height: 480px; min-width: 430px; }
+.chatwin { width: 560px; height: 520px; min-width: 470px; }
 .chatwin .win-body { background: #fff; }
-
-.menubar {
-  display: flex;
-  background: #f4f8fc;
-  border-bottom: 1px solid #d9e6f2;
-  padding: 1px 4px;
-  position: relative;
-}
-.menubar .m-item { padding: 3px 8px; cursor: default; color: #222; }
-.menubar .m-item:hover, .menubar .m-item.open { background: #dcecfb; color: #000; }
-.menu-pop {
-  position: absolute;
-  top: 22px;
-  background: #fff;
-  border: 1px solid #8ab1d8;
-  box-shadow: 2px 2px 6px rgba(0,0,0,.25);
-  min-width: 180px;
-  z-index: 500;
-  display: none;
-  padding: 2px;
-}
-.menu-pop .mp-item { padding: 4px 18px 4px 22px; cursor: default; white-space: nowrap; }
-.menu-pop .mp-item:hover { background: #dcecfb; }
-.menu-pop .mp-item.dis { color: #a0a0a0; }
-.menu-pop .mp-sep { border-top: 1px solid #dbe6f0; margin: 2px 4px; }
 
 .to-line {
   background: linear-gradient(180deg, #fdfeff, #edf4fb);
@@ -316,10 +455,30 @@ html, body {
 .to-line b { color: #000; }
 .to-line .pid { color: #7a95b3; }
 
+.away-bar {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  background: #ffffd5;
+  border-bottom: 1px solid #d8d29a;
+  padding: 3px 8px;
+  color: #3b5a82;
+}
+.away-bar.on { display: flex; }
+.away-bar .ib-i {
+  background: #2a70e0; color: #fff;
+  border-radius: 50%; width: 13px; height: 13px;
+  font-size: 10px; font-weight: bold; font-style: italic;
+  text-align: center; line-height: 13px;
+  font-family: Georgia, serif;
+  flex: 0 0 auto;
+}
+
 .chat-toolbar {
   display: flex;
   gap: 2px;
-  padding: 3px 6px;
+  align-items: flex-start;
+  padding: 3px 6px 0;
   background:
     radial-gradient(140% 100% at 0% 0%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 50%),
     linear-gradient(180deg, #f2f8fd 0%, #dcebf9 70%, #cfe2f5 100%);
@@ -332,12 +491,32 @@ html, body {
   font-family: inherit; font-size: 10px; color: #274d77;
   padding: 3px 7px 2px;
   cursor: pointer;
-  min-width: 52px;
+  min-width: 50px;
 }
 .tb-big svg { width: 22px; height: 22px; }
 .tb-big:hover:not(:disabled) { background: #e8f3fd; border-color: #a9cdf0; }
 .tb-big:disabled { color: #9aa7b5; cursor: default; filter: grayscale(1) opacity(.6); }
 .tb-big.active { background: #d5ecc9; border-color: #7fb36a; }
+.tb-round {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1px solid #b7cde8;
+  background: linear-gradient(180deg, #fff, #e4eefb);
+  margin: 8px 2px 0;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  color: #b04030;
+}
+.tb-round:hover { background: #fbeae6; }
+.tb-msn {
+  margin-left: auto;
+  padding: 8px 6px 0;
+  color: #4d6e9b;
+  font-size: 13px;
+}
+.tb-msn b { color: #1a3e6e; }
+.tb-msn img { width: 16px; vertical-align: -3px; }
 
 .stream-bar {
   display: none;
@@ -358,20 +537,28 @@ html, body {
 }
 
 .chat-mid { flex: 1; display: flex; overflow: hidden; }
+.msgs-col { flex: 1; display: flex; flex-direction: column; min-width: 0; border-right: 1px solid #e3edf6; }
+.warn-line {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #6a7a8a;
+  padding: 4px 8px 2px;
+  border-bottom: 1px solid #f0f4f8;
+}
+.warn-line svg { width: 12px; height: 12px; flex: 0 0 auto; }
 .msgs {
   flex: 1;
   overflow-y: auto;
   padding: 6px 8px;
   background: #fff;
   user-select: text;
-  border-right: 1px solid #e3edf6;
 }
 .msg { margin-bottom: 6px; word-wrap: break-word; }
 .msg .m-head { color: #545454; }
 .msg .m-head .m-time { float: right; color: #b5c5d5; font-size: 10px; }
 .msg .m-body { color: #000; padding: 1px 0 0 14px; font-size: 12px; line-height: 1.45; }
 .msg.sys { color: #909090; }
-.msg.sys.warn { color: #7a6a30; background: #fdf9e7; border: 1px solid #eee0a8; padding: 3px 6px; }
 .emo {
   display: inline-block;
   width: 19px; height: 19px;
@@ -381,20 +568,32 @@ html, body {
 }
 
 .dp-col {
-  width: 82px;
+  width: 96px;
   flex: 0 0 auto;
-  background: linear-gradient(180deg, #f4f9fe, #e6f0fa);
+  background:
+    radial-gradient(150% 120% at 100% 100%, #dcebf9 0%, rgba(255,255,255,0) 55%),
+    linear-gradient(180deg, #f8fbfe, #eef5fc);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
 }
-.dp-64 { width: 68px; height: 68px; }
-.dp-64 img, .dp-64 svg { width: 62px; height: 62px; }
-.dp-tag { font-size: 9px; color: #7a95b3; margin-top: 2px; text-align: center; }
-
-.typing-line { height: 15px; color: #7a95b3; font-style: italic; padding: 0 8px; flex: 0 0 auto; font-size: 10px; }
+.dp-64 { width: 76px; height: 76px; }
+.dp-64 img, .dp-64 svg { width: 70px; height: 70px; object-fit: cover; }
+.dp-chev {
+  width: 76px;
+  text-align: right;
+  color: #7fa8d0;
+  font-size: 9px;
+  border: 1px solid #c3d6e8;
+  border-top: none;
+  background: linear-gradient(180deg, #eef5fc, #dcebf9);
+  padding: 0 3px;
+  cursor: default;
+}
+.dp-tag { font-size: 9px; color: #7a95b3; margin-top: 2px; text-align: center; max-width: 90px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .fmt-bar {
   display: flex;
@@ -403,6 +602,7 @@ html, body {
   border-top: 1px solid var(--line);
   background: linear-gradient(180deg, #f2f8fd, #e2eefa);
   padding: 2px 6px;
+  position: relative;
 }
 .fmt-btn {
   border: 1px solid transparent; border-radius: 2px;
@@ -416,7 +616,52 @@ html, body {
 .fmt-btn:hover:not(:disabled) { background: #e8f3fd; border-color: #a9cdf0; }
 .fmt-btn:disabled { color: #9aa7b5; cursor: default; }
 .fmt-btn .emo { vertical-align: -4px; }
+.fmt-btn.toggled { background: #cfe4f7; border-color: #7fa8d0; }
+.fmt-btn.rec { background: #f5c9c2; border-color: #a33; color: #8a1a0a; }
 .fmt-sep { width: 1px; height: 16px; background: #c3d6e8; margin: 0 3px; }
+
+/* A (betűtípus) felugró */
+.font-pop {
+  position: absolute;
+  bottom: 26px;
+  left: 4px;
+  background: #fff;
+  border: 1px solid #8ab1d8;
+  box-shadow: 2px 3px 8px rgba(0,0,0,.3);
+  padding: 7px;
+  display: none;
+  z-index: 620;
+  align-items: center;
+  gap: 6px;
+}
+.font-pop.open { display: flex; }
+.fmt-color {
+  width: 26px; height: 20px;
+  border: 1px solid #8ab1d8;
+  padding: 0; background: none; cursor: pointer;
+}
+
+/* hátterek felugró */
+.bg-pop {
+  position: absolute;
+  bottom: 26px;
+  left: 120px;
+  background: #fff;
+  border: 1px solid #8ab1d8;
+  box-shadow: 2px 3px 8px rgba(0,0,0,.3);
+  padding: 6px;
+  display: none;
+  grid-template-columns: repeat(3, 44px);
+  gap: 4px;
+  z-index: 620;
+}
+.bg-pop.open { display: grid; }
+.bg-pop .bg-cell {
+  width: 44px; height: 32px;
+  border: 1px solid #b7cde8;
+  cursor: pointer;
+}
+.bg-pop .bg-cell:hover { border-color: #f0a030; }
 
 .input-area {
   background: linear-gradient(180deg, #eef5fc, #dcebf9);
@@ -426,14 +671,37 @@ html, body {
 }
 .input-area textarea {
   flex: 1;
-  height: 48px;
+  height: 52px;
   resize: none;
   border: 1px solid #7f9db9;
   padding: 4px 6px;
   font-family: inherit; font-size: 12px;
+  background: #fff;
 }
-.send-col { display: flex; flex-direction: column; gap: 4px; }
-.send-col .xp-btn { min-width: 72px; flex: 1; font-weight: bold; }
+.send-col { display: flex; flex-direction: column; }
+.send-col .send-btn {
+  min-width: 62px;
+  flex: 1;
+  border: 1px solid #7f9db9;
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, #ffffff, #e8f0f8);
+  color: #1a3e6e;
+  font-weight: bold;
+  font-family: inherit; font-size: 11px;
+  cursor: pointer;
+}
+.send-col .search-btn2 {
+  min-width: 62px;
+  height: 20px;
+  border: 1px solid #7f9db9;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(180deg, #f2f6fa, #dde8f2);
+  color: #7a95b3;
+  font-family: inherit; font-size: 10px;
+  cursor: pointer;
+}
+.send-col .send-btn:hover, .send-col .search-btn2:hover { box-shadow: inset 0 0 0 1px #ffc73c; }
 
 .chat-status {
   border-top: 1px solid #cbdcee;
@@ -478,47 +746,6 @@ html, body {
   90% { transform: translate(-3px,5px); }
 }
 .nudging { animation: nudgeShake .55s linear 2; }
-
-/* ---------- Stream néző ---------- */
-.viewerwin { width: 600px; height: 440px; }
-.viewerwin .win-body { background: #101418; }
-.viewerwin video { width: 100%; height: 100%; object-fit: contain; background: #000; flex: 1; min-height: 0; }
-.viewer-bar {
-  background: linear-gradient(180deg, #2c3540, #1a2129);
-  color: #cfe0ee;
-  padding: 4px 8px;
-  display: flex; align-items: center; gap: 8px;
-  flex: 0 0 auto;
-}
-.viewer-bar .live {
-  background: #d02818; color: #fff; font-weight: bold;
-  border-radius: 2px; padding: 1px 5px; font-size: 10px;
-}
-.viewer-bar button {
-  margin-left: auto;
-  border: 1px solid #4a5a6a; border-radius: 3px;
-  background: #2c3a48; color: #cfe0ee;
-  font-family: inherit; font-size: 10px;
-  padding: 2px 8px; cursor: pointer;
-}
-.viewer-bar button:hover { background: #3a4c5e; }
-
-.ask-box {
-  background: #fffbe6;
-  border-bottom: 1px solid #e0d48a;
-  padding: 6px 8px;
-  display: flex; align-items: center; gap: 8px;
-  color: #5c4d10;
-}
-.ask-box .row { margin-left: auto; display: flex; gap: 5px; }
-
-/* görgetősáv */
-::-webkit-scrollbar { width: 15px; }
-::-webkit-scrollbar-track { background: #f0f4f8; }
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(90deg, #d6e5f5, #b6cfeb);
-  border: 1px solid #9ebedd; border-radius: 7px;
-}
 
 /* ---------- Fájlátvitel ---------- */
 .file-line {
@@ -580,30 +807,56 @@ html, body {
 .call-bar button.hang:hover { background: #93301f; }
 .call-bar button.mute-on { background: #6a5a18; }
 
-/* ---------- Formázás sáv ---------- */
-.fmt-btn.toggled { background: #cfe4f7; border-color: #7fa8d0; }
-.fmt-color {
-  width: 22px; height: 18px;
-  border: 1px solid #8ab1d8;
-  padding: 0; background: none; cursor: pointer;
-}
-.fmt-btn.rec { background: #f5c9c2; border-color: #a33; color: #8a1a0a; }
-
-/* hangüzenet a beszélgetésben */
+/* hangüzenet */
 .vclip-line { margin: 3px 0 6px 14px; }
 .vclip-line audio { height: 26px; max-width: 260px; }
 
-/* tiltott partner */
-.contact.blockedc .c-name { color: #b04030; text-decoration: line-through; }
-.contact .c-blk {
-  visibility: hidden;
-  cursor: pointer; padding: 0 3px; font-size: 10px;
+/* ---------- Stream néző ---------- */
+.viewerwin { width: 640px; height: 460px; }
+.viewerwin .win-body { background: #101418; }
+.viewerwin video { width: 100%; height: 100%; object-fit: contain; background: #000; flex: 1; min-height: 0; }
+.viewer-bar {
+  background: linear-gradient(180deg, #2c3540, #1a2129);
+  color: #cfe0ee;
+  padding: 4px 8px;
+  display: flex; align-items: center; gap: 8px;
+  flex: 0 0 auto;
 }
-.contact:hover .c-blk { visibility: visible; }
+.viewer-bar .live {
+  background: #d02818; color: #fff; font-weight: bold;
+  border-radius: 2px; padding: 1px 5px; font-size: 10px;
+}
+.viewer-bar .vstate { color: #8fa8c0; font-size: 10px; }
+.viewer-bar button {
+  border: 1px solid #4a5a6a; border-radius: 3px;
+  background: #2c3a48; color: #cfe0ee;
+  font-family: inherit; font-size: 10px;
+  padding: 2px 8px; cursor: pointer;
+}
+.viewer-bar button:hover { background: #3a4c5e; }
+.viewer-bar .vunmute { background: #6a5a18; border-color: #9a8a3a; display: none; }
+.viewer-bar .vfull { margin-left: auto; }
 
-/* saját kép csere */
+.ask-box {
+  background: #fffbe6;
+  border-bottom: 1px solid #e0d48a;
+  padding: 6px 8px;
+  display: flex; align-items: center; gap: 8px;
+  color: #5c4d10;
+}
+.ask-box .row { margin-left: auto; display: flex; gap: 5px; }
+
+/* tiltott partner */
 #myDp { cursor: pointer; }
 #myDp:hover { outline: 2px solid #ffc73c; }
+
+/* görgetősáv */
+::-webkit-scrollbar { width: 15px; }
+::-webkit-scrollbar-track { background: #f0f4f8; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #d6e5f5, #b6cfeb);
+  border: 1px solid #9ebedd; border-radius: 7px;
+}
 </style>
 </head>
 <body>
@@ -618,39 +871,41 @@ html, body {
   <div class="win-body">
     <div class="login-top">
       <span id="logoHolder"></span>
-      <div class="login-brand"><b>msn</b> Messenger 7.5 <span style="color:#8aa5c4">— P2P kiadás</span></div>
+      <div class="login-brand"><b>msn</b> Messenger 7.5 <span style="color:#8aa5c4" id="brandSub"></span></div>
     </div>
     <div class="login-form">
       <div class="fld">
-        <label for="inName">Megjelenítendő név:</label>
+        <label for="inLang" id="lblLang">Nyelv / Language:</label>
+        <select id="inLang">
+          <option value="hu">Magyar</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label for="inName" id="lblName"></label>
         <input id="inName" maxlength="40" autocomplete="off">
       </div>
       <div class="fld">
-        <label for="inPeerId">Saját Peer ID:</label>
+        <label for="inPeerId" id="lblPeerId"></label>
         <input id="inPeerId" maxlength="40" autocomplete="off">
-        <div class="hint">Nincs e-mail és jelszó — a barátaid ezzel az azonosítóval találnak meg.
-        Betű, szám, kötőjel, aláhúzás (3–40 karakter).</div>
+        <div class="hint" id="hintPeerId"></div>
       </div>
       <div class="fld">
-        <label for="inStatus">Bejelentkezés a következő állapotban:</label>
-        <select id="inStatus">
-          <option value="online">Elérhető</option>
-          <option value="busy">Elfoglalt</option>
-          <option value="away">Nem vagyok a gépnél</option>
-        </select>
+        <label for="inStatus" id="lblStatus"></label>
+        <select id="inStatus"></select>
       </div>
       <div class="chk-row">
         <input type="checkbox" id="chkRemember" checked>
-        <label for="chkRemember">Adataim megjegyzése ezen a gépen</label>
+        <label for="chkRemember" id="lblRemember"></label>
       </div>
       <div class="login-btn-row">
-        <button class="xp-btn primary" id="loginBtn">Bejelentkezés</button>
+        <button class="xp-btn primary" id="loginBtn"></button>
       </div>
       <div id="loginErr"></div>
       <div id="loginStatus"></div>
     </div>
     <div class="login-foot">
-      <span>Szerver nélküli, közvetlen P2P kapcsolat</span>
+      <span id="footNote"></span>
       <span id="passportHolder"></span>
     </div>
   </div>
@@ -664,51 +919,79 @@ html, body {
     <span class="t-btns"></span>
   </div>
   <div class="win-body">
+    <div class="menubar" id="mainMenubar"></div>
+
+    <div class="brand-band">
+      <span class="expander">»</span>
+      <span id="brandBfly"></span>
+      <span class="brand-text"><b>msn</b><span class="brand-b2">Messenger</span></span>
+    </div>
+
     <div class="main-head">
-      <img class="bfly-corner" id="bflyCorner" alt="" style="display:none">
       <div class="dp dp-48" id="myDp"></div>
       <div class="me-info">
-        <div class="me-line" id="meLine" title="Állapot módosítása">
+        <div class="me-line" id="meLine">
           <span class="me-name" id="meName"></span>
-          <span class="me-st" id="meStText">(Elérhető)</span>
+          <span class="me-st" id="meStText"></span>
           <span class="drop">▼</span>
         </div>
-        <select class="me-status-sel" id="meStatus" size="6">
-          <option value="online">Elérhető</option>
-          <option value="busy">Elfoglalt</option>
-          <option value="away">Nem vagyok a gépnél</option>
-          <option value="brb">Rögtön jövök</option>
-          <option value="phone">Telefonálok</option>
-          <option value="lunch">Ebédelek</option>
-        </select>
-        <div class="pm-line" id="pmLine">&lt;Írja be személyes üzenetét&gt;</div>
+        <select class="me-status-sel" id="meStatus" size="6"></select>
+        <div class="pm-line" id="pmLine"></div>
         <input class="pm-input" id="pmInput" maxlength="80">
         <div class="me-id-line">Peer ID: <b id="meId"></b>
-          <button class="copy-btn" id="copyId">másol</button>
+          <button class="copy-btn" id="copyId">⧉</button>
         </div>
       </div>
     </div>
 
+    <div class="today-row">
+      <span class="env-ic" id="envIc"></span>
+      <span id="todayBfly"></span>
+      <span class="today-link" id="todayLink"></span>
+    </div>
+
+    <div class="info-banner" id="infoBanner">
+      <span class="ib-i">i</span>
+      <span class="ib-text" id="infoBannerText"></span>
+      <span class="ib-x" id="infoBannerClose">✕</span>
+    </div>
+
     <div class="main-tools">
-      <span class="tool-ic" id="addToggle" title="Partner hozzáadása Peer ID alapján">
+      <span class="tool-ic" id="addToggle">
         <svg viewBox="0 0 16 16"><circle cx="6" cy="5" r="3" fill="#3faf22"/><path d="M1 14c0-3.3 2.2-5 5-5s5 1.7 5 5z" fill="#3faf22"/><path d="M12 4v6M9 7h6" stroke="#274d77" stroke-width="1.6"/></svg>
-        Partner hozzáadása
+        <span id="addContactLbl"></span>
       </span>
     </div>
 
     <div class="add-form" id="addForm">
-      <input id="addId" placeholder="Partner Peer ID-ja">
-      <input id="addName" placeholder="Név (nem kötelező)">
+      <input id="addId">
+      <input id="addName">
       <div class="row">
-        <button class="xp-btn" id="addCancel">Mégse</button>
-        <button class="xp-btn primary" id="addOk">Hozzáadás</button>
+        <button class="xp-btn" id="addCancel"></button>
+        <button class="xp-btn primary" id="addOk"></button>
       </div>
     </div>
 
-    <div id="contactArea"></div>
+    <div class="main-body-row">
+      <div class="tabstrip" id="tabstrip"></div>
+      <div id="contactArea"></div>
+    </div>
+
+    <div class="banner-box">
+      <div class="banner-inner">
+        <span id="bannerBfly"></span>
+        <span class="banner-t1">MSN 7.5</span>
+        <span class="banner-t2" id="bannerTxt"></span>
+      </div>
+    </div>
+
+    <div class="search-row">
+      <input id="webSearch">
+      <button id="webSearchBtn" class="search-btn"></button>
+    </div>
 
     <div class="main-foot">
-      <span>P2P mód — szerver nélkül</span>
+      <span id="footP2p"></span>
       <span id="netState"></span>
     </div>
   </div>
@@ -744,28 +1027,216 @@ window.MSN_ASSETS = {
 /* ===== MSN Messenger 7.5 — P2P kiadás =====
  *
  * Belépés: név + saját Peer ID (nincs regisztráció, e-mail, jelszó).
- * A partnerek egymás Peer ID-jával kapcsolódnak; minden adat (üzenet,
- * fájl, hívás, stream) közvetlenül, WebRTC-n megy a két gép között.
+ * Minden adat (üzenet, fájl, hívás, stream) közvetlenül, WebRTC-n megy.
  * Az MSN_ASSETS az eredeti MSN 7.5 telepítőből kinyert hangokat,
  * hangulatjeleket és képeket tartalmazza.
- *
- * Funkciók az eredeti 7.5 mintájára: üzenetek formázással, hangulatjelek,
- * rezgetés, fájlküldés, hanghívás, webkamera, hangüzenet (max 15 mp),
- * képernyő-stream, személyes üzenet, egyéni megjelenítendő kép, tiltás.
  */
 
 'use strict';
 
+// ---------- nyelv ----------
+const LANGS = {
+  hu: {
+    brandSub: '— P2P kiadás',
+    lblName: 'Megjelenítendő név:',
+    lblPeerId: 'Saját Peer ID:',
+    hintPeerId: 'Nincs e-mail és jelszó — a barátaid ezzel az azonosítóval találnak meg. Betű, szám, kötőjel, aláhúzás (3–40 karakter).',
+    lblStatus: 'Bejelentkezés a következő állapotban:',
+    lblRemember: 'Adataim megjegyzése ezen a gépen',
+    loginBtn: 'Bejelentkezés',
+    connecting: 'Kapcsolódás a P2P hálózathoz…',
+    errName: 'Adj meg egy nevet!',
+    errPeerId: 'A Peer ID 3–40 karakter: betű, szám, kötőjel, aláhúzás.',
+    errTaken: 'Ez a Peer ID már foglalt — válassz másikat!',
+    errNet: 'Hálózati hiba: ',
+    footNote: 'Szerver nélküli, közvetlen P2P kapcsolat',
+    st_online: 'Elérhető', st_busy: 'Elfoglalt', st_away: 'Nem vagyok a gépnél',
+    st_brb: 'Rögtön jövök', st_phone: 'Telefonálok', st_lunch: 'Ebédelek',
+    stOffline: 'Offline',
+    menuFile: 'Fájl', menuContacts: 'Partnerek', menuActions: 'Műveletek',
+    menuTools: 'Eszközök', menuHelp: 'Súgó', menuEdit: 'Szerkesztés',
+    miSignOut: 'Kijelentkezés', miClose: 'Bezárás',
+    miAddContact: 'Partner felvétele…',
+    miSendIM: 'Azonnali üzenet küldése',
+    miSoundsOn: 'Hangok bekapcsolása', miSoundsOff: 'Hangok kikapcsolása',
+    miLangHu: 'Magyar', miLangEn: 'English',
+    miAbout: 'Az MSN Messenger — P2P kiadás névjegye',
+    aboutText: 'MSN Messenger 7.5 — P2P kiadás. Szerver és regisztráció nélkül, WebRTC-vel. Az eredeti MSN 7.5 hangjaival és hangulatjeleivel.',
+    today: 'MSN Ma',
+    infoBanner: 'P2P mód: a partnerek egymás Peer ID-jával kapcsolódnak — kattints ide a névjegyhez.',
+    addContact: 'Partner felvétele',
+    addIdPh: 'Partner Peer ID-ja', addNamePh: 'Név (nem kötelező)',
+    cancel: 'Mégse', add: 'Hozzáadás',
+    grpOnline: 'Elérhető', grpOffline: 'Nem elérhető',
+    bannerTxt: 'P2P kiadás — szerver nélkül',
+    searchPh: 'Keresés az interneten…', searchBtn: 'Keresés',
+    footP2p: 'P2P mód — szerver nélkül',
+    netOk: 'Kapcsolódva', netBad: 'Kapcsolat megszakadt…',
+    pmPlaceholder: '<Írj személyes üzenetet>',
+    invalidId: 'Érvénytelen Peer ID.', ownId: 'Ez a saját azonosítód. :)',
+    delContact: 'Partner törlése', blockC: 'Partner tiltása', unblockC: 'Tiltás feloldása',
+    blockedMark: 'TILTVA',
+    convTitle: 'Beszélgetés', toLbl: 'Címzett:',
+    awayBar: '$1 lehet, hogy nem válaszol, mert állapota: $2.',
+    warnLine: 'Jelszót és bankkártyaszámot soha ne adj meg csevegés közben.',
+    tbInvite: 'Meghívás', tbFiles: 'Fájlküldés', tbWebcam: 'Webkamera',
+    tbVoice: 'Hang', tbStream: 'Stream', tbAct: 'Tevékenységek', tbGames: 'Játékok',
+    tbServerNote: 'Az eredeti szolgáltatás a Microsoft központi szerverét igényelte',
+    tbInviteNote: 'Több partneres beszélgetés — hamarosan',
+    blockRound: 'Partner tiltása',
+    fontTip: 'Betűtípus és szín', emoTip: 'Hangulatjelek',
+    vclipBtn: 'Hangüzenet', vclipTip: 'Hangüzenet felvétele (max 15 mp)',
+    winks: 'Kacsintók', winksNote: 'A Kacsintók letölthető Flash-tartalmak voltak — P2P-ben nem elérhetők',
+    bgs: 'Hátterek', nudgeTip: 'Rezgetés küldése',
+    send: 'Küldés', search2: 'Keresés',
+    writes: '$1 írja:', lastMsg: 'Utolsó üzenet: ', typing: '$1 éppen üzenetet ír…',
+    sentNudge: 'Rezgetést küldtél.', gotNudge: '$1 megrezegtette a beszélgetőablakot!',
+    left: '$1 kilépett a beszélgetésből.',
+    notAvail: 'A partner jelenleg nem érhető el — az üzenetet nem lehet kézbesíteni.',
+    notAvailShort: 'A partner nem érhető el.',
+    micDenied: 'A mikrofon nem érhető el (engedély megtagadva?).',
+    camDenied: 'A kamera nem érhető el (engedély megtagadva?).',
+    vclipSent: '$1 hangüzenetet küldött:',
+    fOfferWait: ' — várakozás a partner válaszára…',
+    fRecv: ' — fogadás…', fRejected: 'Elutasítva.', fCancelled: 'Megszakítva.',
+    fSending: ' — küldés: ', fSent: ' — elküldve ✓', fDone: ' — kész ✓',
+    fSave: 'Mentés', fCantSend: 'A partner nem érhető el, a fájlt nem lehet elküldeni.',
+    accept: 'Elfogadás', decline: 'Elutasítás',
+    callVoiceStarted: 'Hanghívást indítottál.', callCamStarted: 'Webkamerás beszélgetést kezdeményeztél.',
+    callIncVoice: '$1 hanghívást indított.', callIncCam: '$1 webkamerás beszélgetést kezdeményez.',
+    callBusy: 'Már van folyamatban hívás ezzel a partnerrel.',
+    callNoDev: 'A mikrofon/kamera nem érhető el — a hívást nem lehet fogadni.',
+    callEnded: 'A hívás befejeződött.',
+    calling: 'Hívás…', connectingCall: 'Kapcsolódás…', inCall: 'Beszélgetés folyamatban',
+    muteMic: 'Mikrofon némítása', unmuteMic: 'Némítás feloldása', hangUp: 'Hívás befejezése',
+    voiceCall: 'Hanghívás', webcamCall: 'Webkamera',
+    streamAlready: 'Már streamelsz ennek a partnernek.',
+    streamDenied: 'A képernyőmegosztás nem indult el (engedély megtagadva?).',
+    streamStarted: 'Streamelést indítottál — a partner látja a képernyődet.',
+    streamStopped: 'Leállítottad a streamet.', streamTheirStop: '$1 leállította a streamet.',
+    streamCantStart: 'A partner nem érhető el, nem lehet streamelni.',
+    streamAsk: '$1 streamelni szeretné neked a képernyőjét.',
+    streamLive: 'ÉLŐ', streamOf: '$1 képernyője', streamWin: 'Stream',
+    streamYouSend: '🔴 Képernyődet streameled neki', stopStreamBtn: 'Stream leállítása',
+    streamConnecting: 'kapcsolódás…',
+    streamFailed: 'A stream kapcsolat nem jött létre (tűzfal/NAT). Próbáljátok újra!',
+    streamWaiting: 'A stream még nem érkezett meg — ha fél percen belül nem indul el, próbáljátok újra.',
+    streamGot: '$1 streamje elindult.',
+    unmute: '🔊 Hang bekapcsolása', fullscreen: 'Teljes képernyő',
+    youStream: 'Streamelés indítása',
+    dpTip: 'Megjelenítendő kép cseréje',
+    miNudge: 'Rezgetés küldése', miVoiceCall: 'Hanghívás indítása',
+    miWebcam: 'Webkamerás beszélgetés', miSendFile: 'Fájl vagy fénykép küldése…',
+    cut: 'Kivágás', copy: 'Másolás', paste: 'Beillesztés',
+  },
+  en: {
+    brandSub: '— P2P Edition',
+    lblName: 'Display name:',
+    lblPeerId: 'Your Peer ID:',
+    hintPeerId: 'No e-mail or password — your friends find you by this ID. Letters, numbers, dash, underscore (3–40 chars).',
+    lblStatus: 'Sign in with this status:',
+    lblRemember: 'Remember me on this computer',
+    loginBtn: 'Sign In',
+    connecting: 'Connecting to the P2P network…',
+    errName: 'Please enter a name!',
+    errPeerId: 'The Peer ID must be 3–40 chars: letters, numbers, dash, underscore.',
+    errTaken: 'This Peer ID is already taken — choose another one!',
+    errNet: 'Network error: ',
+    footNote: 'Serverless, direct P2P connection',
+    st_online: 'Online', st_busy: 'Busy', st_away: 'Away',
+    st_brb: 'Be Right Back', st_phone: 'On the Phone', st_lunch: 'Out to Lunch',
+    stOffline: 'Offline',
+    menuFile: 'File', menuContacts: 'Contacts', menuActions: 'Actions',
+    menuTools: 'Tools', menuHelp: 'Help', menuEdit: 'Edit',
+    miSignOut: 'Sign Out', miClose: 'Close',
+    miAddContact: 'Add a Contact…',
+    miSendIM: 'Send an Instant Message',
+    miSoundsOn: 'Turn Sounds On', miSoundsOff: 'Turn Sounds Off',
+    miLangHu: 'Magyar', miLangEn: 'English',
+    miAbout: 'About MSN Messenger — P2P Edition',
+    aboutText: 'MSN Messenger 7.5 — P2P Edition. No server, no registration, powered by WebRTC. With the original MSN 7.5 sounds and emoticons.',
+    today: 'MSN Today',
+    infoBanner: 'P2P mode: contacts connect using each other\'s Peer ID — click here to learn more.',
+    addContact: 'Add a Contact',
+    addIdPh: 'Contact\'s Peer ID', addNamePh: 'Name (optional)',
+    cancel: 'Cancel', add: 'Add',
+    grpOnline: 'Online', grpOffline: 'Offline',
+    bannerTxt: 'P2P Edition — no server needed',
+    searchPh: 'Search the web…', searchBtn: 'Search',
+    footP2p: 'P2P mode — no server',
+    netOk: 'Connected', netBad: 'Connection lost…',
+    pmPlaceholder: '<Type a personal message>',
+    invalidId: 'Invalid Peer ID.', ownId: 'That is your own ID. :)',
+    delContact: 'Delete contact', blockC: 'Block contact', unblockC: 'Unblock contact',
+    blockedMark: 'BLOCKED',
+    convTitle: 'Conversation', toLbl: 'To:',
+    awayBar: '$1 may not reply because his or her status is set to $2.',
+    warnLine: 'Never share your password or credit card number in an instant message conversation.',
+    tbInvite: 'Invite', tbFiles: 'Send Files', tbWebcam: 'Webcam',
+    tbVoice: 'Voice', tbStream: 'Stream', tbAct: 'Activities', tbGames: 'Games',
+    tbServerNote: 'The original service required Microsoft\'s central server',
+    tbInviteNote: 'Multi-party conversations — coming soon',
+    blockRound: 'Block contact',
+    fontTip: 'Font and color', emoTip: 'Emoticons',
+    vclipBtn: 'Voice Clip', vclipTip: 'Record a voice clip (max 15 s)',
+    winks: 'Winks', winksNote: 'Winks were downloadable Flash content — not available in P2P',
+    bgs: 'Backgrounds', nudgeTip: 'Send a nudge',
+    send: 'Send', search2: 'Search',
+    writes: '$1 says:', lastMsg: 'Last message: ', typing: '$1 is writing a message…',
+    sentNudge: 'You sent a nudge.', gotNudge: '$1 just sent you a nudge!',
+    left: '$1 has left the conversation.',
+    notAvail: 'The contact is currently unavailable — the message cannot be delivered.',
+    notAvailShort: 'The contact is unavailable.',
+    micDenied: 'The microphone is unavailable (permission denied?).',
+    camDenied: 'The camera is unavailable (permission denied?).',
+    vclipSent: '$1 sent a voice clip:',
+    fOfferWait: ' — waiting for the contact to respond…',
+    fRecv: ' — receiving…', fRejected: 'Declined.', fCancelled: 'Cancelled.',
+    fSending: ' — sending: ', fSent: ' — sent ✓', fDone: ' — done ✓',
+    fSave: 'Save', fCantSend: 'The contact is unavailable, the file cannot be sent.',
+    accept: 'Accept', decline: 'Decline',
+    callVoiceStarted: 'You started a voice call.', callCamStarted: 'You started a webcam conversation.',
+    callIncVoice: '$1 is calling you (voice).', callIncCam: '$1 wants to start a webcam conversation.',
+    callBusy: 'A call is already in progress with this contact.',
+    callNoDev: 'Microphone/camera unavailable — the call cannot be answered.',
+    callEnded: 'The call has ended.',
+    calling: 'Calling…', connectingCall: 'Connecting…', inCall: 'Call in progress',
+    muteMic: 'Mute microphone', unmuteMic: 'Unmute', hangUp: 'End call',
+    voiceCall: 'Voice Call', webcamCall: 'Webcam',
+    streamAlready: 'You are already streaming to this contact.',
+    streamDenied: 'Screen sharing could not start (permission denied?).',
+    streamStarted: 'You started streaming — the contact can see your screen.',
+    streamStopped: 'You stopped the stream.', streamTheirStop: '$1 stopped the stream.',
+    streamCantStart: 'The contact is unavailable, streaming is not possible.',
+    streamAsk: '$1 wants to stream their screen to you.',
+    streamLive: 'LIVE', streamOf: '$1\'s screen', streamWin: 'Stream',
+    streamYouSend: '🔴 You are streaming your screen', stopStreamBtn: 'Stop streaming',
+    streamConnecting: 'connecting…',
+    streamFailed: 'The stream connection could not be established (firewall/NAT). Please try again!',
+    streamWaiting: 'The stream has not arrived yet — if it does not start within half a minute, try again.',
+    streamGot: '$1\'s stream has started.',
+    unmute: '🔊 Unmute', fullscreen: 'Full screen',
+    youStream: 'Start streaming',
+    dpTip: 'Change display picture',
+    miNudge: 'Send a nudge', miVoiceCall: 'Start a voice call',
+    miWebcam: 'Start a webcam conversation', miSendFile: 'Send a file or photo…',
+    cut: 'Cut', copy: 'Copy', paste: 'Paste',
+  },
+};
+let lang = localStorage.getItem('msn75_lang') || 'hu';
+function t(k) { return (LANGS[lang] && LANGS[lang][k]) || LANGS.hu[k] || k; }
+function tf(k, a, b) { return t(k).replace('$1', a).replace('$2', b); }
+
 // ---------- állapot ----------
 let peer = null;
 const me = { name: '', id: '', status: 'online', pm: '' };
-const conns = new Map();      // peerId -> DataConnection
-const remote = new Map();     // peerId -> { name, status, pm, dp }
-const chatWins = new Map();   // peerId -> ablak
-const outCalls = new Map();   // peerId -> kimenő stream MediaConnection
-const viewers = new Map();    // peerId -> stream néző ablak
-const calls = new Map();      // peerId -> hívás állapot
-const fileTx = new Map();     // transferId -> küldés/fogadás állapota
+const conns = new Map();
+const remote = new Map();
+const chatWins = new Map();
+const outCalls = new Map();
+const viewers = new Map();
+const calls = new Map();
+const fileTx = new Map();
 let screenStream = null;
 let zTop = 10;
 let muted = localStorage.getItem('msn75_muted') === '1';
@@ -776,14 +1247,31 @@ try { Object.assign(myFmt, JSON.parse(localStorage.getItem('msn75_fmt') || '{}')
 
 const A = window.MSN_ASSETS || null;
 
-const STATUS_TEXT = {
-  online: 'Elérhető', busy: 'Elfoglalt', away: 'Nem vagyok a gépnél',
-  brb: 'Rögtön jövök', phone: 'Telefonálok', lunch: 'Ebédelek',
+// A streamelés/hívások megbízhatóságához: STUN + ingyenes TURN relay-k.
+// TURN nélkül szigorú NAT/tűzfal mögött a médiakapcsolat nem jön létre.
+const RTC_CONFIG = {
+  iceServers: [
+    { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
+    { urls: 'stun:stun.cloudflare.com:3478' },
+    {
+      urls: [
+        'turn:openrelay.metered.ca:80',
+        'turn:openrelay.metered.ca:443',
+        'turn:openrelay.metered.ca:443?transport=tcp',
+      ],
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
+    },
+  ],
+  iceCandidatePoolSize: 4,
 };
+
 const ST_KIND = { online: 'online', busy: 'busy', phone: 'busy',
                   away: 'away', brb: 'away', lunch: 'away' };
+const STATUSES = ['online', 'busy', 'away', 'brb', 'phone', 'lunch'];
+function stText(code) { return t('st_' + code) || t('st_online'); }
 
-// ---------- hangulatjelek (eredeti MSN 7.5 készlet, 19x19-es csík) ----------
+// ---------- hangulatjelek ----------
 const EMO = [
   [':)', ':-)'], [':D', ':d', ':-D', ':-d'], [';)', ';-)'],
   [':O', ':o', ':-O', ':-o'], [':P', ':p', ':-P', ':-p'], ['(H)', '(h)'],
@@ -816,14 +1304,12 @@ function escHtml(s) {
 }
 function emoHtml(idx, titleCode) {
   if (A) {
-    // titleCode már HTML-escapelt formában érkezik
     return '<span class="emo" style="background-position:-' + (idx * 19) +
       'px 0" title="' + (titleCode || escHtml(EMO[idx][0])) + '"></span>';
   }
   return EMO_FALLBACK[idx] || '';
 }
 function emotify(escaped) {
-  // 1. fázis: parancsikon -> helyőrző, 2. fázis: helyőrző -> HTML
   let out = escaped;
   const used = [];
   for (const [code, idx] of EMO_LOOKUP) {
@@ -836,6 +1322,16 @@ function emotify(escaped) {
   for (const [ph, html] of used) out = out.split(ph).join(html);
   return out;
 }
+
+// ---------- hátterek (beszélgetés) ----------
+const BGS = [
+  ['none', '#ffffff'],
+  ['sky', 'linear-gradient(180deg,#eaf6ff,#cfe8fb)'],
+  ['sunset', 'linear-gradient(180deg,#fff3e0,#ffd9b0)'],
+  ['meadow', 'linear-gradient(180deg,#f0fbe6,#d7f0c0)'],
+  ['rose', 'linear-gradient(180deg,#fdeef4,#f7d4e4)'],
+  ['night', 'linear-gradient(180deg,#e8ecf8,#c8d2ee)'],
+];
 
 // ---------- segédek ----------
 const $ = (sel, root) => (root || document).querySelector(sel);
@@ -873,16 +1369,17 @@ function dpHtml(pid) {
 }
 function refreshDps(pid) {
   for (const [id, w] of chatWins) {
-    if (pid && id !== pid && !(pid === me.id)) continue;
+    if (pid !== undefined && id !== pid && pid !== me.id) continue;
     const them = $('.dp-them', w.win);
     const mine = $('.dp-mine', w.win);
     if (them && (pid === undefined || pid === id)) them.innerHTML = dpHtml(id);
     if (mine && (pid === undefined || pid === me.id)) mine.innerHTML = dpHtml(me.id);
   }
   if (pid === me.id || pid === undefined) $('#myDp').innerHTML = dpHtml(me.id);
+  renderContacts();
 }
 function buddySvg(size, kind) {
-  const col = kind === 'busy' ? '#d02818' : kind === 'away' ? '#e8a812' : '#3faf22';
+  const col = kind === 'busy' ? '#d02818' : kind === 'away' ? '#e8a812' : kind === 'offline' ? '#c08a6a' : '#3faf22';
   return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 32 32">' +
     '<circle cx="11" cy="9" r="5" fill="' + col + '"/>' +
     '<path d="M3 26c0-6 4-9 8-9s8 3 8 9z" fill="' + col + '"/>' +
@@ -890,7 +1387,7 @@ function buddySvg(size, kind) {
     '<path d="M15.5 26c0-5 3-7.6 6.5-7.6s6.5 2.6 6.5 7.6z" fill="#2a70e0"/></svg>';
 }
 function buddyDot(kind) {
-  const col = kind === 'busy' ? '#d02818' : kind === 'away' ? '#e8a812' : kind === 'offline' ? '#9a9a9a' : '#3faf22';
+  const col = kind === 'busy' ? '#d02818' : kind === 'away' ? '#e8a812' : kind === 'offline' ? '#c08a6a' : '#3faf22';
   return '<svg class="buddy" viewBox="0 0 16 16">' +
     '<circle cx="8" cy="5" r="3.4" fill="' + col + '"/>' +
     '<path d="M2 15c0-4 2.7-6 6-6s6 2 6 6z" fill="' + col + '"/></svg>';
@@ -901,16 +1398,16 @@ let audioCtx = null;
 function beep(seq) {
   try {
     audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-    let t = audioCtx.currentTime;
+    let tt = audioCtx.currentTime;
     for (const [freq, dur] of seq) {
       const o = audioCtx.createOscillator();
       const g = audioCtx.createGain();
       o.frequency.value = freq; o.type = 'sine';
-      g.gain.setValueAtTime(0.12, t);
-      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      g.gain.setValueAtTime(0.12, tt);
+      g.gain.exponentialRampToValueAtTime(0.001, tt + dur);
       o.connect(g).connect(audioCtx.destination);
-      o.start(t); o.stop(t + dur);
-      t += dur * 0.9;
+      o.start(tt); o.stop(tt + dur);
+      tt += dur * 0.9;
     }
   } catch { /* hang nélkül is működik */ }
 }
@@ -931,7 +1428,7 @@ const sndOnline = mkSound(A?.sndOnline, [[660, .1], [880, .12], [1100, .15]]);
 const sndNudge  = mkSound(A?.sndNudge,  [[220, .08], [180, .08], [220, .08], [180, .08], [240, .1]]);
 const sndRing   = mkSound(A?.sndRing,   [[740, .2], [740, .2]]);
 
-// ---------- partnerlista tárolása ----------
+// ---------- tárolás ----------
 function loadContacts() {
   try { return JSON.parse(localStorage.getItem('msn75_contacts') || '[]'); }
   catch { return []; }
@@ -939,6 +1436,7 @@ function loadContacts() {
 let contacts = loadContacts();
 function saveContacts() { localStorage.setItem('msn75_contacts', JSON.stringify(contacts)); }
 function saveBlocked() { localStorage.setItem('msn75_blocked', JSON.stringify([...blocked])); }
+function saveFmt() { localStorage.setItem('msn75_fmt', JSON.stringify(myFmt)); }
 
 // ---------- ablakok mozgatása ----------
 function makeDraggable(win, handle) {
@@ -964,31 +1462,181 @@ function makeDraggable(win, handle) {
   win.addEventListener('mousedown', () => bringToFront(win));
 }
 
+// ---------- menü-építő ----------
+function buildMenus(bar, menus, onAction) {
+  bar.innerHTML = '';
+  const closeAll = () => {
+    bar.querySelectorAll('.menu-pop').forEach(p => { p.style.display = 'none'; });
+    bar.querySelectorAll('.m-item').forEach(m => m.classList.remove('open'));
+  };
+  for (const menu of menus) {
+    const mi = el('span', 'm-item', menu.label);
+    bar.appendChild(mi);
+    const pop = el('div', 'menu-pop');
+    for (const it of menu.items) {
+      if (it === '-') { pop.appendChild(el('div', 'mp-sep')); continue; }
+      const item = el('div', 'mp-item' + (it.dis ? ' dis' : '') + (it.checked ? ' checked' : ''), it.label);
+      if (!it.dis && it.act) {
+        item.addEventListener('click', e => {
+          e.stopPropagation();
+          closeAll();
+          onAction(it.act);
+        });
+      }
+      pop.appendChild(item);
+    }
+    bar.appendChild(pop);
+    mi.addEventListener('click', e => {
+      e.stopPropagation();
+      const isOpen = pop.style.display === 'block';
+      closeAll();
+      if (!isOpen) {
+        pop.style.display = 'block';
+        pop.style.left = mi.offsetLeft + 'px';
+        mi.classList.add('open');
+      }
+    });
+  }
+  document.addEventListener('click', closeAll);
+  return closeAll;
+}
+
+// ---------- statikus feliratok ----------
+function applyStaticTexts() {
+  $('#brandSub').textContent = t('brandSub');
+  $('#lblName').textContent = t('lblName');
+  $('#lblPeerId').textContent = t('lblPeerId');
+  $('#hintPeerId').textContent = t('hintPeerId');
+  $('#lblStatus').textContent = t('lblStatus');
+  $('#lblRemember').textContent = t('lblRemember');
+  $('#loginBtn').textContent = t('loginBtn');
+  $('#footNote').textContent = t('footNote');
+  const sel = $('#inStatus');
+  const cur = sel.value;
+  sel.innerHTML = '';
+  for (const s of ['online', 'busy', 'away']) {
+    const o = document.createElement('option');
+    o.value = s; o.textContent = stText(s);
+    sel.appendChild(o);
+  }
+  if (cur) sel.value = cur;
+  $('#todayLink').textContent = t('today');
+  $('#infoBannerText').textContent = t('infoBanner');
+  $('#addContactLbl').textContent = t('addContact');
+  $('#addId').placeholder = t('addIdPh');
+  $('#addName').placeholder = t('addNamePh');
+  $('#addCancel').textContent = t('cancel');
+  $('#addOk').textContent = t('add');
+  $('#bannerTxt').textContent = t('bannerTxt');
+  $('#webSearch').placeholder = t('searchPh');
+  $('#webSearchBtn').textContent = t('searchBtn');
+  $('#footP2p').textContent = t('footP2p');
+  $('#myDp').title = t('dpTip');
+  const ms = $('#meStatus');
+  const mcur = ms.value;
+  ms.innerHTML = '';
+  for (const s of STATUSES) {
+    const o = document.createElement('option');
+    o.value = s; o.textContent = stText(s);
+    ms.appendChild(o);
+  }
+  if (mcur) ms.value = mcur;
+  if (me.status) $('#meStText').textContent = '(' + stText(me.status) + ')';
+  renderPm();
+  buildMainMenus();
+}
+
+function buildMainMenus() {
+  buildMenus($('#mainMenubar'), [
+    { label: t('menuFile'), items: [
+      { label: t('miSignOut'), act: 'signout' },
+    ]},
+    { label: t('menuContacts'), items: [
+      { label: t('miAddContact'), act: 'addcontact' },
+    ]},
+    { label: t('menuActions'), items: [
+      { label: t('miSendIM'), dis: true },
+    ]},
+    { label: t('menuTools'), items: [
+      { label: muted ? t('miSoundsOn') : t('miSoundsOff'), act: 'mute' },
+      '-',
+      { label: t('miLangHu'), act: 'lang-hu', checked: lang === 'hu' },
+      { label: t('miLangEn'), act: 'lang-en', checked: lang === 'en' },
+    ]},
+    { label: t('menuHelp'), items: [
+      { label: t('miAbout'), act: 'about' },
+    ]},
+  ], act => {
+    if (act === 'signout') { try { peer?.destroy(); } catch {} location.reload(); }
+    else if (act === 'addcontact') { $('#addForm').classList.add('open'); $('#addId').focus(); }
+    else if (act === 'mute') { muted = !muted; localStorage.setItem('msn75_muted', muted ? '1' : '0'); buildMainMenus(); }
+    else if (act === 'lang-hu' || act === 'lang-en') { setLang(act.slice(5)); }
+    else if (act === 'about') { alert(t('aboutText')); }
+  });
+}
+
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('msn75_lang', l);
+  $('#inLang').value = l;
+  applyStaticTexts();
+  renderContacts();
+}
+
 // ---------- induló dekoráció ----------
 (function initChrome() {
   if (A) {
     document.documentElement.style.setProperty('--emo', 'url(' + A.emoStrip + ')');
     $('#logoHolder').innerHTML = '<img class="bfly" src="' + A.butterfly + '" alt="MSN">';
     $('#passportHolder').innerHTML = '<img src="' + A.buddies + '" alt="">';
-    const bc = $('#bflyCorner');
-    bc.src = A.butterfly; bc.style.display = '';
     $('#loginTitleIcon').innerHTML = '<img src="' + A.buddies + '" alt="">';
     $('#mainTitleIcon').innerHTML = '<img src="' + A.buddies + '" alt="">';
+    $('#brandBfly').innerHTML = '<img src="' + A.butterfly + '" alt="">';
+    $('#todayBfly').innerHTML = '<img src="' + A.butterfly + '" alt="">';
+    $('#bannerBfly').innerHTML = '<img src="' + A.butterfly + '" alt="">';
   } else {
     $('#logoHolder').innerHTML = '<span class="logo-fallback">' + buddySvg(64, 'online') + '</span>';
     $('#loginTitleIcon').innerHTML = buddySvg(16, 'online');
     $('#mainTitleIcon').innerHTML = buddySvg(16, 'online');
+    $('#brandBfly').innerHTML = buddySvg(16, 'online');
+    $('#todayBfly').innerHTML = buddySvg(13, 'online');
+    $('#bannerBfly').innerHTML = buddySvg(26, 'online');
   }
+  $('#envIc').innerHTML = '<svg viewBox="0 0 16 12" width="15" height="11"><rect x="0" y="0" width="16" height="12" rx="1" fill="#f7f3e8" stroke="#b0a880"/><path d="M0 0l8 7 8-7" fill="none" stroke="#b0a880"/></svg>';
+  const tabs = [
+    buddySvg(18, 'online'),
+    '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#2aa8d8"/><path d="M2 10h16M10 2c3 2.5 3 13.5 0 16M10 2c-3 2.5-3 13.5 0 16" stroke="#fff" stroke-width="1.2" fill="none"/></svg>',
+    '<svg viewBox="0 0 20 20"><path d="M10 1l2.4 5.6L18 7.3l-4.4 4 1.2 6L10 14.4 5.2 17.3l1.2-6L2 7.3l5.6-.7z" fill="#f0a030"/></svg>',
+    '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="5" fill="#ffd24a"/><g stroke="#ffd24a" stroke-width="1.6">' +
+      '<path d="M10 1v3M10 16v3M1 10h3M16 10h3M3.5 3.5l2 2M14.5 14.5l2 2M16.5 3.5l-2 2M5.5 14.5l-2 2"/></g></svg>',
+  ];
+  const strip = $('#tabstrip');
+  tabs.forEach((svg, i) => {
+    const tb = el('div', 'tab' + (i === 0 ? ' active' : ''));
+    tb.innerHTML = svg;
+    strip.appendChild(tb);
+  });
   try {
     const saved = JSON.parse(localStorage.getItem('msn75_login') || 'null');
     if (saved) {
       $('#inName').value = saved.name || '';
       $('#inPeerId').value = saved.id || '';
-      $('#inStatus').value = saved.status || 'online';
       me.pm = saved.pm || '';
     }
   } catch {}
+  $('#inLang').value = lang;
+  applyStaticTexts();
 })();
+
+$('#inLang').addEventListener('change', () => setLang($('#inLang').value));
+$('#infoBannerClose').addEventListener('click', () => { $('#infoBanner').style.display = 'none'; });
+$('#infoBannerText').addEventListener('click', () => alert(t('aboutText')));
+$('#webSearchBtn').addEventListener('click', doWebSearch);
+$('#webSearch').addEventListener('keydown', e => { if (e.key === 'Enter') doWebSearch(); });
+function doWebSearch() {
+  const q = $('#webSearch').value.trim();
+  if (q) window.open('https://www.bing.com/search?q=' + encodeURIComponent(q), '_blank');
+}
 
 // ---------- bejelentkezés ----------
 $('#loginBtn').addEventListener('click', doLogin);
@@ -999,11 +1647,8 @@ function doLogin() {
   const id = $('#inPeerId').value.trim();
   const err = $('#loginErr');
   err.textContent = '';
-  if (!name) { err.textContent = 'Adj meg egy nevet!'; return; }
-  if (!/^[a-zA-Z0-9_-]{3,40}$/.test(id)) {
-    err.textContent = 'A Peer ID 3–40 karakter: betű, szám, kötőjel, aláhúzás.';
-    return;
-  }
+  if (!name) { err.textContent = t('errName'); return; }
+  if (!/^[a-zA-Z0-9_-]{3,40}$/.test(id)) { err.textContent = t('errPeerId'); return; }
   me.name = name;
   me.id = id;
   me.status = $('#inStatus').value;
@@ -1013,9 +1658,9 @@ function doLogin() {
     localStorage.removeItem('msn75_login');
   }
   $('#loginBtn').disabled = true;
-  $('#loginStatus').textContent = 'Kapcsolódás a P2P hálózathoz…';
+  $('#loginStatus').textContent = t('connecting');
 
-  peer = new Peer(id, { debug: 1 });
+  peer = new Peer(id, { debug: 1, config: RTC_CONFIG });
 
   peer.on('open', () => {
     $('#loginWin').style.display = 'none';
@@ -1023,7 +1668,7 @@ function doLogin() {
     $('#meName').textContent = me.name;
     $('#meId').textContent = me.id;
     $('#meStatus').value = me.status;
-    $('#meStText').textContent = '(' + STATUS_TEXT[me.status] + ')';
+    $('#meStText').textContent = '(' + stText(me.status) + ')';
     $('#myDp').innerHTML = dpHtml(me.id);
     renderPm();
     setNetState(true);
@@ -1047,14 +1692,14 @@ function doLogin() {
     if (e.type === 'unavailable-id') {
       $('#loginBtn').disabled = false;
       $('#loginStatus').textContent = '';
-      err.textContent = 'Ez a Peer ID már foglalt — válassz másikat!';
+      err.textContent = t('errTaken');
       try { peer.destroy(); } catch {}
       peer = null;
     } else if (e.type === 'peer-unavailable') {
       // a jelenlét-figyelő újrapróbálja
     } else if (!peer || peer.destroyed) {
       $('#loginBtn').disabled = false;
-      err.textContent = 'Hálózati hiba: ' + e.type;
+      err.textContent = t('errNet') + e.type;
     }
   });
 }
@@ -1062,11 +1707,11 @@ function doLogin() {
 function setNetState(ok) {
   const n = $('#netState');
   if (!n) return;
-  n.textContent = ok ? 'Kapcsolódva' : 'Kapcsolat megszakadt…';
+  n.textContent = ok ? t('netOk') : t('netBad');
   n.className = ok ? 'ok' : 'bad';
 }
 
-// ---------- saját állapot / személyes üzenet / kép ----------
+// ---------- saját állapot / pm / kép ----------
 $('#meLine').addEventListener('click', () => {
   const s = $('#meStatus');
   s.style.display = s.style.display === 'block' ? 'none' : 'block';
@@ -1077,14 +1722,14 @@ function applyStatus() {
   const s = $('#meStatus');
   if (s.value && s.value !== me.status) {
     me.status = s.value;
-    $('#meStText').textContent = '(' + STATUS_TEXT[me.status] + ')';
+    $('#meStText').textContent = '(' + stText(me.status) + ')';
     broadcast({ t: 'status', status: me.status });
   }
   s.style.display = 'none';
 }
 
 function renderPm() {
-  $('#pmLine').textContent = me.pm ? me.pm : '<Írja be személyes üzenetét>';
+  $('#pmLine').textContent = me.pm ? me.pm : t('pmPlaceholder');
   $('#pmLine').style.color = me.pm ? '#5b7ba0' : '#9aabbd';
 }
 $('#pmLine').addEventListener('click', () => {
@@ -1116,16 +1761,14 @@ $('#pmInput').addEventListener('blur', () => {
 $('#copyId').addEventListener('click', () => {
   navigator.clipboard?.writeText(me.id);
   $('#copyId').textContent = '✓';
-  setTimeout(() => { $('#copyId').textContent = 'másol'; }, 1200);
+  setTimeout(() => { $('#copyId').textContent = '⧉'; }, 1200);
 });
 
-// saját megjelenítendő kép cseréje (kattintás a képre)
 const dpInput = document.createElement('input');
 dpInput.type = 'file';
 dpInput.accept = 'image/*';
 dpInput.style.display = 'none';
 document.body.appendChild(dpInput);
-$('#myDp').title = 'Megjelenítendő kép cseréje';
 $('#myDp').addEventListener('click', () => dpInput.click());
 dpInput.addEventListener('change', () => {
   const f = dpInput.files && dpInput.files[0];
@@ -1137,7 +1780,6 @@ dpInput.addEventListener('change', () => {
     const cv = document.createElement('canvas');
     cv.width = 96; cv.height = 96;
     const ctx = cv.getContext('2d');
-    // középre vágott négyzet
     const s = Math.min(img.width, img.height);
     ctx.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, 96, 96);
     myDp = cv.toDataURL('image/jpeg', 0.85);
@@ -1176,7 +1818,7 @@ function setupConn(c, incoming) {
     if (conns.get(c.peer) === c) {
       conns.delete(c.peer);
       const r = remote.get(c.peer);
-      if (r && chatWins.has(c.peer)) sysMsg(c.peer, (r.name || c.peer) + ' kilépett a beszélgetésből.');
+      if (r && chatWins.has(c.peer)) sysMsg(c.peer, tf('left', r.name || c.peer));
       remote.delete(c.peer);
       renderContacts();
       refreshChatHead(c.peer);
@@ -1238,10 +1880,16 @@ function onData(pid, d) {
     case 'typing': showTyping(pid); break;
     case 'nudge': {
       openChat(pid);
-      sysMsg(pid, dispName(pid) + ' megrezegtette a beszélgetőablakot!');
+      sysMsg(pid, tf('gotNudge', dispName(pid)));
       const w = chatWins.get(pid);
       if (w) { w.win.classList.remove('nudging'); void w.win.offsetWidth; w.win.classList.add('nudging'); }
       sndNudge();
+      break;
+    }
+    case 'bg': {
+      const w = chatWins.get(pid) || openChat(pid);
+      const bg = BGS.find(b => b[0] === d.id);
+      if (bg && w) $('.msgs', w.win).style.background = bg[1];
       break;
     }
     case 'vclip': onVclip(pid, d); break;
@@ -1251,7 +1899,7 @@ function onData(pid, d) {
       const tx = fileTx.get(d.id);
       if (tx && tx.pid === pid) {
         fileTx.delete(d.id);
-        if (tx.lineEl) tx.lineEl.querySelector('.f-size').textContent = 'Elutasítva.';
+        if (tx.lineEl) tx.lineEl.querySelector('.f-size').textContent = t('fRejected');
       }
       break;
     }
@@ -1260,14 +1908,14 @@ function onData(pid, d) {
       if (tx && tx.pid === pid) {
         tx.cancelled = true;
         fileTx.delete(d.id);
-        if (tx.lineEl) tx.lineEl.querySelector('.f-size').textContent = 'Megszakítva.';
+        if (tx.lineEl) tx.lineEl.querySelector('.f-size').textContent = t('fCancelled');
       }
       break;
     }
     case 'file-chunk': onFileChunk(pid, d); break;
     case 'stream-stop': {
       if (viewers.has(pid)) closeViewer(pid);
-      sysMsg(pid, dispName(pid) + ' leállította a streamet.');
+      sysMsg(pid, tf('streamTheirStop', dispName(pid)));
       break;
     }
     case 'bye': {
@@ -1296,51 +1944,55 @@ function startPresenceLoop() {
 // ---------- partnerlista ----------
 function renderContacts() {
   const area = $('#contactArea');
+  if (!area) return;
   area.innerHTML = '';
   const online = [], offline = [];
   for (const ct of contacts) (conns.has(ct.id) ? online : offline).push(ct);
-  area.appendChild(buildGroup('Elérhető (' + online.length + ')', online, true));
-  area.appendChild(buildGroup('Nem elérhető (' + offline.length + ')', offline, false));
+  area.appendChild(buildGroup(t('grpOnline') + ' (' + online.length + ')', online, true));
+  area.appendChild(buildGroup(t('grpOffline') + ' (' + offline.length + ')', offline, false));
 }
 
 function buildGroup(title, list, isOnline) {
   const frag = document.createDocumentFragment();
   const head = el('div', 'grp-head');
-  head.appendChild(el('span', 'arrow', '▼'));
+  const box = el('span', 'box', '−');
+  head.appendChild(box);
   head.appendChild(document.createTextNode(title));
   frag.appendChild(head);
-  const box = el('div');
+  const cont = el('div');
   head.addEventListener('click', () => {
-    const hidden = box.style.display === 'none';
-    box.style.display = hidden ? '' : 'none';
-    head.querySelector('.arrow').textContent = hidden ? '▼' : '►';
+    const hidden = cont.style.display === 'none';
+    cont.style.display = hidden ? '' : 'none';
+    box.textContent = hidden ? '−' : '+';
   });
   for (const ct of list) {
     const isBlocked = blocked.has(ct.id);
     const row = el('div', 'contact' + (isOnline ? '' : ' offline') + (isBlocked ? ' blockedc' : ''));
     const r = remote.get(ct.id);
-    const kind = isOnline ? (ST_KIND[r?.status] || 'online') : 'offline';
-    const ic = el('span');
-    ic.innerHTML = buddyDot(kind);
-    row.appendChild(ic.firstChild);
+    if (isOnline) {
+      const th = el('span', 'c-thumb');
+      th.innerHTML = dpHtml(ct.id);
+      row.appendChild(th);
+    } else {
+      const ic = el('span');
+      ic.innerHTML = buddyDot(isBlocked ? 'busy' : 'offline');
+      row.appendChild(ic.firstChild);
+    }
     const nm = el('span', 'c-name', dispName(ct.id));
-    nm.title = ct.id + (isBlocked ? ' — TILTVA' : (r && isOnline ? ' — ' + (STATUS_TEXT[r.status] || '') : ' — Offline'));
+    nm.title = ct.id + (isBlocked ? ' — ' + t('blockedMark') : (r && isOnline ? ' — ' + stText(r.status) : ' — ' + t('stOffline')));
     row.appendChild(nm);
     if (isOnline && r && !isBlocked) {
       let extra = '';
-      if (r.status && r.status !== 'online') extra = '(' + STATUS_TEXT[r.status] + ')';
+      if (r.status && r.status !== 'online') extra = '(' + stText(r.status) + ')';
       if (r.pm) extra = extra ? extra + ' – ' + r.pm : '– ' + r.pm;
       if (extra) row.appendChild(el('span', 'c-pm', ' ' + extra));
     }
     const blk = el('span', 'c-blk', isBlocked ? '✔' : '🚫');
-    blk.title = isBlocked ? 'Tiltás feloldása' : 'Partner tiltása';
-    blk.addEventListener('click', ev => {
-      ev.stopPropagation();
-      toggleBlock(ct.id);
-    });
+    blk.title = isBlocked ? t('unblockC') : t('blockC');
+    blk.addEventListener('click', ev => { ev.stopPropagation(); toggleBlock(ct.id); });
     row.appendChild(blk);
     const x = el('span', 'c-x', '✕');
-    x.title = 'Partner törlése';
+    x.title = t('delContact');
     x.addEventListener('click', ev => {
       ev.stopPropagation();
       contacts = contacts.filter(o => o.id !== ct.id);
@@ -1350,9 +2002,9 @@ function buildGroup(title, list, isOnline) {
     row.appendChild(x);
     row.addEventListener('dblclick', () => { if (!isBlocked) openChat(ct.id); });
     row.addEventListener('click', () => { if (isOnline && !isBlocked) openChat(ct.id); });
-    box.appendChild(row);
+    cont.appendChild(row);
   }
-  frag.appendChild(box);
+  frag.appendChild(cont);
   return frag;
 }
 
@@ -1374,7 +2026,6 @@ function toggleBlock(pid) {
   }
 }
 
-// partner hozzáadása
 $('#addToggle').addEventListener('click', () => {
   $('#addForm').classList.toggle('open');
   $('#addId').focus();
@@ -1386,8 +2037,8 @@ $('#addForm').addEventListener('keydown', e => { if (e.key === 'Enter') addConta
 function addContact() {
   const id = $('#addId').value.trim();
   const nm = $('#addName').value.trim();
-  if (!/^[a-zA-Z0-9_-]{3,40}$/.test(id)) { alert('Érvénytelen Peer ID.'); return; }
-  if (id === me.id) { alert('Ez a saját azonosítód. :)'); return; }
+  if (!/^[a-zA-Z0-9_-]{3,40}$/.test(id)) { alert(t('invalidId')); return; }
+  if (id === me.id) { alert(t('ownId')); return; }
   if (!contacts.find(x => x.id === id)) {
     contacts.push({ id, name: nm || id });
     saveContacts();
@@ -1410,86 +2061,76 @@ const TB_ICONS = {
   act: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" fill="#f0a030"/><rect x="13" y="3" width="8" height="8" fill="#3faf22"/><rect x="3" y="13" width="8" height="8" fill="#2a70e0"/><rect x="13" y="13" width="8" height="8" fill="#d02818"/></svg>',
   games: '<svg viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="10" rx="5" fill="#8aa5c4"/><path d="M7 11v4M5 13h4" stroke="#fff" stroke-width="1.6"/><circle cx="16" cy="12" r="1.3" fill="#fff"/><circle cx="19" cy="14" r="1.3" fill="#fff"/></svg>',
   nudge: '<svg viewBox="0 0 16 16"><path d="M8 1l2 5h4l-3.5 3 1.5 5L8 11l-4 3 1.5-5L2 6h4z" fill="#f0a030"/></svg>',
-  font: '<svg viewBox="0 0 16 16"><text x="2" y="12" font-size="12" font-family="serif" fill="#274d77">A</text><text x="9" y="13" font-size="9" font-family="serif" fill="#4a71a3">a</text></svg>',
-  bg: '<svg viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="11" fill="#7fd0ff"/><circle cx="5" cy="6" r="1.6" fill="#ffe680"/><path d="M1 13l5-5 3 3 2-2 4 4z" fill="#3faf22"/></svg>',
-  mic: '<svg viewBox="0 0 16 16"><rect x="6" y="1" width="4" height="8" rx="2" fill="#b04030"/><path d="M4 7a4 4 0 008 0M8 11v3M6 14h4" stroke="#b04030" stroke-width="1.4" fill="none"/></svg>',
+  bg: '<svg viewBox="0 0 16 16" width="14" height="14"><rect x="1" y="2" width="14" height="11" fill="#7fd0ff"/><circle cx="5" cy="6" r="1.6" fill="#ffe680"/><path d="M1 13l5-5 3 3 2-2 4 4z" fill="#3faf22"/></svg>',
+  mic: '<svg viewBox="0 0 16 16" width="13" height="13"><rect x="6" y="1" width="4" height="8" rx="2" fill="#4a71a3"/><path d="M4 7a4 4 0 008 0M8 11v3M6 14h4" stroke="#4a71a3" stroke-width="1.4" fill="none"/></svg>',
+  winks: '<svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="7" fill="#ffd24a"/><path d="M4.5 6.5h2.4M9 6.2c.4-.7 1.6-.7 2 0" stroke="#7a5c00" stroke-width="1.1" fill="none"/><path d="M5 10c1.5 1.6 4.5 1.6 6 0" stroke="#7a5c00" stroke-width="1.1" fill="none"/></svg>',
+  lock: '<svg viewBox="0 0 12 12" width="11" height="11"><rect x="2" y="5" width="8" height="6" rx="1" fill="#b0a880"/><path d="M4 5V3.5a2 2 0 014 0V5" stroke="#8a8460" stroke-width="1.2" fill="none"/></svg>',
 };
 
 function chatTemplate(pid) {
   const iconImg = A ? '<img src="' + A.buddies + '" alt="">' : buddySvg(16, 'online');
+  const msnLogo = A
+    ? '<span class="tb-msn"><b>msn</b><img src="' + A.butterfly + '" alt=""></span>'
+    : '<span class="tb-msn"><b>msn</b></span>';
   return '' +
     '<div class="titlebar">' +
       '<span class="t-icon">' + iconImg + '</span>' +
-      '<span class="t-text">' + escHtml(dispName(pid)) + ' — Beszélgetés</span>' +
+      '<span class="t-text">' + escHtml(dispName(pid)) + ' — ' + t('convTitle') + '</span>' +
       '<span class="t-btns"><span class="tbtn close" data-act="close">✕</span></span>' +
     '</div>' +
     '<div class="win-body">' +
-      '<div class="menubar">' +
-        '<span class="m-item" data-menu="file">Fájl</span>' +
-        '<span class="m-item" data-menu="edit">Szerkesztés</span>' +
-        '<span class="m-item" data-menu="actions">Műveletek</span>' +
-        '<span class="m-item" data-menu="tools">Eszközök</span>' +
-        '<span class="m-item" data-menu="help">Súgó</span>' +
-        '<div class="menu-pop" data-pop="file">' +
-          '<div class="mp-item" data-act="sendfile">Fájl vagy fénykép küldése…</div>' +
-          '<div class="mp-sep"></div>' +
-          '<div class="mp-item" data-act="close">Bezárás</div>' +
-        '</div>' +
-        '<div class="menu-pop" data-pop="edit">' +
-          '<div class="mp-item dis">Kivágás</div><div class="mp-item dis">Másolás</div><div class="mp-item dis">Beillesztés</div>' +
-        '</div>' +
-        '<div class="menu-pop" data-pop="actions">' +
-          '<div class="mp-item" data-act="nudge">Rezgetés küldése</div>' +
-          '<div class="mp-item" data-act="voice">Hanghívás indítása</div>' +
-          '<div class="mp-item" data-act="webcam">Webkamerás beszélgetés</div>' +
-          '<div class="mp-item" data-act="stream">Streamelés indítása</div>' +
-          '<div class="mp-item" data-act="sendfile">Fájl vagy fénykép küldése…</div>' +
-          '<div class="mp-sep"></div>' +
-          '<div class="mp-item" data-act="block">Partner tiltása</div>' +
-        '</div>' +
-        '<div class="menu-pop" data-pop="tools">' +
-          '<div class="mp-item" data-act="mute">' + (muted ? 'Hangok bekapcsolása' : 'Hangok kikapcsolása') + '</div>' +
-        '</div>' +
-        '<div class="menu-pop" data-pop="help">' +
-          '<div class="mp-item" data-act="about">Az MSN Messenger — P2P kiadás névjegye</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="to-line">Címzett: <b>' + escHtml(dispName(pid)) + '</b> <span class="pid">&lt;' + escHtml(pid) + '&gt;</span> <span class="wst"></span></div>' +
+      '<div class="menubar chat-menubar"></div>' +
+      '<div class="to-line">' + t('toLbl') + ' <b>' + escHtml(dispName(pid)) + '</b> <span class="pid">&lt;' + escHtml(pid) + '&gt;</span></div>' +
+      '<div class="away-bar"><span class="ib-i">i</span><span class="ab-text"></span></div>' +
       '<div class="chat-toolbar">' +
-        '<button class="tb-big" disabled title="Több partneres beszélgetés — hamarosan">' + TB_ICONS.invite + 'Meghívás</button>' +
-        '<button class="tb-big" data-act="sendfile">' + TB_ICONS.file + 'Fájlküldés</button>' +
-        '<button class="tb-big" data-act="webcam">' + TB_ICONS.webcam + 'Webkamera</button>' +
-        '<button class="tb-big" data-act="voice">' + TB_ICONS.voice + 'Hang</button>' +
-        '<button class="tb-big" data-act="stream">' + TB_ICONS.stream + 'Stream</button>' +
-        '<button class="tb-big" disabled title="Az eredeti szolgáltatás a Microsoft központi szerverét igényelte">' + TB_ICONS.act + 'Tevékenységek</button>' +
-        '<button class="tb-big" disabled title="Az eredeti szolgáltatás a Microsoft központi szerverét igényelte">' + TB_ICONS.games + 'Játékok</button>' +
+        '<button class="tb-big" disabled title="' + t('tbInviteNote') + '">' + TB_ICONS.invite + t('tbInvite') + '</button>' +
+        '<button class="tb-big" data-act="sendfile">' + TB_ICONS.file + t('tbFiles') + '</button>' +
+        '<button class="tb-big" data-act="webcam">' + TB_ICONS.webcam + t('tbWebcam') + '</button>' +
+        '<button class="tb-big" data-act="voice">' + TB_ICONS.voice + t('tbVoice') + '</button>' +
+        '<button class="tb-big" data-act="stream">' + TB_ICONS.stream + t('tbStream') + '</button>' +
+        '<button class="tb-big" disabled title="' + t('tbServerNote') + '">' + TB_ICONS.act + t('tbAct') + '</button>' +
+        '<button class="tb-big" disabled title="' + t('tbServerNote') + '">' + TB_ICONS.games + t('tbGames') + '</button>' +
+        '<span class="tb-round" data-act="block" title="' + t('blockRound') + '">⊘</span>' +
+        msnLogo +
       '</div>' +
-      '<div class="stream-bar"><span>🔴 Képernyődet streameled neki</span>' +
-        '<button class="stop" data-act="stopstream">Stream leállítása</button></div>' +
+      '<div class="stream-bar"><span>' + t('streamYouSend') + '</span>' +
+        '<button class="stop" data-act="stopstream">' + t('stopStreamBtn') + '</button></div>' +
       '<div class="chat-mid">' +
-        '<div class="msgs"></div>' +
+        '<div class="msgs-col">' +
+          '<div class="warn-line">' + TB_ICONS.lock + '<span>' + t('warnLine') + '</span></div>' +
+          '<div class="msgs"></div>' +
+        '</div>' +
         '<div class="dp-col">' +
           '<div><div class="dp dp-64 dp-them">' + dpHtml(pid) + '</div>' +
+          '<div class="dp-chev">▾</div>' +
           '<div class="dp-tag dp-them-tag">' + escHtml(dispName(pid)) + '</div></div>' +
           '<div><div class="dp dp-64 dp-mine">' + dpHtml(me.id) + '</div>' +
+          '<div class="dp-chev">▾</div>' +
           '<div class="dp-tag">' + escHtml(me.name) + '</div></div>' +
         '</div>' +
       '</div>' +
       '<div class="fmt-bar">' +
-        '<input type="color" class="fmt-color" title="Betűszín" value="' + (sanitizeColor(myFmt.color) || '#000000') + '">' +
-        '<button class="fmt-btn fmt-b' + (myFmt.bold ? ' toggled' : '') + '" title="Félkövér"><b>F</b></button>' +
-        '<button class="fmt-btn fmt-i' + (myFmt.italic ? ' toggled' : '') + '" title="Dőlt"><i>D</i></button>' +
-        '<span class="fmt-sep"></span>' +
-        '<button class="fmt-btn emo-btn" title="Hangulatjelek">' +
+        '<button class="fmt-btn font-btn" title="' + t('fontTip') + '"><b style="font-size:13px;font-family:serif">A</b></button>' +
+        '<button class="fmt-btn emo-btn" title="' + t('emoTip') + '">' +
           (A ? '<span class="emo" style="background-position:0 0"></span>' : '🙂') + ' ▾</button>' +
-        '<button class="fmt-btn nudge-btn" title="Rezgetés küldése">' + TB_ICONS.nudge + '</button>' +
-        '<button class="fmt-btn vclip-btn" title="Hangüzenet felvétele (max 15 mp)">' + TB_ICONS.mic + '</button>' +
+        '<button class="fmt-btn vclip-btn" title="' + t('vclipTip') + '">' + TB_ICONS.mic + ' ' + t('vclipBtn') + '</button>' +
+        '<button class="fmt-btn" disabled title="' + t('winksNote') + '">' + TB_ICONS.winks + ' ' + t('winks') + ' ▾</button>' +
+        '<button class="fmt-btn bg-btn" title="' + t('bgs') + '">' + TB_ICONS.bg + ' ' + t('bgs') + ' ▾</button>' +
         '<span class="fmt-sep"></span>' +
-        '<button class="fmt-btn" disabled title="Háttér">' + TB_ICONS.bg + '</button>' +
+        '<button class="fmt-btn nudge-btn" title="' + t('nudgeTip') + '">' + TB_ICONS.nudge + '</button>' +
+        '<div class="font-pop">' +
+          '<input type="color" class="fmt-color" value="' + (sanitizeColor(myFmt.color) || '#000000') + '">' +
+          '<button class="fmt-btn fmt-b' + (myFmt.bold ? ' toggled' : '') + '"><b>B</b></button>' +
+          '<button class="fmt-btn fmt-i' + (myFmt.italic ? ' toggled' : '') + '"><i>I</i></button>' +
+        '</div>' +
+        '<div class="bg-pop"></div>' +
       '</div>' +
       '<div class="input-area">' +
-        '<textarea placeholder="Írj üzenetet… (Enter = küldés)"></textarea>' +
-        '<div class="send-col"><button class="xp-btn primary send-btn">Küldés</button></div>' +
+        '<textarea></textarea>' +
+        '<div class="send-col">' +
+          '<button class="send-btn">' + t('send') + '</button>' +
+          '<button class="search-btn2">' + t('search2') + '</button>' +
+        '</div>' +
       '</div>' +
       '<div class="chat-status"></div>' +
       '<div class="emo-pop"></div>' +
@@ -1501,8 +2142,8 @@ function openChat(pid) {
   if (w) { w.win.style.display = 'flex'; bringToFront(w.win); return w; }
 
   const win = el('div', 'win chatwin');
-  win.style.left = (330 + (cascade % 6) * 34) + 'px';
-  win.style.top = (30 + (cascade % 6) * 30) + 'px';
+  win.style.left = (340 + (cascade % 6) * 34) + 'px';
+  win.style.top = (20 + (cascade % 6) * 28) + 'px';
   cascade++;
   win.innerHTML = chatTemplate(pid);
   document.body.appendChild(win);
@@ -1525,7 +2166,32 @@ function openChat(pid) {
   chatWins.set(pid, w);
   refreshChatHead(pid);
 
-  // rejtett fájlválasztó ehhez az ablakhoz
+  buildMenus($('.chat-menubar', win), [
+    { label: t('menuFile'), items: [
+      { label: t('miSendFile'), act: 'sendfile' },
+      '-',
+      { label: t('miClose'), act: 'close' },
+    ]},
+    { label: t('menuEdit'), items: [
+      { label: t('cut'), dis: true }, { label: t('copy'), dis: true }, { label: t('paste'), dis: true },
+    ]},
+    { label: t('menuActions'), items: [
+      { label: t('miNudge'), act: 'nudge' },
+      { label: t('miVoiceCall'), act: 'voice' },
+      { label: t('miWebcam'), act: 'webcam' },
+      { label: t('youStream'), act: 'stream' },
+      { label: t('miSendFile'), act: 'sendfile' },
+      '-',
+      { label: t('blockC'), act: 'block' },
+    ]},
+    { label: t('menuTools'), items: [
+      { label: muted ? t('miSoundsOn') : t('miSoundsOff'), act: 'mute' },
+    ]},
+    { label: t('menuHelp'), items: [
+      { label: t('miAbout'), act: 'about' },
+    ]},
+  ], act => runChatAction(pid, act));
+
   const fIn = document.createElement('input');
   fIn.type = 'file';
   fIn.style.display = 'none';
@@ -1535,14 +2201,14 @@ function openChat(pid) {
     fIn.value = '';
     if (f) offerFile(pid, f);
   });
+  w.fileInput = fIn;
 
-  // --- küldés ---
   const send = () => {
     const text = w.ta.value.trim();
     if (!text) return;
     const c = conns.get(pid);
     if (!c || !c.open) {
-      sysMsg(pid, 'A partner jelenleg nem érhető el — az üzenetet nem lehet kézbesíteni.');
+      sysMsg(pid, t('notAvail'));
       connectTo(pid);
       return;
     }
@@ -1553,20 +2219,26 @@ function openChat(pid) {
     w.ta.focus();
   };
   $('.send-btn', win).addEventListener('click', send);
+  $('.search-btn2', win).addEventListener('click', () => {
+    const q = w.ta.value.trim();
+    if (q) window.open('https://www.bing.com/search?q=' + encodeURIComponent(q), '_blank');
+  });
   w.ta.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   });
   w.ta.addEventListener('input', () => {
     const c = conns.get(pid);
-    const t = Date.now();
-    if (c && c.open && t - w.lastTypeSent > 2000) { c.send({ t: 'typing' }); w.lastTypeSent = t; }
+    const tt = Date.now();
+    if (c && c.open && tt - w.lastTypeSent > 2000) { c.send({ t: 'typing' }); w.lastTypeSent = tt; }
   });
 
-  // --- formázás ---
-  $('.fmt-color', win).addEventListener('input', e => {
-    myFmt.color = e.target.value;
-    saveFmt();
+  const fontPop = $('.font-pop', win);
+  $('.font-btn', win).addEventListener('click', e => {
+    e.stopPropagation();
+    fontPop.classList.toggle('open');
+    $('.bg-pop', win).classList.remove('open');
   });
+  $('.fmt-color', win).addEventListener('input', e => { myFmt.color = e.target.value; saveFmt(); });
   $('.fmt-b', win).addEventListener('click', e => {
     myFmt.bold = !myFmt.bold;
     e.currentTarget.classList.toggle('toggled', myFmt.bold);
@@ -1578,23 +2250,40 @@ function openChat(pid) {
     saveFmt();
   });
 
+  const bgPop = $('.bg-pop', win);
+  for (const [id, css] of BGS) {
+    const cell = el('span', 'bg-cell');
+    cell.style.background = css;
+    cell.title = id;
+    cell.addEventListener('click', () => {
+      w.msgs.style.background = css;
+      bgPop.classList.remove('open');
+      const c = conns.get(pid);
+      if (c && c.open) c.send({ t: 'bg', id });
+    });
+    bgPop.appendChild(cell);
+  }
+  $('.bg-btn', win).addEventListener('click', e => {
+    e.stopPropagation();
+    bgPop.classList.toggle('open');
+    fontPop.classList.remove('open');
+  });
+
   const doNudge = () => {
     const c = conns.get(pid);
     if (!c || !c.open) return;
     c.send({ t: 'nudge' });
-    sysMsg(pid, 'Rezgetést küldtél.');
+    sysMsg(pid, t('sentNudge'));
     win.classList.remove('nudging'); void win.offsetWidth; win.classList.add('nudging');
     sndNudge();
     const b = $('.nudge-btn', win);
     b.disabled = true;
     setTimeout(() => { b.disabled = false; }, 3000);
   };
+  w.doNudge = doNudge;
   $('.nudge-btn', win).addEventListener('click', doNudge);
-
-  // --- hangüzenet (voice clip, max 15 mp mint az eredetiben) ---
   $('.vclip-btn', win).addEventListener('click', () => toggleVclip(pid, w));
 
-  // --- hangulatjel-választó ---
   const pop = $('.emo-pop', win);
   EMO.forEach((codes, idx) => {
     const cell = el('span', 'emo-cell');
@@ -1616,78 +2305,67 @@ function openChat(pid) {
   });
   win.addEventListener('click', e => {
     if (!e.target.closest('.emo-pop') && !e.target.closest('.emo-btn')) pop.classList.remove('open');
+    if (!e.target.closest('.font-pop') && !e.target.closest('.font-btn')) fontPop.classList.remove('open');
+    if (!e.target.closest('.bg-pop') && !e.target.closest('.bg-btn')) bgPop.classList.remove('open');
   });
 
-  // --- menük ---
-  const closeMenus = () => {
-    win.querySelectorAll('.menu-pop').forEach(p => { p.style.display = 'none'; });
-    win.querySelectorAll('.m-item').forEach(m => m.classList.remove('open'));
-  };
-  win.querySelectorAll('.m-item').forEach(mi => {
-    mi.addEventListener('click', e => {
-      e.stopPropagation();
-      const key = mi.dataset.menu;
-      const popEl = win.querySelector('.menu-pop[data-pop="' + key + '"]');
-      const isOpen = popEl.style.display === 'block';
-      closeMenus();
-      if (!isOpen) {
-        popEl.style.display = 'block';
-        popEl.style.left = mi.offsetLeft + 'px';
-        mi.classList.add('open');
-      }
-    });
-  });
-  document.addEventListener('click', closeMenus);
-
-  // --- műveletek ---
   win.addEventListener('click', e => {
     const act = e.target.closest('[data-act]')?.dataset.act;
     if (!act) return;
-    closeMenus();
-    if (act === 'close') win.style.display = 'none';
-    else if (act === 'nudge') doNudge();
-    else if (act === 'stream') startStream(pid);
-    else if (act === 'stopstream') stopStream(pid);
-    else if (act === 'sendfile') fIn.click();
-    else if (act === 'voice') startCall(pid, 'voice');
-    else if (act === 'webcam') startCall(pid, 'webcam');
-    else if (act === 'block') { toggleBlock(pid); win.style.display = 'none'; }
-    else if (act === 'mute') {
-      muted = !muted;
-      localStorage.setItem('msn75_muted', muted ? '1' : '0');
-      document.querySelectorAll('.mp-item[data-act="mute"]').forEach(mi => {
-        mi.textContent = muted ? 'Hangok bekapcsolása' : 'Hangok kikapcsolása';
-      });
-    } else if (act === 'about') {
-      sysMsg(pid, 'MSN Messenger 7.5 — P2P kiadás. Szerver és regisztráció nélkül, ' +
-        'WebRTC-vel. Az eredeti MSN 7.5 hangjaival és hangulatjeleivel.');
-    }
+    runChatAction(pid, act);
   });
 
   return w;
 }
 
-function saveFmt() { localStorage.setItem('msn75_fmt', JSON.stringify(myFmt)); }
+function runChatAction(pid, act) {
+  const w = chatWins.get(pid);
+  if (!w) return;
+  if (act === 'close') w.win.style.display = 'none';
+  else if (act === 'nudge') w.doNudge();
+  else if (act === 'stream') startStream(pid);
+  else if (act === 'stopstream') stopStream(pid);
+  else if (act === 'sendfile') w.fileInput.click();
+  else if (act === 'voice') startCall(pid, 'voice');
+  else if (act === 'webcam') startCall(pid, 'webcam');
+  else if (act === 'block') { toggleBlock(pid); w.win.style.display = 'none'; }
+  else if (act === 'mute') {
+    muted = !muted;
+    localStorage.setItem('msn75_muted', muted ? '1' : '0');
+    buildMainMenus();
+  } else if (act === 'about') {
+    sysMsg(pid, t('aboutText'));
+  }
+}
 
 function refreshChatHead(pid) {
   const w = chatWins.get(pid);
   if (!w) return;
   const r = remote.get(pid);
   const online = conns.has(pid);
-  w.title.textContent = dispName(pid) + ' — Beszélgetés';
+  w.title.textContent = dispName(pid) + ' — ' + t('convTitle');
   $('b', w.toLine).textContent = dispName(pid);
-  $('.wst', w.toLine).textContent = online
-    ? (r && r.status !== 'online' ? '(' + (STATUS_TEXT[r.status] || '') + ')' : '')
-    : '(Offline)';
   const tag = $('.dp-them-tag', w.win);
   if (tag) tag.textContent = dispName(pid);
+  const ab = $('.away-bar', w.win);
+  if (ab) {
+    if (online && r && r.status && r.status !== 'online') {
+      $('.ab-text', ab).textContent = tf('awayBar', dispName(pid), stText(r.status));
+      ab.classList.add('on');
+    } else if (!online) {
+      $('.ab-text', ab).textContent = tf('awayBar', dispName(pid), t('stOffline'));
+      ab.classList.add('on');
+    } else {
+      ab.classList.remove('on');
+    }
+  }
 }
 
 function addMsg(pid, name, text, mine, fmt) {
   const w = openChat(pid);
   const m = el('div', 'msg' + (mine ? ' mine' : ''));
   const h = el('div', 'm-head');
-  h.innerHTML = escHtml(name) + ' írja:<span class="m-time">' + now() + '</span>';
+  h.innerHTML = tf('writes', escHtml(name)) + '<span class="m-time">' + now() + '</span>';
   m.appendChild(h);
   const b = el('div', 'm-body');
   b.innerHTML = emotify(escHtml(text)).replace(/\n/g, '<br>');
@@ -1701,7 +2379,7 @@ function addMsg(pid, name, text, mine, fmt) {
   w.msgs.appendChild(m);
   w.msgs.scrollTop = w.msgs.scrollHeight;
   w.lastMsgAt = now();
-  if (!w.typingTimer) w.status.textContent = 'Utolsó üzenet: ' + w.lastMsgAt;
+  if (!w.typingTimer) w.status.textContent = t('lastMsg') + w.lastMsgAt;
 }
 
 function sysMsg(pid, text) {
@@ -1715,32 +2393,31 @@ function sysMsg(pid, text) {
 function showTyping(pid) {
   const w = chatWins.get(pid);
   if (!w) return;
-  w.status.textContent = dispName(pid) + ' éppen üzenetet ír…';
+  w.status.textContent = tf('typing', dispName(pid));
   clearTimeout(w.typingTimer);
   w.typingTimer = setTimeout(() => {
     w.typingTimer = null;
-    w.status.textContent = w.lastMsgAt ? 'Utolsó üzenet: ' + w.lastMsgAt : '';
+    w.status.textContent = w.lastMsgAt ? t('lastMsg') + w.lastMsgAt : '';
   }, 3000);
 }
 
-// ---------- hangüzenet (voice clip) ----------
+// ---------- hangüzenet ----------
 async function toggleVclip(pid, w) {
   const btn = $('.vclip-btn', w.win);
   if (w.recorder) { w.recorder.stop(); return; }
   const c = conns.get(pid);
-  if (!c || !c.open) { sysMsg(pid, 'A partner nem érhető el.'); return; }
+  if (!c || !c.open) { sysMsg(pid, t('notAvailShort')); return; }
   let stream;
   try {
     stream = await navigator.mediaDevices.getUserMedia({ audio: true });
   } catch {
-    sysMsg(pid, 'A mikrofon nem érhető el (engedély megtagadva?).');
+    sysMsg(pid, t('micDenied'));
     return;
   }
   const chunks = [];
   const rec = new MediaRecorder(stream);
   w.recorder = rec;
   btn.classList.add('rec');
-  btn.title = 'Felvétel leállítása és küldés';
   let secs = 0;
   const t0 = btn.innerHTML;
   const timer = setInterval(() => {
@@ -1753,9 +2430,8 @@ async function toggleVclip(pid, w) {
     clearInterval(timer);
     btn.classList.remove('rec');
     btn.innerHTML = t0;
-    btn.title = 'Hangüzenet felvétele (max 15 mp)';
     w.recorder = null;
-    stream.getTracks().forEach(t => t.stop());
+    stream.getTracks().forEach(tk => tk.stop());
     const blob = new Blob(chunks, { type: rec.mimeType || 'audio/webm' });
     if (!blob.size) return;
     const buf = await blob.arrayBuffer();
@@ -1782,7 +2458,7 @@ function addVclip(pid, name, blob, mine) {
   const w = openChat(pid);
   const m = el('div', 'msg' + (mine ? ' mine' : ''));
   const h = el('div', 'm-head');
-  h.innerHTML = escHtml(name) + ' hangüzenetet küldött:<span class="m-time">' + now() + '</span>';
+  h.innerHTML = tf('vclipSent', escHtml(name)) + '<span class="m-time">' + now() + '</span>';
   m.appendChild(h);
   const line = el('div', 'vclip-line');
   const audio = document.createElement('audio');
@@ -1795,8 +2471,8 @@ function addVclip(pid, name, blob, mine) {
 }
 
 // ---------- fájlküldés ----------
-const CHUNK = 49152;         // 48 KB darabok
-const BUF_LIMIT = 4194304;   // várakozás, ha 4 MB felett a puffer
+const CHUNK = 49152;
+const BUF_LIMIT = 4194304;
 
 function fileLine(pid, name, size, mine) {
   const w = openChat(pid);
@@ -1813,10 +2489,10 @@ function fileLine(pid, name, size, mine) {
 
 function offerFile(pid, file) {
   const c = conns.get(pid);
-  if (!c || !c.open) { sysMsg(pid, 'A partner nem érhető el, a fájlt nem lehet elküldeni.'); return; }
+  if (!c || !c.open) { sysMsg(pid, t('fCantSend')); return; }
   const id = randId();
   const box = fileLine(pid, file.name, file.size, true);
-  box.querySelector('.f-size').textContent = fmtSize(file.size) + ' — várakozás a partner válaszára…';
+  box.querySelector('.f-size').textContent = fmtSize(file.size) + t('fOfferWait');
   fileTx.set(id, { dir: 'out', pid, file, lineEl: box, cancelled: false });
   c.send({ t: 'file-offer', id, name: file.name.slice(0, 120), size: file.size, mime: file.type || 'application/octet-stream' });
 }
@@ -1824,23 +2500,23 @@ function offerFile(pid, file) {
 function onFileOffer(pid, d) {
   if (typeof d.size !== 'number' || d.size < 0 || d.size > 2147483648) return;
   openChat(pid);
-  const name = String(d.name || 'fájl').slice(0, 120);
+  const name = String(d.name || 'file').slice(0, 120);
   const box = fileLine(pid, name, d.size, false);
   const btns = box.querySelector('.f-btns');
-  const ok = el('button', 'xp-btn', 'Elfogadás');
-  const no = el('button', 'xp-btn', 'Elutasítás');
+  const ok = el('button', 'xp-btn', t('accept'));
+  const no = el('button', 'xp-btn', t('decline'));
   btns.appendChild(ok); btns.appendChild(no);
   sndAlert();
   fileTx.set(d.id, { dir: 'in', pid, name, size: d.size, mime: String(d.mime || ''), parts: [], got: 0, lineEl: box });
   ok.addEventListener('click', () => {
     btns.innerHTML = '';
-    box.querySelector('.f-size').textContent = fmtSize(d.size) + ' — fogadás…';
+    box.querySelector('.f-size').textContent = fmtSize(d.size) + t('fRecv');
     const c = conns.get(pid);
     if (c && c.open) c.send({ t: 'file-accept', id: d.id });
   });
   no.addEventListener('click', () => {
     btns.innerHTML = '';
-    box.querySelector('.f-size').textContent = 'Elutasítva.';
+    box.querySelector('.f-size').textContent = t('fRejected');
     fileTx.delete(d.id);
     const c = conns.get(pid);
     if (c && c.open) c.send({ t: 'file-reject', id: d.id });
@@ -1860,7 +2536,6 @@ async function onFileAccept(pid, d) {
   let sent = 0, seq = 0;
   while (sent < total) {
     if (tx.cancelled || !c.open) return;
-    // ne töltsük túl a WebRTC puffert
     while (c.dataChannel && c.dataChannel.bufferedAmount > BUF_LIMIT) {
       await new Promise(r => setTimeout(r, 60));
       if (tx.cancelled || !c.open) return;
@@ -1870,9 +2545,9 @@ async function onFileAccept(pid, d) {
     sent = end; seq++;
     const pct = Math.round(sent / total * 100);
     prog.style.width = pct + '%';
-    sizeEl.textContent = fmtSize(total) + ' — küldés: ' + pct + '%';
+    sizeEl.textContent = fmtSize(total) + t('fSending') + pct + '%';
   }
-  sizeEl.textContent = fmtSize(total) + ' — elküldve ✓';
+  sizeEl.textContent = fmtSize(total) + t('fSent');
   fileTx.delete(d.id);
 }
 
@@ -1888,13 +2563,13 @@ function onFileChunk(pid, d) {
   const prog = tx.lineEl.querySelector('.f-prog > div');
   const pct = Math.min(100, Math.round(tx.got / tx.size * 100));
   prog.style.width = pct + '%';
-  tx.lineEl.querySelector('.f-size').textContent = fmtSize(tx.size) + ' — fogadás: ' + pct + '%';
+  tx.lineEl.querySelector('.f-size').textContent = fmtSize(tx.size) + t('fRecv') + ' ' + pct + '%';
   if (d.last) {
     const blob = new Blob(tx.parts, { type: tx.mime || 'application/octet-stream' });
     const url = URL.createObjectURL(blob);
     const sizeEl = tx.lineEl.querySelector('.f-size');
-    sizeEl.innerHTML = fmtSize(blob.size) + ' — kész ✓ &nbsp;<a href="' + url + '" download="' +
-      escHtml(tx.name) + '">Mentés</a>';
+    sizeEl.innerHTML = fmtSize(blob.size) + t('fDone') + ' &nbsp;<a href="' + url + '" download="' +
+      escHtml(tx.name) + '">' + t('fSave') + '</a>';
     if ((tx.mime || '').startsWith('image/') && blob.size < 8388608) {
       const img = document.createElement('img');
       img.className = 'thumb';
@@ -1906,22 +2581,23 @@ function onFileChunk(pid, d) {
   }
 }
 
-// ---------- hívások (hang / webkamera) ----------
+// ---------- hívások ----------
 async function startCall(pid, kind) {
   const c = conns.get(pid);
-  if (!c || !c.open) { sysMsg(pid, 'A partner nem érhető el.'); return; }
-  if (calls.has(pid)) { sysMsg(pid, 'Már van folyamatban hívás ezzel a partnerrel.'); return; }
+  if (!c || !c.open) { sysMsg(pid, t('notAvailShort')); return; }
+  if (calls.has(pid)) { sysMsg(pid, t('callBusy')); return; }
   let stream;
   try {
     stream = await navigator.mediaDevices.getUserMedia(
       kind === 'webcam' ? { video: true, audio: true } : { audio: true });
   } catch {
-    sysMsg(pid, kind === 'webcam' ? 'A kamera nem érhető el (engedély megtagadva?).' : 'A mikrofon nem érhető el (engedély megtagadva?).');
+    sysMsg(pid, kind === 'webcam' ? t('camDenied') : t('micDenied'));
     return;
   }
   const call = peer.call(pid, stream, { metadata: { kind, name: me.name } });
+  watchIce(call, pid);
   openCallWin(pid, kind, call, stream, true);
-  sysMsg(pid, kind === 'webcam' ? 'Webkamerás beszélgetést kezdeményeztél.' : 'Hanghívást indítottál.');
+  sysMsg(pid, kind === 'webcam' ? t('callCamStarted') : t('callVoiceStarted'));
 }
 
 function handleIncomingCall(call) {
@@ -1933,14 +2609,14 @@ function handleIncomingCall(call) {
 
   openChat(pid);
   const w = chatWins.get(pid);
-  const label = kind === 'webcam' ? 'webkamerás beszélgetést kezdeményez' : 'hanghívást indított';
   const ask = el('div', 'ask-box');
   const span = el('span');
-  span.innerHTML = (kind === 'webcam' ? '📹 ' : '📞 ') + escHtml(dispName(pid)) + ' ' + label + '.';
+  span.innerHTML = (kind === 'webcam' ? '📹 ' : '📞 ') +
+    (kind === 'webcam' ? tf('callIncCam', escHtml(dispName(pid))) : tf('callIncVoice', escHtml(dispName(pid))));
   ask.appendChild(span);
   const row = el('div', 'row');
-  const ok = el('button', 'xp-btn', 'Elfogadás');
-  const no = el('button', 'xp-btn', 'Elutasítás');
+  const ok = el('button', 'xp-btn', t('accept'));
+  const no = el('button', 'xp-btn', t('decline'));
   row.appendChild(ok); row.appendChild(no);
   ask.appendChild(row);
   $('.chat-toolbar', w.win).after(ask);
@@ -1957,11 +2633,12 @@ function handleIncomingCall(call) {
       stream = await navigator.mediaDevices.getUserMedia(
         kind === 'webcam' ? { video: true, audio: true } : { audio: true });
     } catch {
-      sysMsg(pid, 'A mikrofon/kamera nem érhető el — a hívást nem lehet fogadni.');
+      sysMsg(pid, t('callNoDev'));
       try { call.close(); } catch {}
       return;
     }
     call.answer(stream);
+    watchIce(call, pid);
     openCallWin(pid, kind, call, stream, false);
   });
   no.addEventListener('click', () => { finish(); try { call.close(); } catch {} });
@@ -1976,7 +2653,7 @@ function openCallWin(pid, kind, call, localStream, outgoing) {
   win.innerHTML =
     '<div class="titlebar">' +
       '<span class="t-icon">' + iconImg + '</span>' +
-      '<span class="t-text">' + escHtml(dispName(pid)) + ' — ' + (kind === 'webcam' ? 'Webkamera' : 'Hanghívás') + '</span>' +
+      '<span class="t-text">' + escHtml(dispName(pid)) + ' — ' + (kind === 'webcam' ? t('webcamCall') : t('voiceCall')) + '</span>' +
       '<span class="t-btns"><span class="tbtn close">✕</span></span>' +
     '</div>' +
     '<div class="win-body">' +
@@ -1985,36 +2662,36 @@ function openCallWin(pid, kind, call, localStream, outgoing) {
           ? '<video class="remote" autoplay playsinline></video><video class="self" autoplay playsinline muted></video>'
           : '<div class="voice-face"><div class="dp dp-64">' + dpHtml(pid) + '</div>' +
             '<div>' + escHtml(dispName(pid)) + '</div><div class="callstate">' +
-            (outgoing ? 'Hívás…' : 'Kapcsolódás…') + '</div></div>') +
+            (outgoing ? t('calling') : t('connectingCall')) + '</div></div>') +
       '</div>' +
       '<div class="call-bar">' +
         '<span class="timer">0:00</span>' +
-        '<button class="mute">Mikrofon némítása</button>' +
-        '<button class="hang">Hívás befejezése</button>' +
+        '<button class="mute">' + t('muteMic') + '</button>' +
+        '<button class="hang">' + t('hangUp') + '</button>' +
       '</div>' +
     '</div>';
   document.body.appendChild(win);
   makeDraggable(win, $('.titlebar', win));
   bringToFront(win);
 
-  const state = { kind, call, win, localStream, remoteAudio: null, secs: 0, timer: null };
+  const state = { kind, call, win, localStream, secs: 0, timer: null };
   calls.set(pid, state);
 
-  if (kind === 'webcam') {
-    $('.self', win).srcObject = localStream;
-  }
+  if (kind === 'webcam') $('.self', win).srcObject = localStream;
 
   call.on('stream', rs => {
     if (kind === 'webcam') {
-      $('.remote', win).srcObject = rs;
+      const v = $('.remote', win);
+      v.srcObject = rs;
+      v.play().catch(() => { v.muted = true; v.play().catch(() => {}); });
     } else {
       const a = document.createElement('audio');
       a.autoplay = true;
       a.srcObject = rs;
       win.appendChild(a);
-      state.remoteAudio = a;
+      a.play().catch(() => {});
       const cs = $('.callstate', win);
-      if (cs) cs.textContent = 'Beszélgetés folyamatban';
+      if (cs) cs.textContent = t('inCall');
     }
     if (!state.timer) {
       state.timer = setInterval(() => {
@@ -2031,7 +2708,7 @@ function openCallWin(pid, kind, call, localStream, outgoing) {
     const tr = localStream.getAudioTracks()[0];
     if (!tr) return;
     tr.enabled = !tr.enabled;
-    e.currentTarget.textContent = tr.enabled ? 'Mikrofon némítása' : 'Némítás feloldása';
+    e.currentTarget.textContent = tr.enabled ? t('muteMic') : t('unmuteMic');
     e.currentTarget.classList.toggle('mute-on', !tr.enabled);
   });
   $('.hang', win).addEventListener('click', () => endCall(pid));
@@ -2043,32 +2720,44 @@ function endCall(pid) {
   if (!st) return;
   calls.delete(pid);
   try { st.call.close(); } catch {}
-  try { st.localStream.getTracks().forEach(t => t.stop()); } catch {}
+  try { st.localStream.getTracks().forEach(tk => tk.stop()); } catch {}
   clearInterval(st.timer);
   st.win.remove();
-  if (chatWins.has(pid)) sysMsg(pid, 'A hívás befejeződött.');
+  if (chatWins.has(pid)) sysMsg(pid, t('callEnded'));
+}
+
+// ICE-kapcsolat figyelése: ha nem jön létre a médiaút, szólunk
+function watchIce(call, pid) {
+  setTimeout(() => {
+    const pc = call.peerConnection;
+    if (!pc) return;
+    pc.addEventListener('iceconnectionstatechange', () => {
+      if (pc.iceConnectionState === 'failed') {
+        sysMsg(pid, t('streamFailed'));
+      }
+    });
+  }, 0);
 }
 
 // ---------- képernyő-stream ----------
 async function startStream(pid) {
   const c = conns.get(pid);
-  if (!c || !c.open) { sysMsg(pid, 'A partner nem érhető el, nem lehet streamelni.'); return; }
-  if (outCalls.has(pid)) { sysMsg(pid, 'Már streamelsz ennek a partnernek.'); return; }
+  if (!c || !c.open) { sysMsg(pid, t('streamCantStart')); return; }
+  if (outCalls.has(pid)) { sysMsg(pid, t('streamAlready')); return; }
   try {
     if (!screenStream || !screenStream.active) {
-      screenStream = await navigator.mediaDevices.getDisplayMedia({
-        video: { frameRate: 30 }, audio: true,
-      });
+      screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
       screenStream.getVideoTracks()[0].addEventListener('ended', () => {
         for (const id of [...outCalls.keys()]) stopStream(id);
         screenStream = null;
       });
     }
   } catch {
-    sysMsg(pid, 'A képernyőmegosztás nem indult el (engedély megtagadva?).');
+    sysMsg(pid, t('streamDenied'));
     return;
   }
   const call = peer.call(pid, screenStream, { metadata: { kind: 'screen', name: me.name } });
+  watchIce(call, pid);
   outCalls.set(pid, call);
   const w = chatWins.get(pid);
   if (w) {
@@ -2076,7 +2765,7 @@ async function startStream(pid) {
     const b = $('.tb-big[data-act="stream"]', w.win);
     if (b) b.classList.add('active');
   }
-  sysMsg(pid, 'Streamelést indítottál — a partner látja a képernyődet.');
+  sysMsg(pid, t('streamStarted'));
   call.on('close', () => cleanupOutCall(pid));
   call.on('error', () => cleanupOutCall(pid));
 }
@@ -2089,10 +2778,10 @@ function stopStream(pid, silent) {
   if (c && c.open) c.send({ t: 'stream-stop' });
   cleanupOutCall(pid);
   if (outCalls.size === 0 && screenStream) {
-    screenStream.getTracks().forEach(t => t.stop());
+    screenStream.getTracks().forEach(tk => tk.stop());
     screenStream = null;
   }
-  if (!silent) sysMsg(pid, 'Leállítottad a streamet.');
+  if (!silent) sysMsg(pid, t('streamStopped'));
 }
 
 function cleanupOutCall(pid) {
@@ -2113,11 +2802,11 @@ function handleIncomingScreen(call) {
   const ask = el('div', 'ask-box');
   const ic = A ? '<span class="emo" style="background-position:-' + (63 * 19) + 'px 0"></span> ' : '🖥️ ';
   const span = el('span');
-  span.innerHTML = ic + escHtml(dispName(pid)) + ' streamelni szeretné neked a képernyőjét.';
+  span.innerHTML = ic + tf('streamAsk', escHtml(dispName(pid)));
   ask.appendChild(span);
   const row = el('div', 'row');
-  const ok = el('button', 'xp-btn', 'Elfogadás');
-  const no = el('button', 'xp-btn', 'Elutasítás');
+  const ok = el('button', 'xp-btn', t('accept'));
+  const no = el('button', 'xp-btn', t('decline'));
   row.appendChild(ok); row.appendChild(no);
   ask.appendChild(row);
   $('.chat-toolbar', w.win).after(ask);
@@ -2127,9 +2816,13 @@ function handleIncomingScreen(call) {
   ok.addEventListener('click', () => {
     decided = true; ask.remove();
     call.answer();
-    call.on('stream', stream => showViewer(pid, stream));
+    watchIce(call, pid);
+    let got = false;
+    call.on('stream', stream => { got = true; showViewer(pid, stream); });
     call.on('close', () => closeViewer(pid));
     call.on('error', () => closeViewer(pid));
+    // ha 20 mp alatt sem jön a videó, jelezzük (NAT/tűzfal gond)
+    setTimeout(() => { if (!got) sysMsg(pid, t('streamWaiting')); }, 20000);
   });
   no.addEventListener('click', () => { decided = true; ask.remove(); try { call.close(); } catch {} });
   setTimeout(() => { if (!decided) { ask.remove(); try { call.close(); } catch {} } }, 45000);
@@ -2138,20 +2831,22 @@ function handleIncomingScreen(call) {
 function showViewer(pid, stream) {
   closeViewer(pid);
   const win = el('div', 'win viewerwin');
-  win.style.left = (Math.max(20, window.innerWidth / 2 - 300) + (cascade % 4) * 20) + 'px';
+  win.style.left = (Math.max(20, window.innerWidth / 2 - 320) + (cascade % 4) * 20) + 'px';
   win.style.top = (50 + (cascade % 4) * 20) + 'px';
 
   const iconImg = A ? '<img src="' + A.buddies + '" alt="">' : buddySvg(16, 'online');
   win.innerHTML =
     '<div class="titlebar">' +
       '<span class="t-icon">' + iconImg + '</span>' +
-      '<span class="t-text">' + escHtml(dispName(pid)) + ' — Stream</span>' +
+      '<span class="t-text">' + escHtml(dispName(pid)) + ' — ' + t('streamWin') + '</span>' +
       '<span class="t-btns"><span class="tbtn close">✕</span></span>' +
     '</div>' +
     '<div class="win-body">' +
-      '<div class="viewer-bar"><span class="live">ÉLŐ</span>' +
-      '<span>' + escHtml(dispName(pid)) + ' képernyője</span>' +
-      '<button class="vfull">Teljes képernyő</button></div>' +
+      '<div class="viewer-bar"><span class="live">' + t('streamLive') + '</span>' +
+      '<span>' + tf('streamOf', escHtml(dispName(pid))) + '</span>' +
+      '<span class="vstate">' + t('streamConnecting') + '</span>' +
+      '<button class="vunmute">' + t('unmute') + '</button>' +
+      '<button class="vfull">' + t('fullscreen') + '</button></div>' +
     '</div>';
   const video = document.createElement('video');
   video.autoplay = true;
@@ -2163,18 +2858,36 @@ function showViewer(pid, stream) {
   makeDraggable(win, $('.titlebar', win));
   bringToFront(win);
 
+  const vstate = $('.vstate', win);
+  const unmuteBtn = $('.vunmute', win);
+  // Autoplay-védelem: ha hangosan nem indulhat el a videó, némán
+  // indítjuk, és egy gombbal felajánljuk a hang bekapcsolását.
+  video.play().then(() => { vstate.textContent = ''; }).catch(() => {
+    video.muted = true;
+    video.play().then(() => {
+      vstate.textContent = '';
+      if (stream.getAudioTracks().length) unmuteBtn.style.display = 'inline-block';
+    }).catch(() => {});
+  });
+  video.addEventListener('playing', () => { vstate.textContent = ''; });
+  unmuteBtn.addEventListener('click', () => {
+    video.muted = false;
+    video.play().catch(() => {});
+    unmuteBtn.style.display = 'none';
+  });
+
   $('.vfull', win).addEventListener('click', () => video.requestFullscreen?.());
   $('.tbtn.close', win).addEventListener('click', () => closeViewer(pid));
   stream.getVideoTracks()[0]?.addEventListener('ended', () => closeViewer(pid));
 
   viewers.set(pid, { win, stream });
-  sysMsg(pid, dispName(pid) + ' streamje elindult.');
+  sysMsg(pid, tf('streamGot', dispName(pid)));
 }
 
 function closeViewer(pid) {
   const v = viewers.get(pid);
   if (!v) return;
-  try { v.stream.getTracks().forEach(t => t.stop()); } catch {}
+  try { v.stream.getTracks().forEach(tk => tk.stop()); } catch {}
   v.win.remove();
   viewers.delete(pid);
 }
@@ -2185,7 +2898,6 @@ addEventListener('beforeunload', () => {
   try { peer?.destroy(); } catch {}
 });
 
-// mozgatható login/fő ablak
 makeDraggable($('#loginWin'), $('#loginWin .titlebar'));
 makeDraggable($('#mainWin'), $('#mainWin .titlebar'));
 </script>

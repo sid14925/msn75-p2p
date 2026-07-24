@@ -8,16 +8,24 @@ Két változat érhető el külön oldalakon:
 | **https://sid14925.github.io/msn75-p2p/teljes.html** | **Teljes (klasszikus) változat** — a copyright-átvizsgálás előtti build az eredeti MSN 7.5 hangulatjelekkel, hangokkal és grafikákkal. |
 
 Mindkettő ugyanaz a program: szerver és regisztráció nélküli, MSN Messenger
-7.5 stílusú P2P csevegő — belépés névvel + Peer ID-vel, üzenetek, fájlküldés,
-hang- és webkamerás hívás, képernyő-stream, csoportos beszélgetés. A két
-változat használói egymással is tudnak csevegni.
+7.5 stílusú P2P csevegő — belépés névvel + Peer ID-vel, üzenetek, azonnali
+képküldés (vágólapról és behúzással is), fájlküldés, hang- és webkamerás
+hívás, képernyő-stream, csoportos beszélgetés. A két változat használói
+egymással is tudnak csevegni.
+
+## Android
+
+A tisztított változat telepíthető Android-alkalmazásként is:
+**[MSN75-P2P-Lite.apk](MSN75-P2P-Lite.apk)** (Android 7.0+).
+Telepítés előtt engedélyezni kell az ismeretlen forrásból való telepítést.
 
 ## Jogi megjegyzések
 
 - Ez egy **nem hivatalos rajongói projekt**, amely semmilyen kapcsolatban
   nem áll a Microsoft Corporationnel. Az „MSN" és „MSN Messenger" a
   Microsoft védjegyei.
-- A főoldali (lite) build nem tartalmaz Microsoft-tulajdonú anyagot.
+- A főoldali (lite) build és a letölthető APK nem tartalmaz
+  Microsoft-tulajdonú anyagot.
 - A `teljes.html` a Microsoft MSN Messenger 7.5 programjából származó
   erőforrásokat (hangulatjelek, hangok, logók, képek) tartalmaz, amelyek a
   Microsoft Corporation szerzői jogvédelem alatt álló tulajdonai. Ezeket a

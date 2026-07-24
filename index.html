@@ -1044,6 +1044,84 @@ html, body {
   pointer-events: none;
 }
 .drop-overlay.on { display: flex; }
+
+/* ---------- Mobil / érintőképernyős elrendezés ---------- */
+@media (max-width: 820px) {
+  html, body { font-size: 12px; }
+
+  /* az ablakok kitöltik a képernyőt, egymás fölött rétegezve */
+  .win {
+    position: fixed !important;
+    left: 0 !important; top: 0 !important;
+    width: 100% !important; height: 100% !important;
+    max-height: none !important;
+    border-radius: 0;
+    border-width: 0;
+    resize: none;
+    transform: none !important;
+    box-shadow: none;
+  }
+  #loginWin, #mainWin { display: flex; }
+  #mainWin { z-index: 5; }
+
+  .titlebar { height: 34px; font-size: 14px; }
+  .tbtn { width: 30px; height: 28px; line-height: 26px; font-size: 14px; }
+
+  /* nagyobb érintőfelületek */
+  .menubar .m-item { padding: 7px 11px; }
+  .menu-pop { min-width: 220px; }
+  .menu-pop .mp-item { padding: 9px 18px 9px 24px; }
+  .contact { padding: 7px 10px 7px 14px; }
+  .contact .c-thumb { width: 40px; height: 40px; }
+  .contact .c-thumb img, .contact .c-thumb svg { width: 36px; height: 36px; }
+  .contact .c-x, .contact .c-blk { visibility: visible; padding: 0 7px; font-size: 13px; }
+  .grp-head { padding: 9px 8px 7px; }
+  .xp-btn { height: 34px; min-width: 96px; font-size: 12px; }
+  .fld input, .fld select { height: 34px; font-size: 13px; }
+  .copy-btn { height: 22px; font-size: 11px; padding: 0 7px; }
+
+  /* csevegőablak: a képoszlop és a webkereső elrejtve, több hely a szövegnek */
+  .dp-col { display: none; }
+  .msgs-col { border-right: none; }
+  .msgs { font-size: 13px; padding: 8px; }
+  .msg .m-body { font-size: 14px; }
+  .search-row, .banner-box, .tabstrip, .brand-band { display: none; }
+  .input-area textarea { height: 60px; font-size: 15px; }
+  .send-col .send-btn { min-width: 78px; font-size: 13px; }
+  .send-col .search-btn2 { display: none; }
+  .send-col .send-btn { border-radius: 3px; border-bottom: 1px solid #7f9db9; }
+
+  /* eszköztár görgethető, ne törjön szét */
+  .chat-toolbar { overflow-x: auto; flex-wrap: nowrap; }
+  .tb-big { min-width: 56px; padding: 5px 8px 4px; }
+  .tb-big svg { width: 26px; height: 26px; }
+  .tb-msn { display: none; }
+  .fmt-bar { overflow-x: auto; flex-wrap: nowrap; }
+  .fmt-btn { padding: 6px 7px; }
+
+  /* felugrók a képernyőhöz igazítva */
+  .emo-pop { grid-template-columns: repeat(8, 30px); bottom: 130px; left: 4px; }
+  .emo-pop .emo-cell { width: 30px; height: 30px; }
+  .wink-pop { grid-template-columns: repeat(3, 60px); left: 4px; }
+  .wink-pop .wk-cell { width: 60px; height: 52px; font-size: 27px; }
+  .bg-pop { left: 4px; }
+
+  .img-msg img { max-width: 78vw; max-height: 46vh; }
+  .desk-gear { right: 10px; bottom: 10px; width: 44px; height: 44px; font-size: 23px; }
+
+  /* mobilon a behúzás nem értelmezett */
+  .drop-overlay { display: none !important; }
+
+  .callwin .call-stage video.self { width: 88px; height: 66px; }
+  .call-bar button { padding: 7px 11px; }
+  .viewer-bar button { padding: 6px 10px; }
+}
+
+/* nagyon keskeny kijelző */
+@media (max-width: 420px) {
+  .tb-big { min-width: 50px; font-size: 9px; }
+  .emo-pop { grid-template-columns: repeat(7, 30px); }
+}
 </style>
 </head>
 <body>

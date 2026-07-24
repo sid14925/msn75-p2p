@@ -5,21 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MSN Messenger 7.5 — P2P (Escargot)</title>
 <style>
-/* ===== Escargot MSN 7.5 P2P — MSN 7.5 / Windows XP ihletésű kinézet ===== */
+/* ===== MSN Messenger 7.5 — P2P kiadás | hű MSN 7.5 / Windows XP kinézet ===== */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --emo: none;
+  --line: #a9c4e4;
+  --panel: #ebf3fb;
+  --deep: #1a3e6e;
+  --link: #3b5a82;
+}
 
 html, body {
   width: 100%; height: 100%;
   font-family: Tahoma, "Segoe UI", Verdana, sans-serif;
   font-size: 11px;
-  background: #3A6EA5 url('') no-repeat;
   background: linear-gradient(135deg, #4a8ad4 0%, #2a5da8 60%, #1e4b8f 100%);
   overflow: hidden;
   user-select: none;
 }
 
-/* ---------- Általános ablak (XP Luna stílus) ---------- */
+/* ---------- XP Luna ablak ---------- */
 .win {
   position: absolute;
   background: #ECE9D8;
@@ -44,7 +51,8 @@ html, body {
   text-shadow: 1px 1px 1px rgba(0,0,0,.5);
   flex: 0 0 auto;
 }
-.titlebar .t-icon { margin-right: 5px; display: flex; }
+.titlebar .t-icon { margin-right: 5px; display: flex; align-items: center; }
+.titlebar .t-icon img { width: 16px; height: 16px; }
 .titlebar .t-text { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .titlebar .t-btns { display: flex; gap: 3px; }
 .tbtn {
@@ -61,54 +69,19 @@ html, body {
 }
 .tbtn:hover { filter: brightness(1.15); }
 .tbtn.close { background: linear-gradient(180deg, #f2a08b, #d5431f 45%, #b32b0a); }
-.tbtn.close:hover { background: linear-gradient(180deg, #f7b7a5, #e6592f 45%, #c93a12); }
 
 .win-body {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 3px solid transparent;
-  border-top: none;
-}
-
-/* ---------- Bejelentkező ablak ---------- */
-#loginWin {
-  width: 350px;
-  left: 50%; top: 50%;
-  transform: translate(-50%, -52%);
-}
-#loginWin .win-body {
-  background: linear-gradient(180deg, #ffffff 0%, #f3f9ff 55%, #cfe5f8 100%);
-  align-items: center;
-  padding: 18px 24px 20px;
   border-radius: 0 0 3px 3px;
 }
-.msn-logo { margin: 8px 0 4px; }
-.login-title {
-  font-size: 15px;
-  font-weight: bold;
-  color: #1a4d8f;
-  margin-bottom: 2px;
-}
-.login-sub { color: #4a71a3; margin-bottom: 16px; text-align: center; }
-.fld { width: 100%; margin-bottom: 10px; }
-.fld label { display: block; color: #1a4d8f; margin-bottom: 3px; font-weight: bold; }
-.fld input, .fld select {
-  width: 100%;
-  height: 22px;
-  border: 1px solid #7f9db9;
-  border-radius: 2px;
-  padding: 0 5px;
-  font-family: inherit;
-  font-size: 11px;
-  background: #fff;
-}
-.fld .hint { color: #7a8ba0; margin-top: 2px; font-size: 10px; }
+
 .xp-btn {
-  min-width: 90px;
-  height: 24px;
-  padding: 0 14px;
+  min-width: 88px;
+  height: 23px;
+  padding: 0 12px;
   border: 1px solid #003c74;
   border-radius: 3px;
   background: linear-gradient(180deg, #ffffff 0%, #ecebe5 86%, #d8d0c4 100%);
@@ -120,112 +93,184 @@ html, body {
 .xp-btn:active { background: linear-gradient(180deg, #d8d0c4, #ecebe5); }
 .xp-btn.primary { font-weight: bold; }
 .xp-btn:disabled { color: #999; cursor: default; box-shadow: none; }
-#loginErr { color: #c00; margin: 6px 0 0; min-height: 14px; text-align: center; }
-#loginStatus { color: #4a71a3; margin-top: 6px; min-height: 14px; text-align: center; }
 
-/* ---------- Fő ablak (partnerlista) ---------- */
-#mainWin {
-  width: 280px;
-  height: 560px;
-  max-height: calc(100vh - 30px);
-  left: 24px; top: 15px;
-  display: none;
+/* ---------- Bejelentkező ablak ---------- */
+#loginWin { width: 356px; left: 50%; top: 50%; transform: translate(-50%, -52%); }
+#loginWin .win-body {
+  background: #fff;
+  align-items: center;
+  padding: 0 0 0 0;
 }
-#mainWin .win-body { background: #fff; border-radius: 0 0 3px 3px; }
-.main-head {
-  background: linear-gradient(180deg, #eaf4fd 0%, #cbe3f8 70%, #b3d4f2 100%);
-  border-bottom: 1px solid #9ec3e6;
-  padding: 8px 10px;
+.login-top {
+  width: 100%;
+  padding: 18px 0 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(180deg, #ffffff 0%, #f2f8fe 100%);
+}
+.login-top img.bfly { width: 96px; height: auto; }
+.login-top .logo-fallback { font-size: 26px; }
+.login-brand { font-size: 17px; color: #4d6e9b; margin-top: 4px; letter-spacing: .2px; }
+.login-brand b { color: #24466f; }
+.login-form { width: 100%; padding: 8px 34px 6px; }
+.fld { width: 100%; margin-bottom: 9px; }
+.fld label { display: block; color: #333; margin-bottom: 3px; }
+.fld input, .fld select {
+  width: 100%;
+  height: 22px;
+  border: 1px solid #7f9db9;
+  border-radius: 0;
+  padding: 0 5px;
+  font-family: inherit;
+  font-size: 11px;
+  background: #fff;
+}
+.fld .hint { color: #808f9f; margin-top: 2px; font-size: 10px; }
+.chk-row { display: flex; align-items: center; gap: 5px; margin: 2px 0 10px; color: #333; }
+.login-btn-row { text-align: center; margin-bottom: 8px; }
+#loginErr { color: #c00; min-height: 14px; text-align: center; padding: 0 20px; }
+#loginStatus { color: #4a71a3; min-height: 15px; text-align: center; }
+.login-foot {
+  width: 100%;
+  margin-top: 8px;
+  border-top: 1px solid #d6e2ee;
+  background: linear-gradient(180deg, #eef5fc, #d8e8f7);
+  padding: 7px 12px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  color: #5b7ba0;
+  font-size: 10px;
 }
-.avatar {
-  width: 34px; height: 34px;
-  border: 1px solid #8ab1d8;
-  border-radius: 3px;
-  background: linear-gradient(135deg, #fff, #d9ecff);
-  display: flex; align-items: center; justify-content: center;
+.login-foot img { height: 18px; }
+
+/* ---------- Fő ablak ---------- */
+#mainWin {
+  width: 285px;
+  height: 600px;
+  max-height: calc(100vh - 24px);
+  left: 22px; top: 12px;
+  display: none;
+}
+#mainWin .win-body { background: #fff; }
+
+.main-head {
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.85) 0%, rgba(255,255,255,0) 45%),
+    linear-gradient(180deg, #fdfeff 0%, #e2eefa 55%, #cfe2f5 100%);
+  border-bottom: 1px solid var(--line);
+  padding: 9px 10px 7px;
+  display: flex;
+  gap: 9px;
+  position: relative;
+}
+.main-head .bfly-corner {
+  position: absolute; right: 8px; top: 7px;
+  width: 30px; height: auto; opacity: .95;
+}
+.dp {
+  border: 1px solid #98b7d8;
+  background: #fff;
+  padding: 2px;
+  box-shadow: 1px 1px 3px rgba(70,110,160,.35);
   flex: 0 0 auto;
+  display: flex; align-items: center; justify-content: center;
 }
-.me-info { flex: 1; min-width: 0; }
-.me-name { font-weight: bold; font-size: 12px; color: #1a4d8f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.me-status select {
-  border: none; background: transparent;
-  font-family: inherit; font-size: 11px; color: #3d6a99;
-  cursor: pointer; max-width: 130px;
+.dp img, .dp svg { display: block; }
+.dp-48 { width: 52px; height: 52px; }
+.dp-48 img, .dp-48 svg { width: 46px; height: 46px; }
+.me-info { flex: 1; min-width: 0; padding-top: 2px; }
+.me-line { display: flex; align-items: center; gap: 3px; cursor: pointer; max-width: 165px; }
+.me-line:hover { text-decoration: underline; text-decoration-color: #4a71a3; }
+.me-name { font-weight: bold; font-size: 12px; color: #24466f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.me-st { color: #4a71a3; white-space: nowrap; }
+.me-line .drop { color: #4a71a3; font-size: 9px; }
+.me-status-sel { display: none; margin-top: 2px; font-family: inherit; font-size: 11px; max-width: 160px; }
+.pm-line {
+  margin-top: 3px;
+  color: #7a8ba0;
+  font-style: italic;
+  border: 1px solid transparent;
+  padding: 1px 2px;
+  max-width: 175px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  cursor: text;
 }
-.me-id {
+.pm-line:hover { border-color: #b5cbe4; background: #fff; }
+.pm-input {
+  margin-top: 3px;
+  width: 175px;
+  height: 18px;
+  font-family: inherit; font-size: 11px; font-style: italic;
+  border: 1px solid #7f9db9;
+  padding: 0 2px;
+  display: none;
+}
+.me-id-line {
+  margin-top: 3px;
   color: #6688aa; font-size: 10px;
   display: flex; align-items: center; gap: 4px;
-  white-space: nowrap; overflow: hidden;
+  white-space: nowrap;
 }
-.me-id b { overflow: hidden; text-overflow: ellipsis; }
+.me-id-line b { overflow: hidden; text-overflow: ellipsis; max-width: 108px; }
 .copy-btn {
   border: 1px solid #8ab1d8; border-radius: 2px; background: #eaf4fd;
   font-size: 9px; cursor: pointer; padding: 0 4px; height: 14px;
-  flex: 0 0 auto;
+  flex: 0 0 auto; font-family: inherit;
 }
 .copy-btn:hover { background: #d5e9fb; }
 
 .main-tools {
-  background: linear-gradient(180deg, #fdfefe, #e8f2fb);
-  border-bottom: 1px solid #c8ddf0;
-  padding: 4px 8px;
-  display: flex; gap: 6px;
+  background: linear-gradient(180deg, #f7fafd, #e2eefa);
+  border-bottom: 1px solid #cbdcee;
+  padding: 3px 8px;
+  display: flex; gap: 10px;
+  align-items: center;
 }
-.tool-link {
-  color: #1a4d8f; cursor: pointer; padding: 2px 6px; border-radius: 2px;
+.tool-ic {
+  display: flex; align-items: center; gap: 4px;
+  color: var(--link); cursor: pointer; padding: 2px 5px; border-radius: 2px;
   border: 1px solid transparent;
 }
-.tool-link:hover { background: #dcecfb; border-color: #a9cdf0; }
+.tool-ic:hover { background: #dcecfb; border-color: #a9cdf0; }
+.tool-ic svg { width: 15px; height: 15px; }
 
-#contactArea { flex: 1; overflow-y: auto; padding: 4px 0; }
+#contactArea { flex: 1; overflow-y: auto; padding: 4px 0; background: #fff; }
 .grp-head {
-  color: #1a4d8f; font-weight: bold;
+  color: var(--deep); font-weight: bold;
   padding: 5px 8px 3px;
   cursor: pointer;
 }
-.grp-head .arrow { display: inline-block; width: 12px; color: #5588bb; }
+.grp-head .arrow { display: inline-block; width: 12px; color: #5588bb; font-size: 9px; }
 .contact {
-  display: flex; align-items: center; gap: 6px;
-  padding: 3px 10px 3px 20px;
+  display: flex; align-items: center; gap: 5px;
+  padding: 2px 10px 2px 22px;
   cursor: pointer;
   border: 1px solid transparent;
 }
 .contact:hover { background: #eaf3fc; border-color: #bcd8f2; }
-.contact .c-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.contact.offline .c-name { color: #888; }
-.contact .c-x {
-  visibility: hidden;
-  color: #b04030; font-weight: bold; cursor: pointer; padding: 0 3px;
-}
+.contact .buddy { flex: 0 0 auto; width: 14px; height: 14px; }
+.contact .c-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #000; }
+.contact .c-pm { color: #93a5b8; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+.contact.offline .c-name { color: #8a8a8a; }
+.contact .c-x { visibility: hidden; color: #b04030; font-weight: bold; cursor: pointer; padding: 0 3px; }
 .contact:hover .c-x { visibility: visible; }
-.status-dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; border: 1px solid rgba(0,0,0,.35); }
-.st-online   { background: radial-gradient(circle at 35% 30%, #b8f2a0, #3faf22); }
-.st-busy     { background: radial-gradient(circle at 35% 30%, #ffb0a0, #d02818); }
-.st-away     { background: radial-gradient(circle at 35% 30%, #ffe9a0, #e8a812); }
-.st-offline  { background: radial-gradient(circle at 35% 30%, #ddd, #909090); }
 
-.add-form {
-  border-top: 1px solid #c8ddf0;
-  background: #f4f9fe;
-  padding: 8px;
-  display: none;
-}
+.add-form { border-top: 1px solid #cbdcee; background: #f4f9fe; padding: 8px; display: none; }
 .add-form.open { display: block; }
 .add-form input {
   width: 100%; height: 20px; margin-bottom: 5px;
-  border: 1px solid #7f9db9; border-radius: 2px; padding: 0 4px;
+  border: 1px solid #7f9db9; padding: 0 4px;
   font-family: inherit; font-size: 11px;
 }
 .add-form .row { display: flex; gap: 6px; justify-content: flex-end; }
 
 .main-foot {
-  border-top: 1px solid #c8ddf0;
-  background: linear-gradient(180deg, #eaf4fd, #cbe3f8);
+  border-top: 1px solid #cbdcee;
+  background: linear-gradient(180deg, #eef5fc, #d8e8f7);
   padding: 4px 8px;
-  color: #4a71a3;
+  color: #5b7ba0;
   font-size: 10px;
   display: flex; justify-content: space-between;
 }
@@ -233,36 +278,66 @@ html, body {
 #netState.bad { color: #c03020; font-weight: bold; }
 
 /* ---------- Csevegőablak ---------- */
-.chatwin { width: 420px; height: 420px; }
-.chatwin .win-body { background: #fff; border-radius: 0 0 3px 3px; }
-.chat-head {
-  background: linear-gradient(180deg, #f5faff 0%, #d9ebfa 75%, #c4def5 100%);
-  border-bottom: 1px solid #a9cdf0;
-  padding: 6px 10px;
-  display: flex; align-items: center; gap: 7px;
+.chatwin { width: 520px; height: 480px; min-width: 430px; }
+.chatwin .win-body { background: #fff; }
+
+.menubar {
+  display: flex;
+  background: #f4f8fc;
+  border-bottom: 1px solid #d9e6f2;
+  padding: 1px 4px;
+  position: relative;
 }
-.chat-head .who { flex: 1; min-width: 0; }
-.chat-head .who b { color: #1a4d8f; font-size: 12px; }
-.chat-head .who .pid { color: #7a95b3; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.menubar .m-item { padding: 3px 8px; cursor: default; color: #222; }
+.menubar .m-item:hover, .menubar .m-item.open { background: #dcecfb; color: #000; }
+.menu-pop {
+  position: absolute;
+  top: 22px;
+  background: #fff;
+  border: 1px solid #8ab1d8;
+  box-shadow: 2px 2px 6px rgba(0,0,0,.25);
+  min-width: 180px;
+  z-index: 500;
+  display: none;
+  padding: 2px;
+}
+.menu-pop .mp-item { padding: 4px 18px 4px 22px; cursor: default; white-space: nowrap; }
+.menu-pop .mp-item:hover { background: #dcecfb; }
+.menu-pop .mp-item.dis { color: #a0a0a0; }
+.menu-pop .mp-sep { border-top: 1px solid #dbe6f0; margin: 2px 4px; }
+
+.to-line {
+  background: linear-gradient(180deg, #fdfeff, #edf4fb);
+  border-bottom: 1px solid #d9e6f2;
+  color: #444;
+  padding: 4px 8px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.to-line b { color: #000; }
+.to-line .pid { color: #7a95b3; }
 
 .chat-toolbar {
-  border-bottom: 1px solid #d5e5f2;
-  background: linear-gradient(180deg, #fefefe, #edf5fc);
+  display: flex;
+  gap: 2px;
   padding: 3px 6px;
-  display: flex; gap: 4px;
+  background:
+    radial-gradient(140% 100% at 0% 0%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 50%),
+    linear-gradient(180deg, #f2f8fd 0%, #dcebf9 70%, #cfe2f5 100%);
+  border-bottom: 1px solid var(--line);
 }
-.cbtn {
-  border: 1px solid transparent;
-  border-radius: 3px;
+.tb-big {
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  border: 1px solid transparent; border-radius: 3px;
   background: transparent;
-  font-family: inherit; font-size: 11px;
-  color: #1a4d8f;
-  padding: 3px 8px;
+  font-family: inherit; font-size: 10px; color: #274d77;
+  padding: 3px 7px 2px;
   cursor: pointer;
-  display: flex; align-items: center; gap: 4px;
+  min-width: 52px;
 }
-.cbtn:hover { background: #ddeefb; border-color: #a9cdf0; }
-.cbtn:disabled { color: #999; cursor: default; background: transparent; border-color: transparent; }
+.tb-big svg { width: 22px; height: 22px; }
+.tb-big:hover:not(:disabled) { background: #e8f3fd; border-color: #a9cdf0; }
+.tb-big:disabled { color: #9aa7b5; cursor: default; filter: grayscale(1) opacity(.6); }
+.tb-big.active { background: #d5ecc9; border-color: #7fb36a; }
 
 .stream-bar {
   display: none;
@@ -282,41 +357,116 @@ html, body {
   font-family: inherit; font-size: 10px;
 }
 
+.chat-mid { flex: 1; display: flex; overflow: hidden; }
 .msgs {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 10px;
+  padding: 6px 8px;
   background: #fff;
   user-select: text;
+  border-right: 1px solid #e3edf6;
 }
-.msg { margin-bottom: 7px; word-wrap: break-word; }
-.msg .m-head { color: #7a95b3; }
-.msg .m-head b { color: #38618c; }
-.msg.mine .m-head b { color: #7a5c2e; }
-.msg .m-body { color: #000; padding: 1px 0 0 12px; font-size: 12px; }
-.msg.sys { color: #999; font-style: italic; }
-.msg .m-time { float: right; color: #b5c5d5; font-size: 10px; }
+.msg { margin-bottom: 6px; word-wrap: break-word; }
+.msg .m-head { color: #545454; }
+.msg .m-head .m-time { float: right; color: #b5c5d5; font-size: 10px; }
+.msg .m-body { color: #000; padding: 1px 0 0 14px; font-size: 12px; line-height: 1.45; }
+.msg.sys { color: #909090; }
+.msg.sys.warn { color: #7a6a30; background: #fdf9e7; border: 1px solid #eee0a8; padding: 3px 6px; }
+.emo {
+  display: inline-block;
+  width: 19px; height: 19px;
+  background-image: var(--emo);
+  background-repeat: no-repeat;
+  vertical-align: -5px;
+}
 
-.typing-line { height: 16px; color: #7a95b3; font-style: italic; padding: 0 10px; flex: 0 0 auto; }
+.dp-col {
+  width: 82px;
+  flex: 0 0 auto;
+  background: linear-gradient(180deg, #f4f9fe, #e6f0fa);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+.dp-64 { width: 68px; height: 68px; }
+.dp-64 img, .dp-64 svg { width: 62px; height: 62px; }
+.dp-tag { font-size: 9px; color: #7a95b3; margin-top: 2px; text-align: center; }
+
+.typing-line { height: 15px; color: #7a95b3; font-style: italic; padding: 0 8px; flex: 0 0 auto; font-size: 10px; }
+
+.fmt-bar {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  border-top: 1px solid var(--line);
+  background: linear-gradient(180deg, #f2f8fd, #e2eefa);
+  padding: 2px 6px;
+}
+.fmt-btn {
+  border: 1px solid transparent; border-radius: 2px;
+  background: transparent;
+  font-family: inherit; font-size: 11px;
+  padding: 2px 5px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 3px;
+  color: #274d77;
+}
+.fmt-btn:hover:not(:disabled) { background: #e8f3fd; border-color: #a9cdf0; }
+.fmt-btn:disabled { color: #9aa7b5; cursor: default; }
+.fmt-btn .emo { vertical-align: -4px; }
+.fmt-sep { width: 1px; height: 16px; background: #c3d6e8; margin: 0 3px; }
 
 .input-area {
-  border-top: 1px solid #a9cdf0;
-  background: linear-gradient(180deg, #f2f8fe, #dcecfa);
-  padding: 6px;
+  background: linear-gradient(180deg, #eef5fc, #dcebf9);
+  padding: 5px 6px 6px;
   display: flex; gap: 6px;
   flex: 0 0 auto;
 }
 .input-area textarea {
   flex: 1;
-  height: 46px;
+  height: 48px;
   resize: none;
   border: 1px solid #7f9db9;
-  border-radius: 2px;
   padding: 4px 6px;
   font-family: inherit; font-size: 12px;
 }
 .send-col { display: flex; flex-direction: column; gap: 4px; }
-.send-col .xp-btn { min-width: 70px; flex: 1; }
+.send-col .xp-btn { min-width: 72px; flex: 1; font-weight: bold; }
+
+.chat-status {
+  border-top: 1px solid #cbdcee;
+  background: linear-gradient(180deg, #eef5fc, #d8e8f7);
+  color: #5b7ba0;
+  font-size: 10px;
+  padding: 3px 8px;
+  height: 20px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* hangulatjel-választó */
+.emo-pop {
+  position: absolute;
+  bottom: 110px;
+  left: 8px;
+  background: #fff;
+  border: 1px solid #8ab1d8;
+  box-shadow: 2px 3px 8px rgba(0,0,0,.3);
+  padding: 6px;
+  display: none;
+  grid-template-columns: repeat(10, 23px);
+  gap: 1px;
+  z-index: 600;
+}
+.emo-pop.open { display: grid; }
+.emo-pop .emo-cell {
+  width: 23px; height: 23px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.emo-pop .emo-cell:hover { border-color: #f0c05a; background: #fdf3d7; }
 
 /* rezgetés */
 @keyframes nudgeShake {
@@ -329,10 +479,10 @@ html, body {
 }
 .nudging { animation: nudgeShake .55s linear 2; }
 
-/* ---------- Stream néző ablak ---------- */
-.viewerwin { width: 560px; height: 420px; }
-.viewerwin .win-body { background: #101418; border-radius: 0 0 3px 3px; }
-.viewerwin video { width: 100%; height: 100%; object-fit: contain; background: #000; }
+/* ---------- Stream néző ---------- */
+.viewerwin { width: 600px; height: 440px; }
+.viewerwin .win-body { background: #101418; }
+.viewerwin video { width: 100%; height: 100%; object-fit: contain; background: #000; flex: 1; min-height: 0; }
 .viewer-bar {
   background: linear-gradient(180deg, #2c3540, #1a2129);
   color: #cfe0ee;
@@ -353,7 +503,6 @@ html, body {
 }
 .viewer-bar button:hover { background: #3a4c5e; }
 
-/* ---------- Bejövő stream kérdés ---------- */
 .ask-box {
   background: #fffbe6;
   border-bottom: 1px solid #e0d48a;
@@ -365,7 +514,7 @@ html, body {
 
 /* görgetősáv */
 ::-webkit-scrollbar { width: 15px; }
-::-webkit-scrollbar-track { background: #f0f0ea; }
+::-webkit-scrollbar-track { background: #f0f4f8; }
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(90deg, #d6e5f5, #b6cfeb);
   border: 1px solid #9ebedd; border-radius: 7px;
@@ -382,65 +531,84 @@ html, body {
     <span class="t-btns"></span>
   </div>
   <div class="win-body">
-    <div class="msn-logo" id="logoHolder"></div>
-    <div class="login-title">MSN Messenger 7.5 — P2P kiadás</div>
-    <div class="login-sub">Nincs regisztráció, nincs szerver.<br>Csak név és Peer ID kell.</div>
-
-    <div class="fld">
-      <label for="inName">Megjelenítendő név:</label>
-      <input id="inName" maxlength="40" placeholder="pl. Vilmos">
+    <div class="login-top">
+      <span id="logoHolder"></span>
+      <div class="login-brand"><b>msn</b> Messenger 7.5 <span style="color:#8aa5c4">— P2P kiadás</span></div>
     </div>
-    <div class="fld">
-      <label for="inPeerId">Saját Peer ID:</label>
-      <input id="inPeerId" maxlength="40" placeholder="pl. vilmos-gep-1234">
-      <div class="hint">Ezt add meg a barátaidnak — ezzel tudnak kapcsolódni hozzád.
-      Betű, szám, kötőjel, aláhúzás (3–40 karakter).</div>
+    <div class="login-form">
+      <div class="fld">
+        <label for="inName">Megjelenítendő név:</label>
+        <input id="inName" maxlength="40" autocomplete="off">
+      </div>
+      <div class="fld">
+        <label for="inPeerId">Saját Peer ID:</label>
+        <input id="inPeerId" maxlength="40" autocomplete="off">
+        <div class="hint">Nincs e-mail és jelszó — a barátaid ezzel az azonosítóval találnak meg.
+        Betű, szám, kötőjel, aláhúzás (3–40 karakter).</div>
+      </div>
+      <div class="fld">
+        <label for="inStatus">Bejelentkezés a következő állapotban:</label>
+        <select id="inStatus">
+          <option value="online">Elérhető</option>
+          <option value="busy">Elfoglalt</option>
+          <option value="away">Nem vagyok a gépnél</option>
+        </select>
+      </div>
+      <div class="chk-row">
+        <input type="checkbox" id="chkRemember" checked>
+        <label for="chkRemember">Adataim megjegyzése ezen a gépen</label>
+      </div>
+      <div class="login-btn-row">
+        <button class="xp-btn primary" id="loginBtn">Bejelentkezés</button>
+      </div>
+      <div id="loginErr"></div>
+      <div id="loginStatus"></div>
     </div>
-    <div class="fld">
-      <label for="inStatus">Állapot belépés után:</label>
-      <select id="inStatus">
-        <option value="online">Elérhető</option>
-        <option value="busy">Elfoglalt</option>
-        <option value="away">Nem vagyok a gépnél</option>
-      </select>
+    <div class="login-foot">
+      <span>Szerver nélküli, közvetlen P2P kapcsolat</span>
+      <span id="passportHolder"></span>
     </div>
-
-    <button class="xp-btn primary" id="loginBtn">Bejelentkezés</button>
-    <div id="loginErr"></div>
-    <div id="loginStatus"></div>
   </div>
 </div>
 
 <!-- ============ Fő ablak (partnerlista) ============ -->
 <div class="win" id="mainWin">
   <div class="titlebar">
-    <span class="t-icon" id="mainAvatar"></span>
+    <span class="t-icon" id="mainTitleIcon"></span>
     <span class="t-text">MSN Messenger</span>
     <span class="t-btns"></span>
   </div>
   <div class="win-body">
     <div class="main-head">
-      <div class="avatar" id="myAvatarBox">🙂</div>
+      <img class="bfly-corner" id="bflyCorner" alt="" style="display:none">
+      <div class="dp dp-48" id="myDp"></div>
       <div class="me-info">
-        <div class="me-name" id="meName"></div>
-        <div class="me-status">
-          <select id="meStatus">
-            <option value="online">Elérhető</option>
-            <option value="busy">Elfoglalt</option>
-            <option value="away">Nem vagyok a gépnél</option>
-            <option value="brb">Rögtön jövök</option>
-            <option value="phone">Telefonálok</option>
-            <option value="lunch">Ebédelek</option>
-          </select>
+        <div class="me-line" id="meLine" title="Állapot módosítása">
+          <span class="me-name" id="meName"></span>
+          <span class="me-st" id="meStText">(Elérhető)</span>
+          <span class="drop">▼</span>
         </div>
-        <div class="me-id">Peer ID: <b id="meId"></b>
+        <select class="me-status-sel" id="meStatus" size="6">
+          <option value="online">Elérhető</option>
+          <option value="busy">Elfoglalt</option>
+          <option value="away">Nem vagyok a gépnél</option>
+          <option value="brb">Rögtön jövök</option>
+          <option value="phone">Telefonálok</option>
+          <option value="lunch">Ebédelek</option>
+        </select>
+        <div class="pm-line" id="pmLine">&lt;Írja be személyes üzenetét&gt;</div>
+        <input class="pm-input" id="pmInput" maxlength="80">
+        <div class="me-id-line">Peer ID: <b id="meId"></b>
           <button class="copy-btn" id="copyId">másol</button>
         </div>
       </div>
     </div>
 
     <div class="main-tools">
-      <span class="tool-link" id="addToggle">➕ Partner hozzáadása</span>
+      <span class="tool-ic" id="addToggle" title="Partner hozzáadása Peer ID alapján">
+        <svg viewBox="0 0 16 16"><circle cx="6" cy="5" r="3" fill="#3faf22"/><path d="M1 14c0-3.3 2.2-5 5-5s5 1.7 5 5z" fill="#3faf22"/><path d="M12 4v6M9 7h6" stroke="#274d77" stroke-width="1.6"/></svg>
+        Partner hozzáadása
+      </span>
     </div>
 
     <div class="add-form" id="addForm">
@@ -462,6 +630,9 @@ html, body {
 </div>
 
 <script>
+window.MSN_ASSETS = null;
+</script>
+<script>
 (()=>{function e(e,t,n,r){Object.defineProperty(e,t,{get:n,set:r,enumerable:!0,configurable:!0})}function t(e){return e&&e.__esModule?e.default:e}class n{constructor(){this.chunkedMTU=16300,this._dataCount=1,this.chunk=e=>{let t=[],n=e.byteLength,r=Math.ceil(n/this.chunkedMTU),i=0,o=0;for(;o<n;){let s=Math.min(n,o+this.chunkedMTU),a=e.slice(o,s),c={__peerData:this._dataCount,n:i,data:a,total:r};t.push(c),o=s,i++}return this._dataCount++,t}}}class r{append_buffer(e){this.flush(),this._parts.push(e)}append(e){this._pieces.push(e)}flush(){if(this._pieces.length>0){let e=new Uint8Array(this._pieces);this._parts.push(e),this._pieces=[]}}toArrayBuffer(){let e=[];for(let t of this._parts)e.push(t);return function(e){let t=0;for(let n of e)t+=n.byteLength;let n=new Uint8Array(t),r=0;for(let t of e){let e=new Uint8Array(t.buffer,t.byteOffset,t.byteLength);n.set(e,r),r+=t.byteLength}return n}(e).buffer}constructor(){this.encoder=new TextEncoder,this._pieces=[],this._parts=[]}}function i(e){return new s(e).unpack()}function o(e){let t=new a,n=t.pack(e);return n instanceof Promise?n.then(()=>t.getBuffer()):t.getBuffer()}class s{unpack(){let e;let t=this.unpack_uint8();if(t<128)return t;if((224^t)<32)return(224^t)-32;if((e=160^t)<=15)return this.unpack_raw(e);if((e=176^t)<=15)return this.unpack_string(e);if((e=144^t)<=15)return this.unpack_array(e);if((e=128^t)<=15)return this.unpack_map(e);switch(t){case 192:return null;case 193:case 212:case 213:case 214:case 215:return;case 194:return!1;case 195:return!0;case 202:return this.unpack_float();case 203:return this.unpack_double();case 204:return this.unpack_uint8();case 205:return this.unpack_uint16();case 206:return this.unpack_uint32();case 207:return this.unpack_uint64();case 208:return this.unpack_int8();case 209:return this.unpack_int16();case 210:return this.unpack_int32();case 211:return this.unpack_int64();case 216:return e=this.unpack_uint16(),this.unpack_string(e);case 217:return e=this.unpack_uint32(),this.unpack_string(e);case 218:return e=this.unpack_uint16(),this.unpack_raw(e);case 219:return e=this.unpack_uint32(),this.unpack_raw(e);case 220:return e=this.unpack_uint16(),this.unpack_array(e);case 221:return e=this.unpack_uint32(),this.unpack_array(e);case 222:return e=this.unpack_uint16(),this.unpack_map(e);case 223:return e=this.unpack_uint32(),this.unpack_map(e)}}unpack_uint8(){let e=255&this.dataView[this.index];return this.index++,e}unpack_uint16(){let e=this.read(2),t=(255&e[0])*256+(255&e[1]);return this.index+=2,t}unpack_uint32(){let e=this.read(4),t=((256*e[0]+e[1])*256+e[2])*256+e[3];return this.index+=4,t}unpack_uint64(){let e=this.read(8),t=((((((256*e[0]+e[1])*256+e[2])*256+e[3])*256+e[4])*256+e[5])*256+e[6])*256+e[7];return this.index+=8,t}unpack_int8(){let e=this.unpack_uint8();return e<128?e:e-256}unpack_int16(){let e=this.unpack_uint16();return e<32768?e:e-65536}unpack_int32(){let e=this.unpack_uint32();return e<2147483648?e:e-4294967296}unpack_int64(){let e=this.unpack_uint64();return e<0x7fffffffffffffff?e:e-18446744073709552e3}unpack_raw(e){if(this.length<this.index+e)throw Error(`BinaryPackFailure: index is out of range ${this.index} ${e} ${this.length}`);let t=this.dataBuffer.slice(this.index,this.index+e);return this.index+=e,t}unpack_string(e){let t,n;let r=this.read(e),i=0,o="";for(;i<e;)(t=r[i])<160?(n=t,i++):(192^t)<32?(n=(31&t)<<6|63&r[i+1],i+=2):(224^t)<16?(n=(15&t)<<12|(63&r[i+1])<<6|63&r[i+2],i+=3):(n=(7&t)<<18|(63&r[i+1])<<12|(63&r[i+2])<<6|63&r[i+3],i+=4),o+=String.fromCodePoint(n);return this.index+=e,o}unpack_array(e){let t=Array(e);for(let n=0;n<e;n++)t[n]=this.unpack();return t}unpack_map(e){let t={};for(let n=0;n<e;n++)t[this.unpack()]=this.unpack();return t}unpack_float(){let e=this.unpack_uint32();return(0==e>>31?1:-1)*(8388607&e|8388608)*2**((e>>23&255)-127-23)}unpack_double(){let e=this.unpack_uint32(),t=this.unpack_uint32(),n=(e>>20&2047)-1023;return(0==e>>31?1:-1)*((1048575&e|1048576)*2**(n-20)+t*2**(n-52))}read(e){let t=this.index;if(t+e<=this.length)return this.dataView.subarray(t,t+e);throw Error("BinaryPackFailure: read index out of range")}constructor(e){this.index=0,this.dataBuffer=e,this.dataView=new Uint8Array(this.dataBuffer),this.length=this.dataBuffer.byteLength}}class a{getBuffer(){return this._bufferBuilder.toArrayBuffer()}pack(e){if("string"==typeof e)this.pack_string(e);else if("number"==typeof e)Math.floor(e)===e?this.pack_integer(e):this.pack_double(e);else if("boolean"==typeof e)!0===e?this._bufferBuilder.append(195):!1===e&&this._bufferBuilder.append(194);else if(void 0===e)this._bufferBuilder.append(192);else if("object"==typeof e){if(null===e)this._bufferBuilder.append(192);else{let t=e.constructor;if(e instanceof Array){let t=this.pack_array(e);if(t instanceof Promise)return t.then(()=>this._bufferBuilder.flush())}else if(e instanceof ArrayBuffer)this.pack_bin(new Uint8Array(e));else if("BYTES_PER_ELEMENT"in e)this.pack_bin(new Uint8Array(e.buffer,e.byteOffset,e.byteLength));else if(e instanceof Date)this.pack_string(e.toString());else if(e instanceof Blob)return e.arrayBuffer().then(e=>{this.pack_bin(new Uint8Array(e)),this._bufferBuilder.flush()});else if(t==Object||t.toString().startsWith("class")){let t=this.pack_object(e);if(t instanceof Promise)return t.then(()=>this._bufferBuilder.flush())}else throw Error(`Type "${t.toString()}" not yet supported`)}}else throw Error(`Type "${typeof e}" not yet supported`);this._bufferBuilder.flush()}pack_bin(e){let t=e.length;if(t<=15)this.pack_uint8(160+t);else if(t<=65535)this._bufferBuilder.append(218),this.pack_uint16(t);else if(t<=4294967295)this._bufferBuilder.append(219),this.pack_uint32(t);else throw Error("Invalid length");this._bufferBuilder.append_buffer(e)}pack_string(e){let t=this._textEncoder.encode(e),n=t.length;if(n<=15)this.pack_uint8(176+n);else if(n<=65535)this._bufferBuilder.append(216),this.pack_uint16(n);else if(n<=4294967295)this._bufferBuilder.append(217),this.pack_uint32(n);else throw Error("Invalid length");this._bufferBuilder.append_buffer(t)}pack_array(e){let t=e.length;if(t<=15)this.pack_uint8(144+t);else if(t<=65535)this._bufferBuilder.append(220),this.pack_uint16(t);else if(t<=4294967295)this._bufferBuilder.append(221),this.pack_uint32(t);else throw Error("Invalid length");let n=r=>{if(r<t){let t=this.pack(e[r]);return t instanceof Promise?t.then(()=>n(r+1)):n(r+1)}};return n(0)}pack_integer(e){if(e>=-32&&e<=127)this._bufferBuilder.append(255&e);else if(e>=0&&e<=255)this._bufferBuilder.append(204),this.pack_uint8(e);else if(e>=-128&&e<=127)this._bufferBuilder.append(208),this.pack_int8(e);else if(e>=0&&e<=65535)this._bufferBuilder.append(205),this.pack_uint16(e);else if(e>=-32768&&e<=32767)this._bufferBuilder.append(209),this.pack_int16(e);else if(e>=0&&e<=4294967295)this._bufferBuilder.append(206),this.pack_uint32(e);else if(e>=-2147483648&&e<=2147483647)this._bufferBuilder.append(210),this.pack_int32(e);else if(e>=-0x8000000000000000&&e<=0x7fffffffffffffff)this._bufferBuilder.append(211),this.pack_int64(e);else if(e>=0&&e<=18446744073709552e3)this._bufferBuilder.append(207),this.pack_uint64(e);else throw Error("Invalid integer")}pack_double(e){let t=0;e<0&&(t=1,e=-e);let n=Math.floor(Math.log(e)/Math.LN2),r=Math.floor((e/2**n-1)*4503599627370496),i=t<<31|n+1023<<20|r/4294967296&1048575;this._bufferBuilder.append(203),this.pack_int32(i),this.pack_int32(r%4294967296)}pack_object(e){let t=Object.keys(e),n=t.length;if(n<=15)this.pack_uint8(128+n);else if(n<=65535)this._bufferBuilder.append(222),this.pack_uint16(n);else if(n<=4294967295)this._bufferBuilder.append(223),this.pack_uint32(n);else throw Error("Invalid length");let r=n=>{if(n<t.length){let i=t[n];if(e.hasOwnProperty(i)){this.pack(i);let t=this.pack(e[i]);if(t instanceof Promise)return t.then(()=>r(n+1))}return r(n+1)}};return r(0)}pack_uint8(e){this._bufferBuilder.append(e)}pack_uint16(e){this._bufferBuilder.append(e>>8),this._bufferBuilder.append(255&e)}pack_uint32(e){let t=4294967295&e;this._bufferBuilder.append((4278190080&t)>>>24),this._bufferBuilder.append((16711680&t)>>>16),this._bufferBuilder.append((65280&t)>>>8),this._bufferBuilder.append(255&t)}pack_uint64(e){let t=e/4294967296,n=e%4294967296;this._bufferBuilder.append((4278190080&t)>>>24),this._bufferBuilder.append((16711680&t)>>>16),this._bufferBuilder.append((65280&t)>>>8),this._bufferBuilder.append(255&t),this._bufferBuilder.append((4278190080&n)>>>24),this._bufferBuilder.append((16711680&n)>>>16),this._bufferBuilder.append((65280&n)>>>8),this._bufferBuilder.append(255&n)}pack_int8(e){this._bufferBuilder.append(255&e)}pack_int16(e){this._bufferBuilder.append((65280&e)>>8),this._bufferBuilder.append(255&e)}pack_int32(e){this._bufferBuilder.append(e>>>24&255),this._bufferBuilder.append((16711680&e)>>>16),this._bufferBuilder.append((65280&e)>>>8),this._bufferBuilder.append(255&e)}pack_int64(e){let t=Math.floor(e/4294967296),n=e%4294967296;this._bufferBuilder.append((4278190080&t)>>>24),this._bufferBuilder.append((16711680&t)>>>16),this._bufferBuilder.append((65280&t)>>>8),this._bufferBuilder.append(255&t),this._bufferBuilder.append((4278190080&n)>>>24),this._bufferBuilder.append((16711680&n)>>>16),this._bufferBuilder.append((65280&n)>>>8),this._bufferBuilder.append(255&n)}constructor(){this._bufferBuilder=new r,this._textEncoder=new TextEncoder}}let c=!0,l=!0;function p(e,t,n){let r=e.match(t);return r&&r.length>=n&&parseInt(r[n],10)}function d(e,t,n){if(!e.RTCPeerConnection)return;let r=e.RTCPeerConnection.prototype,i=r.addEventListener;r.addEventListener=function(e,r){if(e!==t)return i.apply(this,arguments);let o=e=>{let t=n(e);t&&(r.handleEvent?r.handleEvent(t):r(t))};return this._eventMap=this._eventMap||{},this._eventMap[t]||(this._eventMap[t]=new Map),this._eventMap[t].set(r,o),i.apply(this,[e,o])};let o=r.removeEventListener;r.removeEventListener=function(e,n){if(e!==t||!this._eventMap||!this._eventMap[t]||!this._eventMap[t].has(n))return o.apply(this,arguments);let r=this._eventMap[t].get(n);return this._eventMap[t].delete(n),0===this._eventMap[t].size&&delete this._eventMap[t],0===Object.keys(this._eventMap).length&&delete this._eventMap,o.apply(this,[e,r])},Object.defineProperty(r,"on"+t,{get(){return this["_on"+t]},set(e){this["_on"+t]&&(this.removeEventListener(t,this["_on"+t]),delete this["_on"+t]),e&&this.addEventListener(t,this["_on"+t]=e)},enumerable:!0,configurable:!0})}function h(e){return"boolean"!=typeof e?Error("Argument type: "+typeof e+". Please use a boolean."):(c=e,e?"adapter.js logging disabled":"adapter.js logging enabled")}function u(e){return"boolean"!=typeof e?Error("Argument type: "+typeof e+". Please use a boolean."):(l=!e,"adapter.js deprecation warnings "+(e?"disabled":"enabled"))}function f(){"object"!=typeof window||c||"undefined"==typeof console||"function"!=typeof console.log||console.log.apply(console,arguments)}function m(e,t){l&&console.warn(e+" is deprecated, please use "+t+" instead.")}function g(e){return"[object Object]"===Object.prototype.toString.call(e)}function y(e,t,n){let r=n?"outbound-rtp":"inbound-rtp",i=new Map;if(null===t)return i;let o=[];return e.forEach(e=>{"track"===e.type&&e.trackIdentifier===t.id&&o.push(e)}),o.forEach(t=>{e.forEach(n=>{n.type===r&&n.trackId===t.id&&function e(t,n,r){!n||r.has(n.id)||(r.set(n.id,n),Object.keys(n).forEach(i=>{i.endsWith("Id")?e(t,t.get(n[i]),r):i.endsWith("Ids")&&n[i].forEach(n=>{e(t,t.get(n),r)})}))}(e,n,i)})}),i}var _,C,b,v,k,T,S,R,P,w,E,D,x,I,M,O,j={};function L(e,t){let n=e&&e.navigator;if(!n.mediaDevices)return;let r=function(e){if("object"!=typeof e||e.mandatory||e.optional)return e;let t={};return Object.keys(e).forEach(n=>{if("require"===n||"advanced"===n||"mediaSource"===n)return;let r="object"==typeof e[n]?e[n]:{ideal:e[n]};void 0!==r.exact&&"number"==typeof r.exact&&(r.min=r.max=r.exact);let i=function(e,t){return e?e+t.charAt(0).toUpperCase()+t.slice(1):"deviceId"===t?"sourceId":t};if(void 0!==r.ideal){t.optional=t.optional||[];let e={};"number"==typeof r.ideal?(e[i("min",n)]=r.ideal,t.optional.push(e),(e={})[i("max",n)]=r.ideal):e[i("",n)]=r.ideal,t.optional.push(e)}void 0!==r.exact&&"number"!=typeof r.exact?(t.mandatory=t.mandatory||{},t.mandatory[i("",n)]=r.exact):["min","max"].forEach(e=>{void 0!==r[e]&&(t.mandatory=t.mandatory||{},t.mandatory[i(e,n)]=r[e])})}),e.advanced&&(t.optional=(t.optional||[]).concat(e.advanced)),t},i=function(e,i){if(t.version>=61)return i(e);if((e=JSON.parse(JSON.stringify(e)))&&"object"==typeof e.audio){let t=function(e,t,n){t in e&&!(n in e)&&(e[n]=e[t],delete e[t])};t((e=JSON.parse(JSON.stringify(e))).audio,"autoGainControl","googAutoGainControl"),t(e.audio,"noiseSuppression","googNoiseSuppression"),e.audio=r(e.audio)}if(e&&"object"==typeof e.video){let o=e.video.facingMode;o=o&&("object"==typeof o?o:{ideal:o});let s=t.version<66;if(o&&("user"===o.exact||"environment"===o.exact||"user"===o.ideal||"environment"===o.ideal)&&!(n.mediaDevices.getSupportedConstraints&&n.mediaDevices.getSupportedConstraints().facingMode&&!s)){let t;if(delete e.video.facingMode,"environment"===o.exact||"environment"===o.ideal?t=["back","rear"]:("user"===o.exact||"user"===o.ideal)&&(t=["front"]),t)return n.mediaDevices.enumerateDevices().then(n=>{let s=(n=n.filter(e=>"videoinput"===e.kind)).find(e=>t.some(t=>e.label.toLowerCase().includes(t)));return!s&&n.length&&t.includes("back")&&(s=n[n.length-1]),s&&(e.video.deviceId=o.exact?{exact:s.deviceId}:{ideal:s.deviceId}),e.video=r(e.video),f("chrome: "+JSON.stringify(e)),i(e)})}e.video=r(e.video)}return f("chrome: "+JSON.stringify(e)),i(e)},o=function(e){return t.version>=64?e:{name:({PermissionDeniedError:"NotAllowedError",PermissionDismissedError:"NotAllowedError",InvalidStateError:"NotAllowedError",DevicesNotFoundError:"NotFoundError",ConstraintNotSatisfiedError:"OverconstrainedError",TrackStartError:"NotReadableError",MediaDeviceFailedDueToShutdown:"NotAllowedError",MediaDeviceKillSwitchOn:"NotAllowedError",TabCaptureError:"AbortError",ScreenCaptureError:"AbortError",DeviceCaptureError:"AbortError"})[e.name]||e.name,message:e.message,constraint:e.constraint||e.constraintName,toString(){return this.name+(this.message&&": ")+this.message}}};if(n.getUserMedia=(function(e,t,r){i(e,e=>{n.webkitGetUserMedia(e,t,e=>{r&&r(o(e))})})}).bind(n),n.mediaDevices.getUserMedia){let e=n.mediaDevices.getUserMedia.bind(n.mediaDevices);n.mediaDevices.getUserMedia=function(t){return i(t,t=>e(t).then(e=>{if(t.audio&&!e.getAudioTracks().length||t.video&&!e.getVideoTracks().length)throw e.getTracks().forEach(e=>{e.stop()}),new DOMException("","NotFoundError");return e},e=>Promise.reject(o(e))))}}}function A(e){e.MediaStream=e.MediaStream||e.webkitMediaStream}function B(e){if("object"!=typeof e||!e.RTCPeerConnection||"ontrack"in e.RTCPeerConnection.prototype)d(e,"track",e=>(e.transceiver||Object.defineProperty(e,"transceiver",{value:{receiver:e.receiver}}),e));else{Object.defineProperty(e.RTCPeerConnection.prototype,"ontrack",{get(){return this._ontrack},set(e){this._ontrack&&this.removeEventListener("track",this._ontrack),this.addEventListener("track",this._ontrack=e)},enumerable:!0,configurable:!0});let t=e.RTCPeerConnection.prototype.setRemoteDescription;e.RTCPeerConnection.prototype.setRemoteDescription=function(){return this._ontrackpoly||(this._ontrackpoly=t=>{t.stream.addEventListener("addtrack",n=>{let r;r=e.RTCPeerConnection.prototype.getReceivers?this.getReceivers().find(e=>e.track&&e.track.id===n.track.id):{track:n.track};let i=new Event("track");i.track=n.track,i.receiver=r,i.transceiver={receiver:r},i.streams=[t.stream],this.dispatchEvent(i)}),t.stream.getTracks().forEach(n=>{let r;r=e.RTCPeerConnection.prototype.getReceivers?this.getReceivers().find(e=>e.track&&e.track.id===n.id):{track:n};let i=new Event("track");i.track=n,i.receiver=r,i.transceiver={receiver:r},i.streams=[t.stream],this.dispatchEvent(i)})},this.addEventListener("addstream",this._ontrackpoly)),t.apply(this,arguments)}}}function F(e){if("object"==typeof e&&e.RTCPeerConnection&&!("getSenders"in e.RTCPeerConnection.prototype)&&"createDTMFSender"in e.RTCPeerConnection.prototype){let t=function(e,t){return{track:t,get dtmf(){return void 0===this._dtmf&&("audio"===t.kind?this._dtmf=e.createDTMFSender(t):this._dtmf=null),this._dtmf},_pc:e}};if(!e.RTCPeerConnection.prototype.getSenders){e.RTCPeerConnection.prototype.getSenders=function(){return this._senders=this._senders||[],this._senders.slice()};let n=e.RTCPeerConnection.prototype.addTrack;e.RTCPeerConnection.prototype.addTrack=function(e,r){let i=n.apply(this,arguments);return i||(i=t(this,e),this._senders.push(i)),i};let r=e.RTCPeerConnection.prototype.removeTrack;e.RTCPeerConnection.prototype.removeTrack=function(e){r.apply(this,arguments);let t=this._senders.indexOf(e);-1!==t&&this._senders.splice(t,1)}}let n=e.RTCPeerConnection.prototype.addStream;e.RTCPeerConnection.prototype.addStream=function(e){this._senders=this._senders||[],n.apply(this,[e]),e.getTracks().forEach(e=>{this._senders.push(t(this,e))})};let r=e.RTCPeerConnection.prototype.removeStream;e.RTCPeerConnection.prototype.removeStream=function(e){this._senders=this._senders||[],r.apply(this,[e]),e.getTracks().forEach(e=>{let t=this._senders.find(t=>t.track===e);t&&this._senders.splice(this._senders.indexOf(t),1)})}}else if("object"==typeof e&&e.RTCPeerConnection&&"getSenders"in e.RTCPeerConnection.prototype&&"createDTMFSender"in e.RTCPeerConnection.prototype&&e.RTCRtpSender&&!("dtmf"in e.RTCRtpSender.prototype)){let t=e.RTCPeerConnection.prototype.getSenders;e.RTCPeerConnection.prototype.getSenders=function(){let e=t.apply(this,[]);return e.forEach(e=>e._pc=this),e},Object.defineProperty(e.RTCRtpSender.prototype,"dtmf",{get(){return void 0===this._dtmf&&("audio"===this.track.kind?this._dtmf=this._pc.createDTMFSender(this.track):this._dtmf=null),this._dtmf}})}}function U(e){if(!("object"==typeof e&&e.RTCPeerConnection&&e.RTCRtpSender&&e.RTCRtpReceiver))return;if(!("getStats"in e.RTCRtpSender.prototype)){let t=e.RTCPeerConnection.prototype.getSenders;t&&(e.RTCPeerConnection.prototype.getSenders=function(){let e=t.apply(this,[]);return e.forEach(e=>e._pc=this),e});let n=e.RTCPeerConnection.prototype.addTrack;n&&(e.RTCPeerConnection.prototype.addTrack=function(){let e=n.apply(this,arguments);return e._pc=this,e}),e.RTCRtpSender.prototype.getStats=function(){let e=this;return this._pc.getStats().then(t=>y(t,e.track,!0))}}if(!("getStats"in e.RTCRtpReceiver.prototype)){let t=e.RTCPeerConnection.prototype.getReceivers;t&&(e.RTCPeerConnection.prototype.getReceivers=function(){let e=t.apply(this,[]);return e.forEach(e=>e._pc=this),e}),d(e,"track",e=>(e.receiver._pc=e.srcElement,e)),e.RTCRtpReceiver.prototype.getStats=function(){let e=this;return this._pc.getStats().then(t=>y(t,e.track,!1))}}if(!("getStats"in e.RTCRtpSender.prototype&&"getStats"in e.RTCRtpReceiver.prototype))return;let t=e.RTCPeerConnection.prototype.getStats;e.RTCPeerConnection.prototype.getStats=function(){if(arguments.length>0&&arguments[0]instanceof e.MediaStreamTrack){let e,t,n;let r=arguments[0];return(this.getSenders().forEach(t=>{t.track===r&&(e?n=!0:e=t)}),this.getReceivers().forEach(e=>(e.track===r&&(t?n=!0:t=e),e.track===r)),n||e&&t)?Promise.reject(new DOMException("There are more than one sender or receiver for the track.","InvalidAccessError")):e?e.getStats():t?t.getStats():Promise.reject(new DOMException("There is no sender or receiver for the track.","InvalidAccessError"))}return t.apply(this,arguments)}}function z(e){e.RTCPeerConnection.prototype.getLocalStreams=function(){return this._shimmedLocalStreams=this._shimmedLocalStreams||{},Object.keys(this._shimmedLocalStreams).map(e=>this._shimmedLocalStreams[e][0])};let t=e.RTCPeerConnection.prototype.addTrack;e.RTCPeerConnection.prototype.addTrack=function(e,n){if(!n)return t.apply(this,arguments);this._shimmedLocalStreams=this._shimmedLocalStreams||{};let r=t.apply(this,arguments);return this._shimmedLocalStreams[n.id]?-1===this._shimmedLocalStreams[n.id].indexOf(r)&&this._shimmedLocalStreams[n.id].push(r):this._shimmedLocalStreams[n.id]=[n,r],r};let n=e.RTCPeerConnection.prototype.addStream;e.RTCPeerConnection.prototype.addStream=function(e){this._shimmedLocalStreams=this._shimmedLocalStreams||{},e.getTracks().forEach(e=>{if(this.getSenders().find(t=>t.track===e))throw new DOMException("Track already exists.","InvalidAccessError")});let t=this.getSenders();n.apply(this,arguments);let r=this.getSenders().filter(e=>-1===t.indexOf(e));this._shimmedLocalStreams[e.id]=[e].concat(r)};let r=e.RTCPeerConnection.prototype.removeStream;e.RTCPeerConnection.prototype.removeStream=function(e){return this._shimmedLocalStreams=this._shimmedLocalStreams||{},delete this._shimmedLocalStreams[e.id],r.apply(this,arguments)};let i=e.RTCPeerConnection.prototype.removeTrack;e.RTCPeerConnection.prototype.removeTrack=function(e){return this._shimmedLocalStreams=this._shimmedLocalStreams||{},e&&Object.keys(this._shimmedLocalStreams).forEach(t=>{let n=this._shimmedLocalStreams[t].indexOf(e);-1!==n&&this._shimmedLocalStreams[t].splice(n,1),1===this._shimmedLocalStreams[t].length&&delete this._shimmedLocalStreams[t]}),i.apply(this,arguments)}}function N(e,t){if(!e.RTCPeerConnection)return;if(e.RTCPeerConnection.prototype.addTrack&&t.version>=65)return z(e);let n=e.RTCPeerConnection.prototype.getLocalStreams;e.RTCPeerConnection.prototype.getLocalStreams=function(){let e=n.apply(this);return this._reverseStreams=this._reverseStreams||{},e.map(e=>this._reverseStreams[e.id])};let r=e.RTCPeerConnection.prototype.addStream;e.RTCPeerConnection.prototype.addStream=function(t){if(this._streams=this._streams||{},this._reverseStreams=this._reverseStreams||{},t.getTracks().forEach(e=>{if(this.getSenders().find(t=>t.track===e))throw new DOMException("Track already exists.","InvalidAccessError")}),!this._reverseStreams[t.id]){let n=new e.MediaStream(t.getTracks());this._streams[t.id]=n,this._reverseStreams[n.id]=t,t=n}r.apply(this,[t])};let i=e.RTCPeerConnection.prototype.removeStream;function o(e,t){let n=t.sdp;return Object.keys(e._reverseStreams||[]).forEach(t=>{let r=e._reverseStreams[t],i=e._streams[r.id];n=n.replace(RegExp(i.id,"g"),r.id)}),new RTCSessionDescription({type:t.type,sdp:n})}e.RTCPeerConnection.prototype.removeStream=function(e){this._streams=this._streams||{},this._reverseStreams=this._reverseStreams||{},i.apply(this,[this._streams[e.id]||e]),delete this._reverseStreams[this._streams[e.id]?this._streams[e.id].id:e.id],delete this._streams[e.id]},e.RTCPeerConnection.prototype.addTrack=function(t,n){if("closed"===this.signalingState)throw new DOMException("The RTCPeerConnection's signalingState is 'closed'.","InvalidStateError");let r=[].slice.call(arguments,1);if(1!==r.length||!r[0].getTracks().find(e=>e===t))throw new DOMException("The adapter.js addTrack polyfill only supports a single  stream which is associated with the specified track.","NotSupportedError");if(this.getSenders().find(e=>e.track===t))throw new DOMException("Track already exists.","InvalidAccessError");this._streams=this._streams||{},this._reverseStreams=this._reverseStreams||{};let i=this._streams[n.id];if(i)i.addTrack(t),Promise.resolve().then(()=>{this.dispatchEvent(new Event("negotiationneeded"))});else{let r=new e.MediaStream([t]);this._streams[n.id]=r,this._reverseStreams[r.id]=n,this.addStream(r)}return this.getSenders().find(e=>e.track===t)},["createOffer","createAnswer"].forEach(function(t){let n=e.RTCPeerConnection.prototype[t];e.RTCPeerConnection.prototype[t]=({[t](){let e=arguments,t=arguments.length&&"function"==typeof arguments[0];return t?n.apply(this,[t=>{let n=o(this,t);e[0].apply(null,[n])},t=>{e[1]&&e[1].apply(null,t)},arguments[2]]):n.apply(this,arguments).then(e=>o(this,e))}})[t]});let s=e.RTCPeerConnection.prototype.setLocalDescription;e.RTCPeerConnection.prototype.setLocalDescription=function(){var e,t;let n;return arguments.length&&arguments[0].type&&(arguments[0]=(e=this,t=arguments[0],n=t.sdp,Object.keys(e._reverseStreams||[]).forEach(t=>{let r=e._reverseStreams[t],i=e._streams[r.id];n=n.replace(RegExp(r.id,"g"),i.id)}),new RTCSessionDescription({type:t.type,sdp:n}))),s.apply(this,arguments)};let a=Object.getOwnPropertyDescriptor(e.RTCPeerConnection.prototype,"localDescription");Object.defineProperty(e.RTCPeerConnection.prototype,"localDescription",{get(){let e=a.get.apply(this);return""===e.type?e:o(this,e)}}),e.RTCPeerConnection.prototype.removeTrack=function(e){let t;if("closed"===this.signalingState)throw new DOMException("The RTCPeerConnection's signalingState is 'closed'.","InvalidStateError");if(!e._pc)throw new DOMException("Argument 1 of RTCPeerConnection.removeTrack does not implement interface RTCRtpSender.","TypeError");if(e._pc!==this)throw new DOMException("Sender was not created by this connection.","InvalidAccessError");this._streams=this._streams||{},Object.keys(this._streams).forEach(n=>{this._streams[n].getTracks().find(t=>e.track===t)&&(t=this._streams[n])}),t&&(1===t.getTracks().length?this.removeStream(this._reverseStreams[t.id]):t.removeTrack(e.track),this.dispatchEvent(new Event("negotiationneeded")))}}function $(e,t){!e.RTCPeerConnection&&e.webkitRTCPeerConnection&&(e.RTCPeerConnection=e.webkitRTCPeerConnection),e.RTCPeerConnection&&t.version<53&&["setLocalDescription","setRemoteDescription","addIceCandidate"].forEach(function(t){let n=e.RTCPeerConnection.prototype[t];e.RTCPeerConnection.prototype[t]=({[t](){return arguments[0]=new("addIceCandidate"===t?e.RTCIceCandidate:e.RTCSessionDescription)(arguments[0]),n.apply(this,arguments)}})[t]})}function J(e,t){d(e,"negotiationneeded",e=>{let n=e.target;if(!(t.version<72)&&(!n.getConfiguration||"plan-b"!==n.getConfiguration().sdpSemantics)||"stable"===n.signalingState)return e})}e(j,"shimMediaStream",()=>A),e(j,"shimOnTrack",()=>B),e(j,"shimGetSendersWithDtmf",()=>F),e(j,"shimSenderReceiverGetStats",()=>U),e(j,"shimAddTrackRemoveTrackWithNative",()=>z),e(j,"shimAddTrackRemoveTrack",()=>N),e(j,"shimPeerConnection",()=>$),e(j,"fixNegotiationNeeded",()=>J),e(j,"shimGetUserMedia",()=>L);var V={};function G(e,t){let n=e&&e.navigator,r=e&&e.MediaStreamTrack;if(n.getUserMedia=function(e,t,r){m("navigator.getUserMedia","navigator.mediaDevices.getUserMedia"),n.mediaDevices.getUserMedia(e).then(t,r)},!(t.version>55&&"autoGainControl"in n.mediaDevices.getSupportedConstraints())){let e=function(e,t,n){t in e&&!(n in e)&&(e[n]=e[t],delete e[t])},t=n.mediaDevices.getUserMedia.bind(n.mediaDevices);if(n.mediaDevices.getUserMedia=function(n){return"object"==typeof n&&"object"==typeof n.audio&&(e((n=JSON.parse(JSON.stringify(n))).audio,"autoGainControl","mozAutoGainControl"),e(n.audio,"noiseSuppression","mozNoiseSuppression")),t(n)},r&&r.prototype.getSettings){let t=r.prototype.getSettings;r.prototype.getSettings=function(){let n=t.apply(this,arguments);return e(n,"mozAutoGainControl","autoGainControl"),e(n,"mozNoiseSuppression","noiseSuppression"),n}}if(r&&r.prototype.applyConstraints){let t=r.prototype.applyConstraints;r.prototype.applyConstraints=function(n){return"audio"===this.kind&&"object"==typeof n&&(e(n=JSON.parse(JSON.stringify(n)),"autoGainControl","mozAutoGainControl"),e(n,"noiseSuppression","mozNoiseSuppression")),t.apply(this,[n])}}}}function W(e,t){e.navigator.mediaDevices&&"getDisplayMedia"in e.navigator.mediaDevices||!e.navigator.mediaDevices||(e.navigator.mediaDevices.getDisplayMedia=function(n){if(!(n&&n.video)){let e=new DOMException("getDisplayMedia without video constraints is undefined");return e.name="NotFoundError",e.code=8,Promise.reject(e)}return!0===n.video?n.video={mediaSource:t}:n.video.mediaSource=t,e.navigator.mediaDevices.getUserMedia(n)})}function H(e){"object"==typeof e&&e.RTCTrackEvent&&"receiver"in e.RTCTrackEvent.prototype&&!("transceiver"in e.RTCTrackEvent.prototype)&&Object.defineProperty(e.RTCTrackEvent.prototype,"transceiver",{get(){return{receiver:this.receiver}}})}function Y(e,t){if("object"!=typeof e||!(e.RTCPeerConnection||e.mozRTCPeerConnection))return;!e.RTCPeerConnection&&e.mozRTCPeerConnection&&(e.RTCPeerConnection=e.mozRTCPeerConnection),t.version<53&&["setLocalDescription","setRemoteDescription","addIceCandidate"].forEach(function(t){let n=e.RTCPeerConnection.prototype[t];e.RTCPeerConnection.prototype[t]=({[t](){return arguments[0]=new("addIceCandidate"===t?e.RTCIceCandidate:e.RTCSessionDescription)(arguments[0]),n.apply(this,arguments)}})[t]});let n={inboundrtp:"inbound-rtp",outboundrtp:"outbound-rtp",candidatepair:"candidate-pair",localcandidate:"local-candidate",remotecandidate:"remote-candidate"},r=e.RTCPeerConnection.prototype.getStats;e.RTCPeerConnection.prototype.getStats=function(){let[e,i,o]=arguments;return r.apply(this,[e||null]).then(e=>{if(t.version<53&&!i)try{e.forEach(e=>{e.type=n[e.type]||e.type})}catch(t){if("TypeError"!==t.name)throw t;e.forEach((t,r)=>{e.set(r,Object.assign({},t,{type:n[t.type]||t.type}))})}return e}).then(i,o)}}function K(e){if(!("object"==typeof e&&e.RTCPeerConnection&&e.RTCRtpSender)||e.RTCRtpSender&&"getStats"in e.RTCRtpSender.prototype)return;let t=e.RTCPeerConnection.prototype.getSenders;t&&(e.RTCPeerConnection.prototype.getSenders=function(){let e=t.apply(this,[]);return e.forEach(e=>e._pc=this),e});let n=e.RTCPeerConnection.prototype.addTrack;n&&(e.RTCPeerConnection.prototype.addTrack=function(){let e=n.apply(this,arguments);return e._pc=this,e}),e.RTCRtpSender.prototype.getStats=function(){return this.track?this._pc.getStats(this.track):Promise.resolve(new Map)}}function X(e){if(!("object"==typeof e&&e.RTCPeerConnection&&e.RTCRtpSender)||e.RTCRtpSender&&"getStats"in e.RTCRtpReceiver.prototype)return;let t=e.RTCPeerConnection.prototype.getReceivers;t&&(e.RTCPeerConnection.prototype.getReceivers=function(){let e=t.apply(this,[]);return e.forEach(e=>e._pc=this),e}),d(e,"track",e=>(e.receiver._pc=e.srcElement,e)),e.RTCRtpReceiver.prototype.getStats=function(){return this._pc.getStats(this.track)}}function q(e){!e.RTCPeerConnection||"removeStream"in e.RTCPeerConnection.prototype||(e.RTCPeerConnection.prototype.removeStream=function(e){m("removeStream","removeTrack"),this.getSenders().forEach(t=>{t.track&&e.getTracks().includes(t.track)&&this.removeTrack(t)})})}function Q(e){e.DataChannel&&!e.RTCDataChannel&&(e.RTCDataChannel=e.DataChannel)}function Z(e){if(!("object"==typeof e&&e.RTCPeerConnection))return;let t=e.RTCPeerConnection.prototype.addTransceiver;t&&(e.RTCPeerConnection.prototype.addTransceiver=function(){this.setParametersPromises=[];let e=arguments[1]&&arguments[1].sendEncodings;void 0===e&&(e=[]);let n=(e=[...e]).length>0;n&&e.forEach(e=>{if("rid"in e&&!/^[a-z0-9]{0,16}$/i.test(e.rid))throw TypeError("Invalid RID value provided.");if("scaleResolutionDownBy"in e&&!(parseFloat(e.scaleResolutionDownBy)>=1))throw RangeError("scale_resolution_down_by must be >= 1.0");if("maxFramerate"in e&&!(parseFloat(e.maxFramerate)>=0))throw RangeError("max_framerate must be >= 0.0")});let r=t.apply(this,arguments);if(n){let{sender:t}=r,n=t.getParameters();"encodings"in n&&(1!==n.encodings.length||0!==Object.keys(n.encodings[0]).length)||(n.encodings=e,t.sendEncodings=e,this.setParametersPromises.push(t.setParameters(n).then(()=>{delete t.sendEncodings}).catch(()=>{delete t.sendEncodings})))}return r})}function ee(e){if(!("object"==typeof e&&e.RTCRtpSender))return;let t=e.RTCRtpSender.prototype.getParameters;t&&(e.RTCRtpSender.prototype.getParameters=function(){let e=t.apply(this,arguments);return"encodings"in e||(e.encodings=[].concat(this.sendEncodings||[{}])),e})}function et(e){if(!("object"==typeof e&&e.RTCPeerConnection))return;let t=e.RTCPeerConnection.prototype.createOffer;e.RTCPeerConnection.prototype.createOffer=function(){return this.setParametersPromises&&this.setParametersPromises.length?Promise.all(this.setParametersPromises).then(()=>t.apply(this,arguments)).finally(()=>{this.setParametersPromises=[]}):t.apply(this,arguments)}}function en(e){if(!("object"==typeof e&&e.RTCPeerConnection))return;let t=e.RTCPeerConnection.prototype.createAnswer;e.RTCPeerConnection.prototype.createAnswer=function(){return this.setParametersPromises&&this.setParametersPromises.length?Promise.all(this.setParametersPromises).then(()=>t.apply(this,arguments)).finally(()=>{this.setParametersPromises=[]}):t.apply(this,arguments)}}e(V,"shimOnTrack",()=>H),e(V,"shimPeerConnection",()=>Y),e(V,"shimSenderGetStats",()=>K),e(V,"shimReceiverGetStats",()=>X),e(V,"shimRemoveStream",()=>q),e(V,"shimRTCDataChannel",()=>Q),e(V,"shimAddTransceiver",()=>Z),e(V,"shimGetParameters",()=>ee),e(V,"shimCreateOffer",()=>et),e(V,"shimCreateAnswer",()=>en),e(V,"shimGetUserMedia",()=>G),e(V,"shimGetDisplayMedia",()=>W);var er={};function ei(e){if("object"==typeof e&&e.RTCPeerConnection){if("getLocalStreams"in e.RTCPeerConnection.prototype||(e.RTCPeerConnection.prototype.getLocalStreams=function(){return this._localStreams||(this._localStreams=[]),this._localStreams}),!("addStream"in e.RTCPeerConnection.prototype)){let t=e.RTCPeerConnection.prototype.addTrack;e.RTCPeerConnection.prototype.addStream=function(e){this._localStreams||(this._localStreams=[]),this._localStreams.includes(e)||this._localStreams.push(e),e.getAudioTracks().forEach(n=>t.call(this,n,e)),e.getVideoTracks().forEach(n=>t.call(this,n,e))},e.RTCPeerConnection.prototype.addTrack=function(e,...n){return n&&n.forEach(e=>{this._localStreams?this._localStreams.includes(e)||this._localStreams.push(e):this._localStreams=[e]}),t.apply(this,arguments)}}"removeStream"in e.RTCPeerConnection.prototype||(e.RTCPeerConnection.prototype.removeStream=function(e){this._localStreams||(this._localStreams=[]);let t=this._localStreams.indexOf(e);if(-1===t)return;this._localStreams.splice(t,1);let n=e.getTracks();this.getSenders().forEach(e=>{n.includes(e.track)&&this.removeTrack(e)})})}}function eo(e){if("object"==typeof e&&e.RTCPeerConnection&&("getRemoteStreams"in e.RTCPeerConnection.prototype||(e.RTCPeerConnection.prototype.getRemoteStreams=function(){return this._remoteStreams?this._remoteStreams:[]}),!("onaddstream"in e.RTCPeerConnection.prototype))){Object.defineProperty(e.RTCPeerConnection.prototype,"onaddstream",{get(){return this._onaddstream},set(e){this._onaddstream&&(this.removeEventListener("addstream",this._onaddstream),this.removeEventListener("track",this._onaddstreampoly)),this.addEventListener("addstream",this._onaddstream=e),this.addEventListener("track",this._onaddstreampoly=e=>{e.streams.forEach(e=>{if(this._remoteStreams||(this._remoteStreams=[]),this._remoteStreams.includes(e))return;this._remoteStreams.push(e);let t=new Event("addstream");t.stream=e,this.dispatchEvent(t)})})}});let t=e.RTCPeerConnection.prototype.setRemoteDescription;e.RTCPeerConnection.prototype.setRemoteDescription=function(){let e=this;return this._onaddstreampoly||this.addEventListener("track",this._onaddstreampoly=function(t){t.streams.forEach(t=>{if(e._remoteStreams||(e._remoteStreams=[]),e._remoteStreams.indexOf(t)>=0)return;e._remoteStreams.push(t);let n=new Event("addstream");n.stream=t,e.dispatchEvent(n)})}),t.apply(e,arguments)}}}function es(e){if("object"!=typeof e||!e.RTCPeerConnection)return;let t=e.RTCPeerConnection.prototype,n=t.createOffer,r=t.createAnswer,i=t.setLocalDescription,o=t.setRemoteDescription,s=t.addIceCandidate;t.createOffer=function(e,t){let r=arguments.length>=2?arguments[2]:arguments[0],i=n.apply(this,[r]);return t?(i.then(e,t),Promise.resolve()):i},t.createAnswer=function(e,t){let n=arguments.length>=2?arguments[2]:arguments[0],i=r.apply(this,[n]);return t?(i.then(e,t),Promise.resolve()):i};let a=function(e,t,n){let r=i.apply(this,[e]);return n?(r.then(t,n),Promise.resolve()):r};t.setLocalDescription=a,a=function(e,t,n){let r=o.apply(this,[e]);return n?(r.then(t,n),Promise.resolve()):r},t.setRemoteDescription=a,a=function(e,t,n){let r=s.apply(this,[e]);return n?(r.then(t,n),Promise.resolve()):r},t.addIceCandidate=a}function ea(e){let t=e&&e.navigator;if(t.mediaDevices&&t.mediaDevices.getUserMedia){let e=t.mediaDevices,n=e.getUserMedia.bind(e);t.mediaDevices.getUserMedia=e=>n(ec(e))}!t.getUserMedia&&t.mediaDevices&&t.mediaDevices.getUserMedia&&(t.getUserMedia=(function(e,n,r){t.mediaDevices.getUserMedia(e).then(n,r)}).bind(t))}function ec(e){return e&&void 0!==e.video?Object.assign({},e,{video:function e(t){return g(t)?Object.keys(t).reduce(function(n,r){let i=g(t[r]),o=i?e(t[r]):t[r],s=i&&!Object.keys(o).length;return void 0===o||s?n:Object.assign(n,{[r]:o})},{}):t}(e.video)}):e}function el(e){if(!e.RTCPeerConnection)return;let t=e.RTCPeerConnection;e.RTCPeerConnection=function(e,n){if(e&&e.iceServers){let t=[];for(let n=0;n<e.iceServers.length;n++){let r=e.iceServers[n];void 0===r.urls&&r.url?(m("RTCIceServer.url","RTCIceServer.urls"),(r=JSON.parse(JSON.stringify(r))).urls=r.url,delete r.url,t.push(r)):t.push(e.iceServers[n])}e.iceServers=t}return new t(e,n)},e.RTCPeerConnection.prototype=t.prototype,"generateCertificate"in t&&Object.defineProperty(e.RTCPeerConnection,"generateCertificate",{get:()=>t.generateCertificate})}function ep(e){"object"==typeof e&&e.RTCTrackEvent&&"receiver"in e.RTCTrackEvent.prototype&&!("transceiver"in e.RTCTrackEvent.prototype)&&Object.defineProperty(e.RTCTrackEvent.prototype,"transceiver",{get(){return{receiver:this.receiver}}})}function ed(e){let t=e.RTCPeerConnection.prototype.createOffer;e.RTCPeerConnection.prototype.createOffer=function(e){if(e){void 0!==e.offerToReceiveAudio&&(e.offerToReceiveAudio=!!e.offerToReceiveAudio);let t=this.getTransceivers().find(e=>"audio"===e.receiver.track.kind);!1===e.offerToReceiveAudio&&t?"sendrecv"===t.direction?t.setDirection?t.setDirection("sendonly"):t.direction="sendonly":"recvonly"===t.direction&&(t.setDirection?t.setDirection("inactive"):t.direction="inactive"):!0!==e.offerToReceiveAudio||t||this.addTransceiver("audio",{direction:"recvonly"}),void 0!==e.offerToReceiveVideo&&(e.offerToReceiveVideo=!!e.offerToReceiveVideo);let n=this.getTransceivers().find(e=>"video"===e.receiver.track.kind);!1===e.offerToReceiveVideo&&n?"sendrecv"===n.direction?n.setDirection?n.setDirection("sendonly"):n.direction="sendonly":"recvonly"===n.direction&&(n.setDirection?n.setDirection("inactive"):n.direction="inactive"):!0!==e.offerToReceiveVideo||n||this.addTransceiver("video",{direction:"recvonly"})}return t.apply(this,arguments)}}function eh(e){"object"!=typeof e||e.AudioContext||(e.AudioContext=e.webkitAudioContext)}e(er,"shimLocalStreamsAPI",()=>ei),e(er,"shimRemoteStreamsAPI",()=>eo),e(er,"shimCallbacksAPI",()=>es),e(er,"shimGetUserMedia",()=>ea),e(er,"shimConstraints",()=>ec),e(er,"shimRTCIceServerUrls",()=>el),e(er,"shimTrackEventTransceiver",()=>ep),e(er,"shimCreateOfferLegacy",()=>ed),e(er,"shimAudioContext",()=>eh);var eu={};e(eu,"shimRTCIceCandidate",()=>eg),e(eu,"shimRTCIceCandidateRelayProtocol",()=>ey),e(eu,"shimMaxMessageSize",()=>e_),e(eu,"shimSendThrowTypeError",()=>eC),e(eu,"shimConnectionState",()=>eb),e(eu,"removeExtmapAllowMixed",()=>ev),e(eu,"shimAddIceCandidateNullOrEmpty",()=>ek),e(eu,"shimParameterlessSetLocalDescription",()=>eT);var ef={};let em={};function eg(e){if(!e.RTCIceCandidate||e.RTCIceCandidate&&"foundation"in e.RTCIceCandidate.prototype)return;let n=e.RTCIceCandidate;e.RTCIceCandidate=function(e){if("object"==typeof e&&e.candidate&&0===e.candidate.indexOf("a=")&&((e=JSON.parse(JSON.stringify(e))).candidate=e.candidate.substring(2)),e.candidate&&e.candidate.length){let r=new n(e),i=t(ef).parseCandidate(e.candidate);for(let e in i)e in r||Object.defineProperty(r,e,{value:i[e]});return r.toJSON=function(){return{candidate:r.candidate,sdpMid:r.sdpMid,sdpMLineIndex:r.sdpMLineIndex,usernameFragment:r.usernameFragment}},r}return new n(e)},e.RTCIceCandidate.prototype=n.prototype,d(e,"icecandidate",t=>(t.candidate&&Object.defineProperty(t,"candidate",{value:new e.RTCIceCandidate(t.candidate),writable:"false"}),t))}function ey(e){!e.RTCIceCandidate||e.RTCIceCandidate&&"relayProtocol"in e.RTCIceCandidate.prototype||d(e,"icecandidate",e=>{if(e.candidate){let n=t(ef).parseCandidate(e.candidate.candidate);"relay"===n.type&&(e.candidate.relayProtocol=({0:"tls",1:"tcp",2:"udp"})[n.priority>>24])}return e})}function e_(e,n){if(!e.RTCPeerConnection)return;"sctp"in e.RTCPeerConnection.prototype||Object.defineProperty(e.RTCPeerConnection.prototype,"sctp",{get(){return void 0===this._sctp?null:this._sctp}});let r=function(e){if(!e||!e.sdp)return!1;let n=t(ef).splitSections(e.sdp);return n.shift(),n.some(e=>{let n=t(ef).parseMLine(e);return n&&"application"===n.kind&&-1!==n.protocol.indexOf("SCTP")})},i=function(e){let t=e.sdp.match(/mozilla...THIS_IS_SDPARTA-(\d+)/);if(null===t||t.length<2)return -1;let n=parseInt(t[1],10);return n!=n?-1:n},o=function(e){let t=65536;return"firefox"===n.browser&&(t=n.version<57?-1===e?16384:2147483637:n.version<60?57===n.version?65535:65536:2147483637),t},s=function(e,r){let i=65536;"firefox"===n.browser&&57===n.version&&(i=65535);let o=t(ef).matchPrefix(e.sdp,"a=max-message-size:");return o.length>0?i=parseInt(o[0].substring(19),10):"firefox"===n.browser&&-1!==r&&(i=2147483637),i},a=e.RTCPeerConnection.prototype.setRemoteDescription;e.RTCPeerConnection.prototype.setRemoteDescription=function(){if(this._sctp=null,"chrome"===n.browser&&n.version>=76){let{sdpSemantics:e}=this.getConfiguration();"plan-b"===e&&Object.defineProperty(this,"sctp",{get(){return void 0===this._sctp?null:this._sctp},enumerable:!0,configurable:!0})}if(r(arguments[0])){let e;let t=i(arguments[0]),n=o(t),r=s(arguments[0],t);e=0===n&&0===r?Number.POSITIVE_INFINITY:0===n||0===r?Math.max(n,r):Math.min(n,r);let a={};Object.defineProperty(a,"maxMessageSize",{get:()=>e}),this._sctp=a}return a.apply(this,arguments)}}function eC(e){if(!(e.RTCPeerConnection&&"createDataChannel"in e.RTCPeerConnection.prototype))return;function t(e,t){let n=e.send;e.send=function(){let r=arguments[0],i=r.length||r.size||r.byteLength;if("open"===e.readyState&&t.sctp&&i>t.sctp.maxMessageSize)throw TypeError("Message too large (can send a maximum of "+t.sctp.maxMessageSize+" bytes)");return n.apply(e,arguments)}}let n=e.RTCPeerConnection.prototype.createDataChannel;e.RTCPeerConnection.prototype.createDataChannel=function(){let e=n.apply(this,arguments);return t(e,this),e},d(e,"datachannel",e=>(t(e.channel,e.target),e))}function eb(e){if(!e.RTCPeerConnection||"connectionState"in e.RTCPeerConnection.prototype)return;let t=e.RTCPeerConnection.prototype;Object.defineProperty(t,"connectionState",{get(){return({completed:"connected",checking:"connecting"})[this.iceConnectionState]||this.iceConnectionState},enumerable:!0,configurable:!0}),Object.defineProperty(t,"onconnectionstatechange",{get(){return this._onconnectionstatechange||null},set(e){this._onconnectionstatechange&&(this.removeEventListener("connectionstatechange",this._onconnectionstatechange),delete this._onconnectionstatechange),e&&this.addEventListener("connectionstatechange",this._onconnectionstatechange=e)},enumerable:!0,configurable:!0}),["setLocalDescription","setRemoteDescription"].forEach(e=>{let n=t[e];t[e]=function(){return this._connectionstatechangepoly||(this._connectionstatechangepoly=e=>{let t=e.target;if(t._lastConnectionState!==t.connectionState){t._lastConnectionState=t.connectionState;let n=new Event("connectionstatechange",e);t.dispatchEvent(n)}return e},this.addEventListener("iceconnectionstatechange",this._connectionstatechangepoly)),n.apply(this,arguments)}})}function ev(e,t){if(!e.RTCPeerConnection||"chrome"===t.browser&&t.version>=71||"safari"===t.browser&&t.version>=605)return;let n=e.RTCPeerConnection.prototype.setRemoteDescription;e.RTCPeerConnection.prototype.setRemoteDescription=function(t){if(t&&t.sdp&&-1!==t.sdp.indexOf("\na=extmap-allow-mixed")){let n=t.sdp.split("\n").filter(e=>"a=extmap-allow-mixed"!==e.trim()).join("\n");e.RTCSessionDescription&&t instanceof e.RTCSessionDescription?arguments[0]=new e.RTCSessionDescription({type:t.type,sdp:n}):t.sdp=n}return n.apply(this,arguments)}}function ek(e,t){if(!(e.RTCPeerConnection&&e.RTCPeerConnection.prototype))return;let n=e.RTCPeerConnection.prototype.addIceCandidate;n&&0!==n.length&&(e.RTCPeerConnection.prototype.addIceCandidate=function(){return arguments[0]?("chrome"===t.browser&&t.version<78||"firefox"===t.browser&&t.version<68||"safari"===t.browser)&&arguments[0]&&""===arguments[0].candidate?Promise.resolve():n.apply(this,arguments):(arguments[1]&&arguments[1].apply(null),Promise.resolve())})}function eT(e,t){if(!(e.RTCPeerConnection&&e.RTCPeerConnection.prototype))return;let n=e.RTCPeerConnection.prototype.setLocalDescription;n&&0!==n.length&&(e.RTCPeerConnection.prototype.setLocalDescription=function(){let e=arguments[0]||{};if("object"!=typeof e||e.type&&e.sdp)return n.apply(this,arguments);if(!(e={type:e.type,sdp:e.sdp}).type)switch(this.signalingState){case"stable":case"have-local-offer":case"have-remote-pranswer":e.type="offer";break;default:e.type="answer"}return e.sdp||"offer"!==e.type&&"answer"!==e.type?n.apply(this,[e]):("offer"===e.type?this.createOffer:this.createAnswer).apply(this).then(e=>n.apply(this,[e]))})}em.generateIdentifier=function(){return Math.random().toString(36).substring(2,12)},em.localCName=em.generateIdentifier(),em.splitLines=function(e){return e.trim().split("\n").map(e=>e.trim())},em.splitSections=function(e){return e.split("\nm=").map((e,t)=>(t>0?"m="+e:e).trim()+"\r\n")},em.getDescription=function(e){let t=em.splitSections(e);return t&&t[0]},em.getMediaSections=function(e){let t=em.splitSections(e);return t.shift(),t},em.matchPrefix=function(e,t){return em.splitLines(e).filter(e=>0===e.indexOf(t))},em.parseCandidate=function(e){let t;let n={foundation:(t=0===e.indexOf("a=candidate:")?e.substring(12).split(" "):e.substring(10).split(" "))[0],component:{1:"rtp",2:"rtcp"}[t[1]]||t[1],protocol:t[2].toLowerCase(),priority:parseInt(t[3],10),ip:t[4],address:t[4],port:parseInt(t[5],10),type:t[7]};for(let e=8;e<t.length;e+=2)switch(t[e]){case"raddr":n.relatedAddress=t[e+1];break;case"rport":n.relatedPort=parseInt(t[e+1],10);break;case"tcptype":n.tcpType=t[e+1];break;case"ufrag":n.ufrag=t[e+1],n.usernameFragment=t[e+1];break;default:void 0===n[t[e]]&&(n[t[e]]=t[e+1])}return n},em.writeCandidate=function(e){let t=[];t.push(e.foundation);let n=e.component;"rtp"===n?t.push(1):"rtcp"===n?t.push(2):t.push(n),t.push(e.protocol.toUpperCase()),t.push(e.priority),t.push(e.address||e.ip),t.push(e.port);let r=e.type;return t.push("typ"),t.push(r),"host"!==r&&e.relatedAddress&&e.relatedPort&&(t.push("raddr"),t.push(e.relatedAddress),t.push("rport"),t.push(e.relatedPort)),e.tcpType&&"tcp"===e.protocol.toLowerCase()&&(t.push("tcptype"),t.push(e.tcpType)),(e.usernameFragment||e.ufrag)&&(t.push("ufrag"),t.push(e.usernameFragment||e.ufrag)),"candidate:"+t.join(" ")},em.parseIceOptions=function(e){return e.substring(14).split(" ")},em.parseRtpMap=function(e){let t=e.substring(9).split(" "),n={payloadType:parseInt(t.shift(),10)};return t=t[0].split("/"),n.name=t[0],n.clockRate=parseInt(t[1],10),n.channels=3===t.length?parseInt(t[2],10):1,n.numChannels=n.channels,n},em.writeRtpMap=function(e){let t=e.payloadType;void 0!==e.preferredPayloadType&&(t=e.preferredPayloadType);let n=e.channels||e.numChannels||1;return"a=rtpmap:"+t+" "+e.name+"/"+e.clockRate+(1!==n?"/"+n:"")+"\r\n"},em.parseExtmap=function(e){let t=e.substring(9).split(" ");return{id:parseInt(t[0],10),direction:t[0].indexOf("/")>0?t[0].split("/")[1]:"sendrecv",uri:t[1],attributes:t.slice(2).join(" ")}},em.writeExtmap=function(e){return"a=extmap:"+(e.id||e.preferredId)+(e.direction&&"sendrecv"!==e.direction?"/"+e.direction:"")+" "+e.uri+(e.attributes?" "+e.attributes:"")+"\r\n"},em.parseFmtp=function(e){let t;let n={},r=e.substring(e.indexOf(" ")+1).split(";");for(let e=0;e<r.length;e++)n[(t=r[e].trim().split("="))[0].trim()]=t[1];return n},em.writeFmtp=function(e){let t="",n=e.payloadType;if(void 0!==e.preferredPayloadType&&(n=e.preferredPayloadType),e.parameters&&Object.keys(e.parameters).length){let r=[];Object.keys(e.parameters).forEach(t=>{void 0!==e.parameters[t]?r.push(t+"="+e.parameters[t]):r.push(t)}),t+="a=fmtp:"+n+" "+r.join(";")+"\r\n"}return t},em.parseRtcpFb=function(e){let t=e.substring(e.indexOf(" ")+1).split(" ");return{type:t.shift(),parameter:t.join(" ")}},em.writeRtcpFb=function(e){let t="",n=e.payloadType;return void 0!==e.preferredPayloadType&&(n=e.preferredPayloadType),e.rtcpFeedback&&e.rtcpFeedback.length&&e.rtcpFeedback.forEach(e=>{t+="a=rtcp-fb:"+n+" "+e.type+(e.parameter&&e.parameter.length?" "+e.parameter:"")+"\r\n"}),t},em.parseSsrcMedia=function(e){let t=e.indexOf(" "),n={ssrc:parseInt(e.substring(7,t),10)},r=e.indexOf(":",t);return r>-1?(n.attribute=e.substring(t+1,r),n.value=e.substring(r+1)):n.attribute=e.substring(t+1),n},em.parseSsrcGroup=function(e){let t=e.substring(13).split(" ");return{semantics:t.shift(),ssrcs:t.map(e=>parseInt(e,10))}},em.getMid=function(e){let t=em.matchPrefix(e,"a=mid:")[0];if(t)return t.substring(6)},em.parseFingerprint=function(e){let t=e.substring(14).split(" ");return{algorithm:t[0].toLowerCase(),value:t[1].toUpperCase()}},em.getDtlsParameters=function(e,t){return{role:"auto",fingerprints:em.matchPrefix(e+t,"a=fingerprint:").map(em.parseFingerprint)}},em.writeDtlsParameters=function(e,t){let n="a=setup:"+t+"\r\n";return e.fingerprints.forEach(e=>{n+="a=fingerprint:"+e.algorithm+" "+e.value+"\r\n"}),n},em.parseCryptoLine=function(e){let t=e.substring(9).split(" ");return{tag:parseInt(t[0],10),cryptoSuite:t[1],keyParams:t[2],sessionParams:t.slice(3)}},em.writeCryptoLine=function(e){return"a=crypto:"+e.tag+" "+e.cryptoSuite+" "+("object"==typeof e.keyParams?em.writeCryptoKeyParams(e.keyParams):e.keyParams)+(e.sessionParams?" "+e.sessionParams.join(" "):"")+"\r\n"},em.parseCryptoKeyParams=function(e){if(0!==e.indexOf("inline:"))return null;let t=e.substring(7).split("|");return{keyMethod:"inline",keySalt:t[0],lifeTime:t[1],mkiValue:t[2]?t[2].split(":")[0]:void 0,mkiLength:t[2]?t[2].split(":")[1]:void 0}},em.writeCryptoKeyParams=function(e){return e.keyMethod+":"+e.keySalt+(e.lifeTime?"|"+e.lifeTime:"")+(e.mkiValue&&e.mkiLength?"|"+e.mkiValue+":"+e.mkiLength:"")},em.getCryptoParameters=function(e,t){return em.matchPrefix(e+t,"a=crypto:").map(em.parseCryptoLine)},em.getIceParameters=function(e,t){let n=em.matchPrefix(e+t,"a=ice-ufrag:")[0],r=em.matchPrefix(e+t,"a=ice-pwd:")[0];return n&&r?{usernameFragment:n.substring(12),password:r.substring(10)}:null},em.writeIceParameters=function(e){let t="a=ice-ufrag:"+e.usernameFragment+"\r\na=ice-pwd:"+e.password+"\r\n";return e.iceLite&&(t+="a=ice-lite\r\n"),t},em.parseRtpParameters=function(e){let t={codecs:[],headerExtensions:[],fecMechanisms:[],rtcp:[]},n=em.splitLines(e)[0].split(" ");t.profile=n[2];for(let r=3;r<n.length;r++){let i=n[r],o=em.matchPrefix(e,"a=rtpmap:"+i+" ")[0];if(o){let n=em.parseRtpMap(o),r=em.matchPrefix(e,"a=fmtp:"+i+" ");switch(n.parameters=r.length?em.parseFmtp(r[0]):{},n.rtcpFeedback=em.matchPrefix(e,"a=rtcp-fb:"+i+" ").map(em.parseRtcpFb),t.codecs.push(n),n.name.toUpperCase()){case"RED":case"ULPFEC":t.fecMechanisms.push(n.name.toUpperCase())}}}em.matchPrefix(e,"a=extmap:").forEach(e=>{t.headerExtensions.push(em.parseExtmap(e))});let r=em.matchPrefix(e,"a=rtcp-fb:* ").map(em.parseRtcpFb);return t.codecs.forEach(e=>{r.forEach(t=>{e.rtcpFeedback.find(e=>e.type===t.type&&e.parameter===t.parameter)||e.rtcpFeedback.push(t)})}),t},em.writeRtpDescription=function(e,t){let n="";n+="m="+e+" "+(t.codecs.length>0?"9":"0")+" "+(t.profile||"UDP/TLS/RTP/SAVPF")+" "+t.codecs.map(e=>void 0!==e.preferredPayloadType?e.preferredPayloadType:e.payloadType).join(" ")+"\r\nc=IN IP4 0.0.0.0\r\na=rtcp:9 IN IP4 0.0.0.0\r\n",t.codecs.forEach(e=>{n+=em.writeRtpMap(e)+em.writeFmtp(e)+em.writeRtcpFb(e)});let r=0;return t.codecs.forEach(e=>{e.maxptime>r&&(r=e.maxptime)}),r>0&&(n+="a=maxptime:"+r+"\r\n"),t.headerExtensions&&t.headerExtensions.forEach(e=>{n+=em.writeExtmap(e)}),n},em.parseRtpEncodingParameters=function(e){let t;let n=[],r=em.parseRtpParameters(e),i=-1!==r.fecMechanisms.indexOf("RED"),o=-1!==r.fecMechanisms.indexOf("ULPFEC"),s=em.matchPrefix(e,"a=ssrc:").map(e=>em.parseSsrcMedia(e)).filter(e=>"cname"===e.attribute),a=s.length>0&&s[0].ssrc,c=em.matchPrefix(e,"a=ssrc-group:FID").map(e=>e.substring(17).split(" ").map(e=>parseInt(e,10)));c.length>0&&c[0].length>1&&c[0][0]===a&&(t=c[0][1]),r.codecs.forEach(e=>{if("RTX"===e.name.toUpperCase()&&e.parameters.apt){let r={ssrc:a,codecPayloadType:parseInt(e.parameters.apt,10)};a&&t&&(r.rtx={ssrc:t}),n.push(r),i&&((r=JSON.parse(JSON.stringify(r))).fec={ssrc:a,mechanism:o?"red+ulpfec":"red"},n.push(r))}}),0===n.length&&a&&n.push({ssrc:a});let l=em.matchPrefix(e,"b=");return l.length&&(l=0===l[0].indexOf("b=TIAS:")?parseInt(l[0].substring(7),10):0===l[0].indexOf("b=AS:")?950*parseInt(l[0].substring(5),10)-16e3:void 0,n.forEach(e=>{e.maxBitrate=l})),n},em.parseRtcpParameters=function(e){let t={},n=em.matchPrefix(e,"a=ssrc:").map(e=>em.parseSsrcMedia(e)).filter(e=>"cname"===e.attribute)[0];n&&(t.cname=n.value,t.ssrc=n.ssrc);let r=em.matchPrefix(e,"a=rtcp-rsize");t.reducedSize=r.length>0,t.compound=0===r.length;let i=em.matchPrefix(e,"a=rtcp-mux");return t.mux=i.length>0,t},em.writeRtcpParameters=function(e){let t="";return e.reducedSize&&(t+="a=rtcp-rsize\r\n"),e.mux&&(t+="a=rtcp-mux\r\n"),void 0!==e.ssrc&&e.cname&&(t+="a=ssrc:"+e.ssrc+" cname:"+e.cname+"\r\n"),t},em.parseMsid=function(e){let t;let n=em.matchPrefix(e,"a=msid:");if(1===n.length)return{stream:(t=n[0].substring(7).split(" "))[0],track:t[1]};let r=em.matchPrefix(e,"a=ssrc:").map(e=>em.parseSsrcMedia(e)).filter(e=>"msid"===e.attribute);if(r.length>0)return{stream:(t=r[0].value.split(" "))[0],track:t[1]}},em.parseSctpDescription=function(e){let t;let n=em.parseMLine(e),r=em.matchPrefix(e,"a=max-message-size:");r.length>0&&(t=parseInt(r[0].substring(19),10)),isNaN(t)&&(t=65536);let i=em.matchPrefix(e,"a=sctp-port:");if(i.length>0)return{port:parseInt(i[0].substring(12),10),protocol:n.fmt,maxMessageSize:t};let o=em.matchPrefix(e,"a=sctpmap:");if(o.length>0){let e=o[0].substring(10).split(" ");return{port:parseInt(e[0],10),protocol:e[1],maxMessageSize:t}}},em.writeSctpDescription=function(e,t){let n=[];return n="DTLS/SCTP"!==e.protocol?["m="+e.kind+" 9 "+e.protocol+" "+t.protocol+"\r\n","c=IN IP4 0.0.0.0\r\n","a=sctp-port:"+t.port+"\r\n"]:["m="+e.kind+" 9 "+e.protocol+" "+t.port+"\r\n","c=IN IP4 0.0.0.0\r\n","a=sctpmap:"+t.port+" "+t.protocol+" 65535\r\n"],void 0!==t.maxMessageSize&&n.push("a=max-message-size:"+t.maxMessageSize+"\r\n"),n.join("")},em.generateSessionId=function(){return Math.random().toString().substr(2,22)},em.writeSessionBoilerplate=function(e,t,n){return"v=0\r\no="+(n||"thisisadapterortc")+" "+(e||em.generateSessionId())+" "+(void 0!==t?t:2)+" IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\n"},em.getDirection=function(e,t){let n=em.splitLines(e);for(let e=0;e<n.length;e++)switch(n[e]){case"a=sendrecv":case"a=sendonly":case"a=recvonly":case"a=inactive":return n[e].substring(2)}return t?em.getDirection(t):"sendrecv"},em.getKind=function(e){return em.splitLines(e)[0].split(" ")[0].substring(2)},em.isRejected=function(e){return"0"===e.split(" ",2)[1]},em.parseMLine=function(e){let t=em.splitLines(e)[0].substring(2).split(" ");return{kind:t[0],port:parseInt(t[1],10),protocol:t[2],fmt:t.slice(3).join(" ")}},em.parseOLine=function(e){let t=em.matchPrefix(e,"o=")[0].substring(2).split(" ");return{username:t[0],sessionId:t[1],sessionVersion:parseInt(t[2],10),netType:t[3],addressType:t[4],address:t[5]}},em.isValidSDP=function(e){if("string"!=typeof e||0===e.length)return!1;let t=em.splitLines(e);for(let e=0;e<t.length;e++)if(t[e].length<2||"="!==t[e].charAt(1))return!1;return!0},ef=em;let eS=function({window:e}={},t={shimChrome:!0,shimFirefox:!0,shimSafari:!0}){let n=function(e){let t={browser:null,version:null};if(void 0===e||!e.navigator||!e.navigator.userAgent)return t.browser="Not a browser.",t;let{navigator:n}=e;if(n.userAgentData&&n.userAgentData.brands){let e=n.userAgentData.brands.find(e=>"Chromium"===e.brand);if(e)return{browser:"chrome",version:parseInt(e.version,10)}}return n.mozGetUserMedia?(t.browser="firefox",t.version=p(n.userAgent,/Firefox\/(\d+)\./,1)):n.webkitGetUserMedia||!1===e.isSecureContext&&e.webkitRTCPeerConnection?(t.browser="chrome",t.version=p(n.userAgent,/Chrom(e|ium)\/(\d+)\./,2)):e.RTCPeerConnection&&n.userAgent.match(/AppleWebKit\/(\d+)\./)?(t.browser="safari",t.version=p(n.userAgent,/AppleWebKit\/(\d+)\./,1),t.supportsUnifiedPlan=e.RTCRtpTransceiver&&"currentDirection"in e.RTCRtpTransceiver.prototype):t.browser="Not a supported browser.",t}(e),r={browserDetails:n,commonShim:eu,extractVersion:p,disableLog:h,disableWarnings:u,sdp:ef};switch(n.browser){case"chrome":if(!j||!j.shimPeerConnection||!t.shimChrome){f("Chrome shim is not included in this adapter release.");break}if(null===n.version){f("Chrome shim can not determine version, not shimming.");break}f("adapter.js shimming chrome."),r.browserShim=j,ek(e,n),eT(e,n),j.shimGetUserMedia(e,n),j.shimMediaStream(e,n),j.shimPeerConnection(e,n),j.shimOnTrack(e,n),j.shimAddTrackRemoveTrack(e,n),j.shimGetSendersWithDtmf(e,n),j.shimSenderReceiverGetStats(e,n),j.fixNegotiationNeeded(e,n),eg(e,n),ey(e,n),eb(e,n),e_(e,n),eC(e,n),ev(e,n);break;case"firefox":if(!V||!V.shimPeerConnection||!t.shimFirefox){f("Firefox shim is not included in this adapter release.");break}f("adapter.js shimming firefox."),r.browserShim=V,ek(e,n),eT(e,n),V.shimGetUserMedia(e,n),V.shimPeerConnection(e,n),V.shimOnTrack(e,n),V.shimRemoveStream(e,n),V.shimSenderGetStats(e,n),V.shimReceiverGetStats(e,n),V.shimRTCDataChannel(e,n),V.shimAddTransceiver(e,n),V.shimGetParameters(e,n),V.shimCreateOffer(e,n),V.shimCreateAnswer(e,n),eg(e,n),eb(e,n),e_(e,n),eC(e,n);break;case"safari":if(!er||!t.shimSafari){f("Safari shim is not included in this adapter release.");break}f("adapter.js shimming safari."),r.browserShim=er,ek(e,n),eT(e,n),er.shimRTCIceServerUrls(e,n),er.shimCreateOfferLegacy(e,n),er.shimCallbacksAPI(e,n),er.shimLocalStreamsAPI(e,n),er.shimRemoteStreamsAPI(e,n),er.shimTrackEventTransceiver(e,n),er.shimGetUserMedia(e,n),er.shimAudioContext(e,n),eg(e,n),ey(e,n),e_(e,n),eC(e,n),ev(e,n);break;default:f("Unsupported browser!")}return r}({window:"undefined"==typeof window?void 0:window}),eR=eS.default||eS,eP=new class{isWebRTCSupported(){return"undefined"!=typeof RTCPeerConnection}isBrowserSupported(){let e=this.getBrowser(),t=this.getVersion();return!!this.supportedBrowsers.includes(e)&&("chrome"===e?t>=this.minChromeVersion:"firefox"===e?t>=this.minFirefoxVersion:"safari"===e&&!this.isIOS&&t>=this.minSafariVersion)}getBrowser(){return eR.browserDetails.browser}getVersion(){return eR.browserDetails.version||0}isUnifiedPlanSupported(){let e;let t=this.getBrowser(),n=eR.browserDetails.version||0;if("chrome"===t&&n<this.minChromeVersion)return!1;if("firefox"===t&&n>=this.minFirefoxVersion)return!0;if(!window.RTCRtpTransceiver||!("currentDirection"in RTCRtpTransceiver.prototype))return!1;let r=!1;try{(e=new RTCPeerConnection).addTransceiver("audio"),r=!0}catch(e){}finally{e&&e.close()}return r}toString(){return`Supports:
     browser:${this.getBrowser()}
     version:${this.getVersion()}
@@ -473,53 +644,94 @@ html, body {
 
 </script>
 <script>
-/* ===== Escargot MSN 7.5 P2P — szerver nélküli kliens =====
+/* ===== MSN Messenger 7.5 — P2P kiadás =====
  *
- * Belépés: név + saját Peer ID (nincs regisztráció, nincs fiók).
- * A partnerek egymás Peer ID-jával kapcsolódnak. Minden üzenet és
- * a képernyőstream is közvetlenül, WebRTC-n megy a két gép között.
- * (A Peer ID-k összepárosításához a PeerJS ingyenes, nyilvános
- * közvetítőjét használjuk — saját szervert nem igényel.)
+ * Belépés: név + saját Peer ID (nincs regisztráció, e-mail, jelszó).
+ * A partnerek egymás Peer ID-jával kapcsolódnak; minden üzenet és a
+ * képernyőstream közvetlenül, WebRTC-n megy a két gép között.
+ * Az MSN_ASSETS (assets-full.js) az eredeti MSN 7.5 telepítőből kinyert
+ * hangokat, hangulatjeleket és képeket tartalmazza; nélküle (assets-lite.js)
+ * az app beépített pótlásokkal fut.
  */
 
 'use strict';
 
 // ---------- állapot ----------
 let peer = null;
-const me = { name: '', id: '', status: 'online' };
+const me = { name: '', id: '', status: 'online', pm: '' };
 const conns = new Map();      // peerId -> DataConnection
-const remote = new Map();     // peerId -> { name, status }
-const chatWins = new Map();   // peerId -> ablak elemek
+const remote = new Map();     // peerId -> { name, status, pm }
+const chatWins = new Map();   // peerId -> ablak
 const outCalls = new Map();   // peerId -> kimenő MediaConnection
 const viewers = new Map();    // peerId -> néző ablak
 let screenStream = null;
 let zTop = 10;
+let muted = localStorage.getItem('msn75_muted') === '1';
+
+const A = window.MSN_ASSETS || null;
 
 const STATUS_TEXT = {
-  online:  'Elérhető',
-  busy:    'Elfoglalt',
-  away:    'Nem vagyok a gépnél',
-  brb:     'Rögtön jövök',
-  phone:   'Telefonálok',
-  lunch:   'Ebédelek',
+  online: 'Elérhető', busy: 'Elfoglalt', away: 'Nem vagyok a gépnél',
+  brb: 'Rögtön jövök', phone: 'Telefonálok', lunch: 'Ebédelek',
 };
-const STATUS_DOT = { online: 'st-online', busy: 'st-busy', phone: 'st-busy',
-                     away: 'st-away', brb: 'st-away', lunch: 'st-away' };
+const ST_KIND = { online: 'online', busy: 'busy', phone: 'busy',
+                  away: 'away', brb: 'away', lunch: 'away' };
 
-const EMOTES = [
-  [/:\)/g, '🙂'], [/:-\)/g, '🙂'], [/:\(/g, '☹️'], [/:-\(/g, '☹️'],
-  [/:D/g, '😃'], [/;\)/g, '😉'], [/:P/gi, '😛'], [/:O/gi, '😮'],
-  [/\(Y\)/gi, '👍'], [/\(N\)/gi, '👎'], [/\(L\)/gi, '❤️'], [/\(6\)/g, '😈'],
-  [/8-\)/g, '😎'], [/:'\(/g, '😢'],
+// ---------- hangulatjelek (eredeti MSN 7.5 készlet, 19x19-es csík) ----------
+const EMO = [
+  [':)', ':-)'], [':D', ':d', ':-D', ':-d'], [';)', ';-)'],
+  [':O', ':o', ':-O', ':-o'], [':P', ':p', ':-P', ':-p'], ['(H)', '(h)'],
+  [':@', ':-@'], [':$', ':-$'], [':S', ':s', ':-S', ':-s'], [':(', ':-('],
+  [":'("], [':|', ':-|'], ['(6)'], ['(A)', '(a)'], ['(L)', '(l)'],
+  ['(U)', '(u)'], ['(M)', '(m)'], ['(@)'], ['(&)'], ['(S)'],
+  ['(*)'], ['(~)'], ['(8)'], ['(E)', '(e)'], ['(F)', '(f)'],
+  ['(W)', '(w)'], ['(O)', '(o)'], ['(K)', '(k)'], ['(G)', '(g)'], ['(^)'],
+  ['(P)', '(p)'], ['(I)', '(i)'], ['(C)', '(c)'], ['(T)', '(t)'], ['({)'],
+  ['(})'], ['(B)', '(b)'], ['(D)', '(d)'], ['(Z)', '(z)'], ['(X)', '(x)'],
+  ['(Y)', '(y)'], ['(N)', '(n)'], [':[', ':-['], ['(nah)'], ['(%)'],
+  ['(#)'], ['(R)', '(r)'], [':-#'], ['8o|'], ['8-|'],
+  ['^o)'], [':-*'], ['+o('], ['(sn)'], ['(tu)'],
+  ['(pl)'], ['(||)'], ['(pi)'], ['(so)'], ['(au)'],
+  ['(ap)'], ['(um)'], ['(ip)'], ['(co)'], ['(mp)'],
+  ['8-)'], ['(st)'], ['(yn)'], ['(h5)'], ['(mo)'],
+  ['(bah)'], [':^)'], ['*-)'], ['(li)'], ['<:o)'],
+  ['|-)'], ['(ci)'], ['(yawn)'], ['(xx)'],
 ];
+const EMO_FALLBACK = ['🙂','😃','😉','😮','😛','😎','😠','😊','😖','☹️','😭','😐','😈','😇','❤️','💔','👥','🐱','🐶','🌙','⭐','🎬','🎵','✉️','🌹','🥀','🕐','💋','🎁','🎂','📷','💡','☕','📞','🤗','🤗','🍺','🍸','👦','👧','👍','👎','🦇','🐐','🔗','☀️','🌈','🤐','😬','🤓','🤨','🤫','🤢','🐌','🐢','🍽️','🥣','🍕','⚽','🚗','✈️','☂️','🏝️','💻','📱','🙄','🌧️','🤞','🙌','💰','🐑','😏','🤔','⚡','🥳','😪','🚬','🥱','🎮'];
 
-// ---------- partnerlista tárolása ----------
-function loadContacts() {
-  try { return JSON.parse(localStorage.getItem('msn75_contacts') || '[]'); }
-  catch { return []; }
+// visszafejtéshez: [escapelt parancsikon, index], hossz szerint csökkenő
+const EMO_LOOKUP = [];
+EMO.forEach((codes, idx) => {
+  for (const c of codes) EMO_LOOKUP.push([escHtml(c), idx]);
+});
+EMO_LOOKUP.sort((a, b) => b[0].length - a[0].length);
+
+function escHtml(s) {
+  return s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
-let contacts = loadContacts(); // [{id, name}]
-function saveContacts() { localStorage.setItem('msn75_contacts', JSON.stringify(contacts)); }
+function emoHtml(idx, titleCode) {
+  if (A) {
+    // titleCode már HTML-escapelt formában érkezik
+    return '<span class="emo" style="background-position:-' + (idx * 19) +
+      'px 0" title="' + (titleCode || escHtml(EMO[idx][0])) + '"></span>';
+  }
+  return EMO_FALLBACK[idx] || '';
+}
+function emotify(escaped) {
+  // 1. fázis: parancsikon -> helyőrző (hogy a rövidebb kódok ne
+  // rontsák el a már legenerált HTML-t), 2. fázis: helyőrző -> HTML
+  let out = escaped;
+  const used = [];
+  for (const [code, idx] of EMO_LOOKUP) {
+    if (out.indexOf(code) !== -1) {
+      const ph = '\u0000' + used.length + '\u0001';
+      used.push([ph, emoHtml(idx, code)]);
+      out = out.split(code).join(ph);
+    }
+  }
+  for (const [ph, html] of used) out = out.split(ph).join(html);
+  return out;
+}
 
 // ---------- segédek ----------
 const $ = (sel, root) => (root || document).querySelector(sel);
@@ -529,21 +741,40 @@ function el(tag, cls, text) {
   if (text !== undefined) e.textContent = text;
   return e;
 }
-function esc(s) {
-  return s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-}
-function emotify(escaped) {
-  let out = escaped;
-  for (const [re, em] of EMOTES) out = out.replace(re, em);
-  return out;
-}
 function now() {
   const d = new Date();
   return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
 }
 function bringToFront(w) { w.style.zIndex = ++zTop; }
+function hashCode(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
 
-// ---------- hangok (WebAudio, nincs külső fájl) ----------
+// megjelenítendő kép (az eredeti MSN 7.5 alapképeiből, Peer ID alapján)
+function dpHtml(pid) {
+  if (A) {
+    const src = A.dps[hashCode(pid) % A.dps.length];
+    return '<img src="' + src + '" alt="">';
+  }
+  return buddySvg(46, ST_KIND[remote.get(pid)?.status] || 'online');
+}
+function buddySvg(size, kind) {
+  const col = kind === 'busy' ? '#d02818' : kind === 'away' ? '#e8a812' : '#3faf22';
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 32 32">' +
+    '<circle cx="11" cy="9" r="5" fill="' + col + '"/>' +
+    '<path d="M3 26c0-6 4-9 8-9s8 3 8 9z" fill="' + col + '"/>' +
+    '<circle cx="22" cy="11" r="4.2" fill="#2a70e0"/>' +
+    '<path d="M15.5 26c0-5 3-7.6 6.5-7.6s6.5 2.6 6.5 7.6z" fill="#2a70e0"/></svg>';
+}
+function buddyDot(kind) {
+  return '<svg class="buddy" viewBox="0 0 16 16">' +
+    '<circle cx="8" cy="5" r="3.4" fill="' + (kind === 'busy' ? '#d02818' : kind === 'away' ? '#e8a812' : kind === 'offline' ? '#9a9a9a' : '#3faf22') + '"/>' +
+    '<path d="M2 15c0-4 2.7-6 6-6s6 2 6 6z" fill="' + (kind === 'busy' ? '#d02818' : kind === 'away' ? '#e8a812' : kind === 'offline' ? '#9a9a9a' : '#3faf22') + '"/></svg>';
+}
+
+// ---------- hangok (eredeti MSN 7.5 wav-ok; nélkülük WebAudio pótlás) ----------
 let audioCtx = null;
 function beep(seq) {
   try {
@@ -561,9 +792,30 @@ function beep(seq) {
     }
   } catch { /* hang nélkül is működik */ }
 }
-const sndMsg   = () => beep([[880, .09], [1320, .12]]);
-const sndNudge = () => beep([[220, .08], [180, .08], [220, .08], [180, .08], [240, .1]]);
-const sndOn    = () => beep([[660, .1], [880, .12], [1100, .15]]);
+function mkSound(dataUri, fallbackSeq) {
+  let audio = null;
+  if (dataUri) { try { audio = new Audio(dataUri); } catch {} }
+  return () => {
+    if (muted) return;
+    if (audio) {
+      try { audio.currentTime = 0; audio.play().catch(() => {}); return; } catch {}
+    }
+    beep(fallbackSeq);
+  };
+}
+const sndMsg    = mkSound(A?.sndType,   [[880, .09], [1320, .12]]);
+const sndAlert  = mkSound(A?.sndAlert,  [[660, .1], [990, .14]]);
+const sndOnline = mkSound(A?.sndOnline, [[660, .1], [880, .12], [1100, .15]]);
+const sndNudge  = mkSound(A?.sndNudge,  [[220, .08], [180, .08], [220, .08], [180, .08], [240, .1]]);
+const sndRing   = mkSound(A?.sndRing,   [[740, .2], [740, .2]]);
+
+// ---------- partnerlista tárolása ----------
+function loadContacts() {
+  try { return JSON.parse(localStorage.getItem('msn75_contacts') || '[]'); }
+  catch { return []; }
+}
+let contacts = loadContacts();
+function saveContacts() { localStorage.setItem('msn75_contacts', JSON.stringify(contacts)); }
 
 // ---------- ablakok mozgatása ----------
 function makeDraggable(win, handle) {
@@ -589,6 +841,33 @@ function makeDraggable(win, handle) {
   win.addEventListener('mousedown', () => bringToFront(win));
 }
 
+// ---------- induló dekoráció ----------
+(function initChrome() {
+  if (A) {
+    document.documentElement.style.setProperty('--emo', 'url(' + A.emoStrip + ')');
+    $('#logoHolder').innerHTML = '<img class="bfly" src="' + A.butterfly + '" alt="MSN">';
+    $('#passportHolder').innerHTML = '<img src="' + A.buddies + '" alt="">';
+    const bc = $('#bflyCorner');
+    bc.src = A.butterfly; bc.style.display = '';
+    $('#loginTitleIcon').innerHTML = '<img src="' + A.buddies + '" alt="">';
+    $('#mainTitleIcon').innerHTML = '<img src="' + A.buddies + '" alt="">';
+  } else {
+    $('#logoHolder').innerHTML = '<span class="logo-fallback">' + buddySvg(64, 'online') + '</span>';
+    $('#loginTitleIcon').innerHTML = buddySvg(16, 'online');
+    $('#mainTitleIcon').innerHTML = buddySvg(16, 'online');
+  }
+  // mentett belépési adatok
+  try {
+    const saved = JSON.parse(localStorage.getItem('msn75_login') || 'null');
+    if (saved) {
+      $('#inName').value = saved.name || '';
+      $('#inPeerId').value = saved.id || '';
+      $('#inStatus').value = saved.status || 'online';
+      me.pm = saved.pm || '';
+    }
+  } catch {}
+})();
+
 // ---------- bejelentkezés ----------
 $('#loginBtn').addEventListener('click', doLogin);
 $('#loginWin').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
@@ -606,6 +885,11 @@ function doLogin() {
   me.name = name;
   me.id = id;
   me.status = $('#inStatus').value;
+  if ($('#chkRemember').checked) {
+    localStorage.setItem('msn75_login', JSON.stringify({ name, id, status: me.status, pm: me.pm }));
+  } else {
+    localStorage.removeItem('msn75_login');
+  }
   $('#loginBtn').disabled = true;
   $('#loginStatus').textContent = 'Kapcsolódás a P2P hálózathoz…';
 
@@ -617,21 +901,22 @@ function doLogin() {
     $('#meName').textContent = me.name;
     $('#meId').textContent = me.id;
     $('#meStatus').value = me.status;
-    sndOn();
+    $('#meStText').textContent = '(' + STATUS_TEXT[me.status] + ')';
+    $('#myDp').innerHTML = dpHtml(me.id);
+    renderPm();
+    setNetState(true);
+    sndOnline();
     renderContacts();
     startPresenceLoop();
   });
 
   peer.on('connection', c => setupConn(c, true));
-
   peer.on('call', call => handleIncomingCall(call));
 
   peer.on('disconnected', () => {
     setNetState(false);
-    // az azonosítót megtartva próbál visszakapcsolódni
-    try { peer.reconnect(); } catch { /* destroyed */ }
+    try { peer.reconnect(); } catch {}
   });
-  peer.on('open', () => setNetState(true));
 
   peer.on('error', e => {
     if (e.type === 'unavailable-id') {
@@ -641,7 +926,7 @@ function doLogin() {
       try { peer.destroy(); } catch {}
       peer = null;
     } else if (e.type === 'peer-unavailable') {
-      // a hívott partner nincs fent — a jelenlét-figyelő kezeli
+      // a hívott partner nincs fent — a jelenlét-figyelő újrapróbálja
     } else if (!peer || peer.destroyed) {
       $('#loginBtn').disabled = false;
       err.textContent = 'Hálózati hiba: ' + e.type;
@@ -656,17 +941,76 @@ function setNetState(ok) {
   n.className = ok ? 'ok' : 'bad';
 }
 
+// ---------- saját állapot / személyes üzenet ----------
+$('#meLine').addEventListener('click', () => {
+  const s = $('#meStatus');
+  s.style.display = s.style.display === 'block' ? 'none' : 'block';
+});
+$('#meStatus').addEventListener('change', applyStatus);
+$('#meStatus').addEventListener('click', applyStatus);
+function applyStatus() {
+  const s = $('#meStatus');
+  if (s.value && s.value !== me.status) {
+    me.status = s.value;
+    $('#meStText').textContent = '(' + STATUS_TEXT[me.status] + ')';
+    broadcast({ t: 'status', status: me.status });
+  }
+  s.style.display = 'none';
+}
+
+function renderPm() {
+  $('#pmLine').textContent = me.pm ? me.pm : '<Írja be személyes üzenetét>';
+  $('#pmLine').style.color = me.pm ? '#5b7ba0' : '#9aabbd';
+}
+$('#pmLine').addEventListener('click', () => {
+  $('#pmLine').style.display = 'none';
+  const i = $('#pmInput');
+  i.value = me.pm;
+  i.style.display = 'block';
+  i.focus();
+});
+$('#pmInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') $('#pmInput').blur();
+  if (e.key === 'Escape') { $('#pmInput').value = me.pm; $('#pmInput').blur(); }
+});
+$('#pmInput').addEventListener('blur', () => {
+  me.pm = $('#pmInput').value.trim().slice(0, 80);
+  $('#pmInput').style.display = 'none';
+  $('#pmLine').style.display = 'block';
+  renderPm();
+  broadcast({ t: 'pm', pm: me.pm });
+  const saved = localStorage.getItem('msn75_login');
+  if (saved) {
+    try {
+      const o = JSON.parse(saved); o.pm = me.pm;
+      localStorage.setItem('msn75_login', JSON.stringify(o));
+    } catch {}
+  }
+});
+
+$('#copyId').addEventListener('click', () => {
+  navigator.clipboard?.writeText(me.id);
+  $('#copyId').textContent = '✓';
+  setTimeout(() => { $('#copyId').textContent = 'másol'; }, 1200);
+});
+
+function broadcast(obj) {
+  for (const c of conns.values()) if (c.open) c.send(obj);
+}
+
 // ---------- adatkapcsolatok ----------
 function setupConn(c, incoming) {
   c.on('open', () => {
     const old = conns.get(c.peer);
     if (old && old !== c && old.open) { try { c.close(); } catch {} return; }
+    const wasOnline = conns.has(c.peer);
     conns.set(c.peer, c);
-    c.send({ t: 'hello', name: me.name, status: me.status });
+    c.send({ t: 'hello', name: me.name, status: me.status, pm: me.pm });
     if (incoming && !contacts.find(x => x.id === c.peer)) {
       contacts.push({ id: c.peer, name: c.peer });
       saveContacts();
     }
+    if (!wasOnline) sndOnline();
     renderContacts();
   });
 
@@ -676,10 +1020,10 @@ function setupConn(c, incoming) {
     if (conns.get(c.peer) === c) {
       conns.delete(c.peer);
       const r = remote.get(c.peer);
-      const w = chatWins.get(c.peer);
-      if (r && w) sysMsg(c.peer, (r.name || c.peer) + ' kilépett a beszélgetésből.');
+      if (r && chatWins.has(c.peer)) sysMsg(c.peer, (r.name || c.peer) + ' kilépett a beszélgetésből.');
       remote.delete(c.peer);
       renderContacts();
+      refreshChatHead(c.peer);
     }
   };
   c.on('close', drop);
@@ -697,11 +1041,13 @@ function onData(pid, d) {
   if (!d || typeof d !== 'object') return;
   switch (d.t) {
     case 'hello': {
-      const known = remote.has(pid);
-      remote.set(pid, { name: String(d.name || pid).slice(0, 40), status: d.status || 'online' });
+      remote.set(pid, {
+        name: String(d.name || pid).slice(0, 40),
+        status: d.status || 'online',
+        pm: String(d.pm || '').slice(0, 80),
+      });
       const ct = contacts.find(x => x.id === pid);
       if (ct && (ct.name === ct.id || !ct.name)) { ct.name = remote.get(pid).name; saveContacts(); }
-      if (!known) sndOn();
       renderContacts();
       refreshChatHead(pid);
       break;
@@ -711,10 +1057,16 @@ function onData(pid, d) {
       if (r) { r.status = d.status; renderContacts(); refreshChatHead(pid); }
       break;
     }
+    case 'pm': {
+      const r = remote.get(pid);
+      if (r) { r.pm = String(d.pm || '').slice(0, 80); renderContacts(); }
+      break;
+    }
     case 'msg': {
+      const isNew = !chatWins.has(pid) || chatWins.get(pid).win.style.display === 'none';
       openChat(pid);
       addMsg(pid, dispName(pid), String(d.text).slice(0, 4000), false);
-      sndMsg();
+      if (isNew) sndAlert(); else sndMsg();
       break;
     }
     case 'typing': showTyping(pid); break;
@@ -727,8 +1079,7 @@ function onData(pid, d) {
       break;
     }
     case 'stream-stop': {
-      const v = viewers.get(pid);
-      if (v) closeViewer(pid);
+      if (viewers.has(pid)) closeViewer(pid);
       sysMsg(pid, dispName(pid) + ' leállította a streamet.');
       break;
     }
@@ -747,7 +1098,7 @@ function dispName(pid) {
   return (ct && ct.name) || pid;
 }
 
-// ---------- jelenlét (időnként próbál kapcsolódni az offline partnerekhez) ----------
+// ---------- jelenlét ----------
 function startPresenceLoop() {
   for (const ct of contacts) connectTo(ct.id);
   setInterval(() => {
@@ -760,33 +1111,39 @@ function renderContacts() {
   const area = $('#contactArea');
   area.innerHTML = '';
   const online = [], offline = [];
-  for (const ct of contacts) {
-    (conns.has(ct.id) ? online : offline).push(ct);
-  }
-  area.appendChild(buildGroup('Elérhető partnerek (' + online.length + ')', online, true));
-  area.appendChild(buildGroup('Nem elérhető partnerek (' + offline.length + ')', offline, false));
+  for (const ct of contacts) (conns.has(ct.id) ? online : offline).push(ct);
+  area.appendChild(buildGroup('Elérhető (' + online.length + ')', online, true));
+  area.appendChild(buildGroup('Nem elérhető (' + offline.length + ')', offline, false));
 }
 
 function buildGroup(title, list, isOnline) {
   const frag = document.createDocumentFragment();
   const head = el('div', 'grp-head');
-  head.appendChild(el('span', 'arrow', '▾'));
+  head.appendChild(el('span', 'arrow', '▼'));
   head.appendChild(document.createTextNode(title));
   frag.appendChild(head);
   const box = el('div');
   head.addEventListener('click', () => {
     const hidden = box.style.display === 'none';
     box.style.display = hidden ? '' : 'none';
-    head.querySelector('.arrow').textContent = hidden ? '▾' : '▸';
+    head.querySelector('.arrow').textContent = hidden ? '▼' : '►';
   });
   for (const ct of list) {
     const row = el('div', 'contact' + (isOnline ? '' : ' offline'));
     const r = remote.get(ct.id);
-    const dot = el('span', 'status-dot ' + (isOnline ? (STATUS_DOT[r?.status] || 'st-online') : 'st-offline'));
-    row.appendChild(dot);
+    const kind = isOnline ? (ST_KIND[r?.status] || 'online') : 'offline';
+    const ic = el('span');
+    ic.innerHTML = buddyDot(kind);
+    row.appendChild(ic.firstChild);
     const nm = el('span', 'c-name', dispName(ct.id));
-    nm.title = ct.id + (r && isOnline ? ' — ' + (STATUS_TEXT[r.status] || '') : '');
+    nm.title = ct.id + (r && isOnline ? ' — ' + (STATUS_TEXT[r.status] || '') : ' — Offline');
     row.appendChild(nm);
+    if (isOnline && r) {
+      let extra = '';
+      if (r.status && r.status !== 'online') extra = '(' + STATUS_TEXT[r.status] + ')';
+      if (r.pm) extra = extra ? extra + ' – ' + r.pm : '– ' + r.pm;
+      if (extra) row.appendChild(el('span', 'c-pm', ' ' + extra));
+    }
     const x = el('span', 'c-x', '✕');
     x.title = 'Partner törlése';
     x.addEventListener('click', ev => {
@@ -817,7 +1174,7 @@ function addContact() {
   const id = $('#addId').value.trim();
   const nm = $('#addName').value.trim();
   if (!/^[a-zA-Z0-9_-]{3,40}$/.test(id)) { alert('Érvénytelen Peer ID.'); return; }
-  if (id === me.id) { alert('Ez a saját azonosítód. 🙂'); return; }
+  if (id === me.id) { alert('Ez a saját azonosítód. :)'); return; }
   if (!contacts.find(x => x.id === id)) {
     contacts.push({ id, name: nm || id });
     saveContacts();
@@ -828,102 +1185,123 @@ function addContact() {
   connectTo(id);
 }
 
-// saját állapot
-$('#meStatus').addEventListener('change', () => {
-  me.status = $('#meStatus').value;
-  broadcast({ t: 'status', status: me.status });
-});
-$('#copyId').addEventListener('click', () => {
-  navigator.clipboard?.writeText(me.id);
-  $('#copyId').textContent = '✓';
-  setTimeout(() => { $('#copyId').textContent = 'másol'; }, 1200);
-});
+// ---------- csevegőablak ----------
+let cascade = 0;
 
-function broadcast(obj) {
-  for (const c of conns.values()) if (c.open) c.send(obj);
+const TB_ICONS = {
+  invite: '<svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4" fill="#3faf22"/><path d="M2 21c0-4.5 3-7 7-7s7 2.5 7 7z" fill="#3faf22"/><path d="M18 6v8M14 10h8" stroke="#274d77" stroke-width="2"/></svg>',
+  file: '<svg viewBox="0 0 24 24"><path d="M5 2h9l5 5v15H5z" fill="#fff" stroke="#8aa5c4"/><path d="M14 2v5h5" fill="none" stroke="#8aa5c4"/><path d="M8 13h8M8 16h8M8 10h4" stroke="#4a71a3"/></svg>',
+  stream: '<svg viewBox="0 0 24 24"><rect x="2" y="5" width="15" height="12" rx="2" fill="#274d77"/><rect x="4" y="7" width="11" height="8" fill="#7fd0ff"/><path d="M17 9l5-3v10l-5-3z" fill="#274d77"/><circle cx="20" cy="19" r="3" fill="#d02818"/></svg>',
+  voice: '<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" fill="#8aa5c4"/><path d="M6 11a6 6 0 0012 0M12 17v4M8 21h8" stroke="#8aa5c4" stroke-width="2" fill="none"/></svg>',
+  act: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" fill="#f0a030"/><rect x="13" y="3" width="8" height="8" fill="#3faf22"/><rect x="3" y="13" width="8" height="8" fill="#2a70e0"/><rect x="13" y="13" width="8" height="8" fill="#d02818"/></svg>',
+  games: '<svg viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="10" rx="5" fill="#8aa5c4"/><path d="M7 11v4M5 13h4" stroke="#fff" stroke-width="1.6"/><circle cx="16" cy="12" r="1.3" fill="#fff"/><circle cx="19" cy="14" r="1.3" fill="#fff"/></svg>',
+  nudge: '<svg viewBox="0 0 16 16"><path d="M8 1l2 5h4l-3.5 3 1.5 5L8 11l-4 3 1.5-5L2 6h4z" fill="#f0a030"/></svg>',
+  font: '<svg viewBox="0 0 16 16"><text x="2" y="12" font-size="12" font-family="serif" fill="#274d77">A</text><text x="9" y="13" font-size="9" font-family="serif" fill="#4a71a3">a</text></svg>',
+  bg: '<svg viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="11" fill="#7fd0ff"/><circle cx="5" cy="6" r="1.6" fill="#ffe680"/><path d="M1 13l5-5 3 3 2-2 4 4z" fill="#3faf22"/></svg>',
+};
+
+function chatTemplate(pid) {
+  const iconImg = A ? '<img src="' + A.buddies + '" alt="">' : buddySvg(16, 'online');
+  return '' +
+    '<div class="titlebar">' +
+      '<span class="t-icon">' + iconImg + '</span>' +
+      '<span class="t-text">' + escHtml(dispName(pid)) + ' — Beszélgetés</span>' +
+      '<span class="t-btns"><span class="tbtn close" data-act="close">✕</span></span>' +
+    '</div>' +
+    '<div class="win-body">' +
+      '<div class="menubar">' +
+        '<span class="m-item" data-menu="file">Fájl</span>' +
+        '<span class="m-item" data-menu="edit">Szerkesztés</span>' +
+        '<span class="m-item" data-menu="actions">Műveletek</span>' +
+        '<span class="m-item" data-menu="tools">Eszközök</span>' +
+        '<span class="m-item" data-menu="help">Súgó</span>' +
+        '<div class="menu-pop" data-pop="file">' +
+          '<div class="mp-item" data-act="close">Bezárás</div>' +
+        '</div>' +
+        '<div class="menu-pop" data-pop="edit">' +
+          '<div class="mp-item dis">Kivágás</div><div class="mp-item dis">Másolás</div><div class="mp-item dis">Beillesztés</div>' +
+        '</div>' +
+        '<div class="menu-pop" data-pop="actions">' +
+          '<div class="mp-item" data-act="nudge">Rezgetés küldése</div>' +
+          '<div class="mp-item" data-act="stream">Streamelés indítása</div>' +
+          '<div class="mp-sep"></div>' +
+          '<div class="mp-item dis">Fájl vagy fénykép küldése…</div>' +
+        '</div>' +
+        '<div class="menu-pop" data-pop="tools">' +
+          '<div class="mp-item" data-act="mute">' + (muted ? 'Hangok bekapcsolása' : 'Hangok kikapcsolása') + '</div>' +
+        '</div>' +
+        '<div class="menu-pop" data-pop="help">' +
+          '<div class="mp-item" data-act="about">Az MSN Messenger — P2P kiadás névjegye</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="to-line">Címzett: <b>' + escHtml(dispName(pid)) + '</b> <span class="pid">&lt;' + escHtml(pid) + '&gt;</span> <span class="wst"></span></div>' +
+      '<div class="chat-toolbar">' +
+        '<button class="tb-big" disabled>' + TB_ICONS.invite + 'Meghívás</button>' +
+        '<button class="tb-big" disabled>' + TB_ICONS.file + 'Fájlküldés</button>' +
+        '<button class="tb-big" data-act="stream">' + TB_ICONS.stream + 'Stream</button>' +
+        '<button class="tb-big" disabled>' + TB_ICONS.voice + 'Hang</button>' +
+        '<button class="tb-big" disabled>' + TB_ICONS.act + 'Tevékenységek</button>' +
+        '<button class="tb-big" disabled>' + TB_ICONS.games + 'Játékok</button>' +
+      '</div>' +
+      '<div class="stream-bar"><span>🔴 Képernyődet streameled neki</span>' +
+        '<button class="stop" data-act="stopstream">Stream leállítása</button></div>' +
+      '<div class="chat-mid">' +
+        '<div class="msgs"></div>' +
+        '<div class="dp-col">' +
+          '<div><div class="dp dp-64 dp-them">' + dpHtml(pid) + '</div>' +
+          '<div class="dp-tag dp-them-tag">' + escHtml(dispName(pid)) + '</div></div>' +
+          '<div><div class="dp dp-64">' + dpHtml(me.id) + '</div>' +
+          '<div class="dp-tag">' + escHtml(me.name) + '</div></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="fmt-bar">' +
+        '<button class="fmt-btn" disabled title="Betűtípus">' + TB_ICONS.font + '</button>' +
+        '<button class="fmt-btn emo-btn" title="Hangulatjelek">' +
+          (A ? '<span class="emo" style="background-position:0 0"></span>' : '🙂') + ' ▾</button>' +
+        '<button class="fmt-btn nudge-btn" title="Rezgetés küldése">' + TB_ICONS.nudge + '</button>' +
+        '<span class="fmt-sep"></span>' +
+        '<button class="fmt-btn" disabled title="Háttér">' + TB_ICONS.bg + '</button>' +
+      '</div>' +
+      '<div class="input-area">' +
+        '<textarea placeholder="Írj üzenetet… (Enter = küldés)"></textarea>' +
+        '<div class="send-col"><button class="xp-btn primary send-btn">Küldés</button></div>' +
+      '</div>' +
+      '<div class="chat-status"></div>' +
+      '<div class="emo-pop"></div>' +
+    '</div>';
 }
 
-// ---------- csevegőablakok ----------
-let cascade = 0;
 function openChat(pid) {
   let w = chatWins.get(pid);
   if (w) { w.win.style.display = 'flex'; bringToFront(w.win); return w; }
 
   const win = el('div', 'win chatwin');
   win.style.left = (330 + (cascade % 6) * 34) + 'px';
-  win.style.top = (40 + (cascade % 6) * 30) + 'px';
+  win.style.top = (30 + (cascade % 6) * 30) + 'px';
   cascade++;
-
-  // címsor
-  const tb = el('div', 'titlebar');
-  const ic = el('span', 't-icon'); ic.innerHTML = miniLogoSvg(14);
-  tb.appendChild(ic);
-  const tt = el('span', 't-text', dispName(pid) + ' — Beszélgetés');
-  tb.appendChild(tt);
-  const btns = el('span', 't-btns');
-  const bClose = el('span', 'tbtn close', '✕');
-  bClose.addEventListener('click', () => { win.style.display = 'none'; });
-  btns.appendChild(bClose);
-  tb.appendChild(btns);
-  win.appendChild(tb);
-
-  const body = el('div', 'win-body');
-
-  // fejléc
-  const head = el('div', 'chat-head');
-  const av = el('div', 'avatar'); av.innerHTML = buddySvg(24);
-  head.appendChild(av);
-  const who = el('div', 'who');
-  const whoName = el('div'); whoName.innerHTML = '<b></b> <span class="wst"></span>';
-  who.appendChild(whoName);
-  who.appendChild(el('div', 'pid', pid));
-  head.appendChild(who);
-  body.appendChild(head);
-
-  // eszköztár
-  const bar = el('div', 'chat-toolbar');
-  const bNudge = el('button', 'cbtn', '📳 Rezgetés');
-  const bStream = el('button', 'cbtn', '🖥️ Streamelés');
-  const bEmo = el('button', 'cbtn', '🙂');
-  bEmo.title = 'Hangulatjel beszúrása';
-  bar.appendChild(bNudge); bar.appendChild(bStream); bar.appendChild(bEmo);
-  body.appendChild(bar);
-
-  // stream sáv
-  const sbar = el('div', 'stream-bar');
-  sbar.appendChild(el('span', null, '🔴 Képernyődet streameled neki'));
-  const bStop = el('button', 'stop', 'Stream leállítása');
-  sbar.appendChild(bStop);
-  body.appendChild(sbar);
-
-  const msgs = el('div', 'msgs');
-  body.appendChild(msgs);
-  const typing = el('div', 'typing-line');
-  body.appendChild(typing);
-
-  // beviteli sáv
-  const ia = el('div', 'input-area');
-  const ta = document.createElement('textarea');
-  ta.placeholder = 'Írj üzenetet… (Enter = küldés)';
-  ia.appendChild(ta);
-  const sc = el('div', 'send-col');
-  const bSend = el('button', 'xp-btn primary', 'Küldés');
-  sc.appendChild(bSend);
-  ia.appendChild(sc);
-  body.appendChild(ia);
-
-  win.appendChild(body);
+  win.innerHTML = chatTemplate(pid);
   document.body.appendChild(win);
-  makeDraggable(win, tb);
+  makeDraggable(win, $('.titlebar', win));
   bringToFront(win);
 
-  w = { win, title: tt, whoName, msgs, typing, ta, sbar, typingTimer: null, lastTypeSent: 0 };
+  w = {
+    win,
+    title: $('.t-text', win),
+    toLine: $('.to-line', win),
+    msgs: $('.msgs', win),
+    status: $('.chat-status', win),
+    ta: $('textarea', win),
+    sbar: $('.stream-bar', win),
+    typingTimer: null,
+    lastTypeSent: 0,
+    lastMsgAt: null,
+  };
   chatWins.set(pid, w);
   refreshChatHead(pid);
 
-  // események
+  // --- események ---
   const send = () => {
-    const text = ta.value.trim();
+    const text = w.ta.value.trim();
     if (!text) return;
     const c = conns.get(pid);
     if (!c || !c.open) {
@@ -933,31 +1311,97 @@ function openChat(pid) {
     }
     c.send({ t: 'msg', text });
     addMsg(pid, me.name, text, true);
-    ta.value = '';
-    ta.focus();
+    w.ta.value = '';
+    w.ta.focus();
   };
-  bSend.addEventListener('click', send);
-  ta.addEventListener('keydown', e => {
+  $('.send-btn', win).addEventListener('click', send);
+  w.ta.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   });
-  ta.addEventListener('input', () => {
+  w.ta.addEventListener('input', () => {
     const c = conns.get(pid);
     const t = Date.now();
     if (c && c.open && t - w.lastTypeSent > 2000) { c.send({ t: 'typing' }); w.lastTypeSent = t; }
   });
-  bNudge.addEventListener('click', () => {
+
+  const doNudge = () => {
     const c = conns.get(pid);
     if (!c || !c.open) return;
     c.send({ t: 'nudge' });
     sysMsg(pid, 'Rezgetést küldtél.');
     win.classList.remove('nudging'); void win.offsetWidth; win.classList.add('nudging');
     sndNudge();
-    bNudge.disabled = true;
-    setTimeout(() => { bNudge.disabled = false; }, 3000);
+    const b = $('.nudge-btn', win);
+    b.disabled = true;
+    setTimeout(() => { b.disabled = false; }, 3000);
+  };
+  $('.nudge-btn', win).addEventListener('click', doNudge);
+
+  // hangulatjel-választó
+  const pop = $('.emo-pop', win);
+  EMO.forEach((codes, idx) => {
+    const cell = el('span', 'emo-cell');
+    cell.title = codes[0];
+    cell.innerHTML = A
+      ? '<span class="emo" style="background-position:-' + (idx * 19) + 'px 0"></span>'
+      : EMO_FALLBACK[idx];
+    cell.addEventListener('click', () => {
+      w.ta.value += (w.ta.value && !w.ta.value.endsWith(' ') ? ' ' : '') + codes[0] + ' ';
+      pop.classList.remove('open');
+      w.ta.focus();
+      w.ta.dispatchEvent(new Event('input'));
+    });
+    pop.appendChild(cell);
   });
-  bEmo.addEventListener('click', () => { ta.value += ' :) '; ta.focus(); });
-  bStream.addEventListener('click', () => startStream(pid));
-  bStop.addEventListener('click', () => stopStream(pid));
+  $('.emo-btn', win).addEventListener('click', e => {
+    e.stopPropagation();
+    pop.classList.toggle('open');
+  });
+  win.addEventListener('click', e => {
+    if (!e.target.closest('.emo-pop') && !e.target.closest('.emo-btn')) pop.classList.remove('open');
+  });
+
+  // menük
+  const closeMenus = () => {
+    win.querySelectorAll('.menu-pop').forEach(p => { p.style.display = 'none'; });
+    win.querySelectorAll('.m-item').forEach(m => m.classList.remove('open'));
+  };
+  win.querySelectorAll('.m-item').forEach(mi => {
+    mi.addEventListener('click', e => {
+      e.stopPropagation();
+      const key = mi.dataset.menu;
+      const popEl = win.querySelector('.menu-pop[data-pop="' + key + '"]');
+      const isOpen = popEl.style.display === 'block';
+      closeMenus();
+      if (!isOpen) {
+        popEl.style.display = 'block';
+        popEl.style.left = mi.offsetLeft + 'px';
+        mi.classList.add('open');
+      }
+    });
+  });
+  document.addEventListener('click', closeMenus);
+
+  // műveletek (menü + gombok)
+  win.addEventListener('click', e => {
+    const act = e.target.closest('[data-act]')?.dataset.act;
+    if (!act) return;
+    closeMenus();
+    if (act === 'close') win.style.display = 'none';
+    else if (act === 'nudge') doNudge();
+    else if (act === 'stream') startStream(pid);
+    else if (act === 'stopstream') stopStream(pid);
+    else if (act === 'mute') {
+      muted = !muted;
+      localStorage.setItem('msn75_muted', muted ? '1' : '0');
+      document.querySelectorAll('.mp-item[data-act="mute"]').forEach(mi => {
+        mi.textContent = muted ? 'Hangok bekapcsolása' : 'Hangok kikapcsolása';
+      });
+    } else if (act === 'about') {
+      sysMsg(pid, 'MSN Messenger 7.5 — P2P kiadás. Szerver és regisztráció nélkül, ' +
+        'WebRTC-vel. Az eredeti MSN 7.5 hangjaival és hangulatjeleivel.');
+    }
+  });
 
   return w;
 }
@@ -968,22 +1412,27 @@ function refreshChatHead(pid) {
   const r = remote.get(pid);
   const online = conns.has(pid);
   w.title.textContent = dispName(pid) + ' — Beszélgetés';
-  w.whoName.querySelector('b').textContent = dispName(pid);
-  w.whoName.querySelector('.wst').textContent =
-    online ? '(' + (STATUS_TEXT[r?.status] || 'Elérhető') + ')' : '(Offline)';
+  $('b', w.toLine).textContent = dispName(pid);
+  $('.wst', w.toLine).textContent = online
+    ? (r && r.status !== 'online' ? '(' + (STATUS_TEXT[r.status] || '') + ')' : '')
+    : '(Offline)';
+  const tag = $('.dp-them-tag', w.win);
+  if (tag) tag.textContent = dispName(pid);
 }
 
 function addMsg(pid, name, text, mine) {
   const w = openChat(pid);
   const m = el('div', 'msg' + (mine ? ' mine' : ''));
   const h = el('div', 'm-head');
-  h.innerHTML = '<b>' + esc(name) + '</b> írja:<span class="m-time">' + now() + '</span>';
+  h.innerHTML = escHtml(name) + ' írja:<span class="m-time">' + now() + '</span>';
   m.appendChild(h);
   const b = el('div', 'm-body');
-  b.innerHTML = emotify(esc(text)).replace(/\n/g, '<br>');
+  b.innerHTML = emotify(escHtml(text)).replace(/\n/g, '<br>');
   m.appendChild(b);
   w.msgs.appendChild(m);
   w.msgs.scrollTop = w.msgs.scrollHeight;
+  w.lastMsgAt = now();
+  if (!w.typingTimer) w.status.textContent = 'Utolsó üzenet: ' + w.lastMsgAt;
 }
 
 function sysMsg(pid, text) {
@@ -996,12 +1445,15 @@ function sysMsg(pid, text) {
 function showTyping(pid) {
   const w = chatWins.get(pid);
   if (!w) return;
-  w.typing.textContent = dispName(pid) + ' éppen ír…';
+  w.status.textContent = dispName(pid) + ' éppen üzenetet ír…';
   clearTimeout(w.typingTimer);
-  w.typingTimer = setTimeout(() => { w.typing.textContent = ''; }, 3000);
+  w.typingTimer = setTimeout(() => {
+    w.typingTimer = null;
+    w.status.textContent = w.lastMsgAt ? 'Utolsó üzenet: ' + w.lastMsgAt : '';
+  }, 3000);
 }
 
-// ---------- streamelés (képernyőmegosztás, mint a Discordban) ----------
+// ---------- streamelés ----------
 async function startStream(pid) {
   const c = conns.get(pid);
   if (!c || !c.open) { sysMsg(pid, 'A partner nem érhető el, nem lehet streamelni.'); return; }
@@ -1023,7 +1475,11 @@ async function startStream(pid) {
   const call = peer.call(pid, screenStream, { metadata: { kind: 'screen', name: me.name } });
   outCalls.set(pid, call);
   const w = chatWins.get(pid);
-  if (w) w.sbar.classList.add('on');
+  if (w) {
+    w.sbar.classList.add('on');
+    const b = $('.tb-big[data-act="stream"]', w.win);
+    if (b) b.classList.add('active');
+  }
   sysMsg(pid, 'Streamelést indítottál — a partner látja a képernyődet.');
   call.on('close', () => cleanupOutCall(pid));
   call.on('error', () => cleanupOutCall(pid));
@@ -1045,32 +1501,36 @@ function stopStream(pid) {
 function cleanupOutCall(pid) {
   outCalls.delete(pid);
   const w = chatWins.get(pid);
-  if (w) w.sbar.classList.remove('on');
+  if (w) {
+    w.sbar.classList.remove('on');
+    const b = $('.tb-big[data-act="stream"]', w.win);
+    if (b) b.classList.remove('active');
+  }
 }
 
-// bejövő stream
 function handleIncomingCall(call) {
   const pid = call.peer;
-  const kind = call.metadata?.kind;
-  if (kind !== 'screen') { try { call.close(); } catch {} return; }
+  if (call.metadata?.kind !== 'screen') { try { call.close(); } catch {} return; }
   openChat(pid);
   const w = chatWins.get(pid);
 
-  // MSN-stílusú kérdéssáv a csevegőablakban
   const ask = el('div', 'ask-box');
-  ask.appendChild(el('span', null, '🖥️ ' + dispName(pid) + ' streamelni szeretné neked a képernyőjét.'));
+  const ic = A ? '<span class="emo" style="background-position:-' + (63 * 19) + 'px 0"></span> ' : '🖥️ ';
+  const span = el('span');
+  span.innerHTML = ic + escHtml(dispName(pid)) + ' streamelni szeretné neked a képernyőjét.';
+  ask.appendChild(span);
   const row = el('div', 'row');
   const ok = el('button', 'xp-btn', 'Elfogadás');
   const no = el('button', 'xp-btn', 'Elutasítás');
   row.appendChild(ok); row.appendChild(no);
   ask.appendChild(row);
-  w.win.querySelector('.chat-toolbar').after(ask);
-  sndMsg();
+  $('.chat-toolbar', w.win).after(ask);
+  sndRing();
 
   let decided = false;
   ok.addEventListener('click', () => {
     decided = true; ask.remove();
-    call.answer(); // mi nem küldünk médiát vissza
+    call.answer();
     call.on('stream', stream => showViewer(pid, stream));
     call.on('close', () => closeViewer(pid));
     call.on('error', () => closeViewer(pid));
@@ -1082,40 +1542,33 @@ function handleIncomingCall(call) {
 function showViewer(pid, stream) {
   closeViewer(pid);
   const win = el('div', 'win viewerwin');
-  win.style.left = (window.innerWidth / 2 - 280 + (cascade % 4) * 20) + 'px';
-  win.style.top = (60 + (cascade % 4) * 20) + 'px';
+  win.style.left = (Math.max(20, window.innerWidth / 2 - 300) + (cascade % 4) * 20) + 'px';
+  win.style.top = (50 + (cascade % 4) * 20) + 'px';
 
-  const tb = el('div', 'titlebar');
-  const ic = el('span', 't-icon'); ic.innerHTML = miniLogoSvg(14);
-  tb.appendChild(ic);
-  tb.appendChild(el('span', 't-text', dispName(pid) + ' — Stream'));
-  const btns = el('span', 't-btns');
-  const bClose = el('span', 'tbtn close', '✕');
-  btns.appendChild(bClose);
-  tb.appendChild(btns);
-  win.appendChild(tb);
-
-  const body = el('div', 'win-body');
-  const bar = el('div', 'viewer-bar');
-  bar.appendChild(el('span', 'live', 'ÉLŐ'));
-  bar.appendChild(el('span', null, dispName(pid) + ' képernyője'));
-  const bFull = el('button', null, 'Teljes képernyő');
-  bar.appendChild(bFull);
-  body.appendChild(bar);
-
+  const iconImg = A ? '<img src="' + A.buddies + '" alt="">' : buddySvg(16, 'online');
+  win.innerHTML =
+    '<div class="titlebar">' +
+      '<span class="t-icon">' + iconImg + '</span>' +
+      '<span class="t-text">' + escHtml(dispName(pid)) + ' — Stream</span>' +
+      '<span class="t-btns"><span class="tbtn close">✕</span></span>' +
+    '</div>' +
+    '<div class="win-body">' +
+      '<div class="viewer-bar"><span class="live">ÉLŐ</span>' +
+      '<span>' + escHtml(dispName(pid)) + ' képernyője</span>' +
+      '<button class="vfull">Teljes képernyő</button></div>' +
+    '</div>';
   const video = document.createElement('video');
   video.autoplay = true;
   video.playsInline = true;
   video.srcObject = stream;
-  body.appendChild(video);
-  win.appendChild(body);
+  $('.win-body', win).appendChild(video);
 
   document.body.appendChild(win);
-  makeDraggable(win, tb);
+  makeDraggable(win, $('.titlebar', win));
   bringToFront(win);
 
-  bFull.addEventListener('click', () => video.requestFullscreen?.());
-  bClose.addEventListener('click', () => closeViewer(pid));
+  $('.vfull', win).addEventListener('click', () => video.requestFullscreen?.());
+  $('.tbtn.close', win).addEventListener('click', () => closeViewer(pid));
   stream.getVideoTracks()[0]?.addEventListener('ended', () => closeViewer(pid));
 
   viewers.set(pid, { win, stream });
@@ -1135,26 +1588,6 @@ addEventListener('beforeunload', () => {
   broadcast({ t: 'bye' });
   try { peer?.destroy(); } catch {}
 });
-
-// ---------- SVG kis logók (saját rajz, MSN-ihletésű figurák) ----------
-function buddySvg(size) {
-  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 32 32">' +
-    '<circle cx="11" cy="9" r="5" fill="#3faf22"/>' +
-    '<path d="M3 26c0-6 4-9 8-9s8 3 8 9z" fill="#3faf22"/>' +
-    '<circle cx="22" cy="11" r="4.2" fill="#2a70e0"/>' +
-    '<path d="M15.5 26c0-5 3-7.6 6.5-7.6s6.5 2.6 6.5 7.6z" fill="#2a70e0"/></svg>';
-}
-function miniLogoSvg(size) { return buddySvg(size); }
-
-// belépő képernyő logó
-(function initLogo() {
-  const holder = $('#logoHolder');
-  if (holder) holder.innerHTML = buddySvg(56);
-  const mw = $('#mainAvatar');
-  if (mw) mw.innerHTML = buddySvg(26);
-  const li = $('#loginTitleIcon');
-  if (li) li.innerHTML = miniLogoSvg(14);
-})();
 
 // mozgatható login/fő ablak
 makeDraggable($('#loginWin'), $('#loginWin .titlebar'));

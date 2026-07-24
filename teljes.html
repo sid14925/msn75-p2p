@@ -1011,6 +1011,39 @@ html, body {
 .set-row label { flex: 1; color: #333; }
 .set-row input[type="color"] { width: 48px; height: 26px; border: 1px solid #7f9db9; padding: 0; cursor: pointer; }
 .set-btns { display: flex; justify-content: space-between; margin-top: 6px; }
+
+/* ---------- Azonnali képüzenet ---------- */
+.img-msg { margin: 3px 0 6px 14px; }
+.img-msg img {
+  max-width: 260px;
+  max-height: 200px;
+  display: block;
+  border: 1px solid #b7cde8;
+  border-radius: 3px;
+  cursor: zoom-in;
+  background: #fff;
+}
+.img-msg img:hover { border-color: #f0a030; }
+.img-dl { display: inline-block; margin-top: 3px; font-size: 10px; color: #2a5da8; }
+
+/* ---------- Behúzás (drag & drop) ---------- */
+.drop-overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(42, 112, 224, .18);
+  border: 3px dashed #2a70e0;
+  border-radius: 8px;
+  color: #14396f;
+  font-size: 13px;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(255,255,255,.8);
+  z-index: 700;
+  pointer-events: none;
+}
+.drop-overlay.on { display: flex; }
 </style>
 </head>
 <body>
@@ -1297,6 +1330,8 @@ const LANGS = {
     winCol: 'Ablakok színe:',
     reset: 'Alaphelyzet',
     imgWin: 'Kép',
+    imgSent: '$1 képet küldött:',
+    dropHere: 'Engedd el a képet vagy fájlt a küldéshez',
   },
   en: {
     brandSub: '— P2P Edition',
@@ -1403,6 +1438,8 @@ const LANGS = {
     winCol: 'Window color:',
     reset: 'Reset',
     imgWin: 'Image',
+    imgSent: '$1 sent a picture:',
+    dropHere: 'Drop the image or file here to send it',
   },
 };
 let lang = localStorage.getItem('msn75_lang') || 'hu';
@@ -2195,6 +2232,8 @@ function onData(pid, d) {
     }
     case 'ginv': onGinv(pid, d); break;
     case 'gmsg': onGmsg(pid, d); break;
+    case 'img-start': onImgStart(pid, d); break;
+    case 'img-chunk': onImgChunk(pid, d); break;
     case 'vclip': onVclip(pid, d); break;
     case 'file-offer': onFileOffer(pid, d); break;
     case 'file-accept': onFileAccept(pid, d); break;
@@ -2761,6 +2800,54 @@ function openChat(pid) {
     if (c && c.open && tt - w.lastTypeSent > 2000) { c.send({ t: 'typing' }); w.lastTypeSent = tt; }
   });
 
+  // vágólapról beillesztett kép (Ctrl+V) — azonnal megy
+  w.ta.addEventListener('paste', e => {
+    const items = e.clipboardData && e.clipboardData.items;
+    if (!items) return;
+    for (const it of items) {
+      if (it.kind === 'file' && (it.type || '').startsWith('image/')) {
+        const f = it.getAsFile();
+        if (f) {
+          e.preventDefault();
+          const named = f.name && f.name !== 'image.png'
+            ? f
+            : new File([f], 'vagolap-' + randId() + '.' + ((f.type.split('/')[1]) || 'png'), { type: f.type });
+          sendImage(pid, named);
+        }
+        return;
+      }
+    }
+  });
+
+  // fájl/kép behúzása az ablakba
+  const drop = el('div', 'drop-overlay');
+  drop.textContent = t('dropHere');
+  win.appendChild(drop);
+  let dragDepth = 0;
+  win.addEventListener('dragenter', e => {
+    if (!e.dataTransfer || ![...e.dataTransfer.types].includes('Files')) return;
+    e.preventDefault();
+    dragDepth++;
+    drop.classList.add('on');
+  });
+  win.addEventListener('dragover', e => {
+    if (!e.dataTransfer || ![...e.dataTransfer.types].includes('Files')) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  });
+  win.addEventListener('dragleave', () => {
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (!dragDepth) drop.classList.remove('on');
+  });
+  win.addEventListener('drop', e => {
+    if (!e.dataTransfer) return;
+    e.preventDefault();
+    dragDepth = 0;
+    drop.classList.remove('on');
+    const files = [...(e.dataTransfer.files || [])];
+    for (const f of files) offerFile(pid, f);
+  });
+
   const fontPop = $('.font-pop', win);
   $('.font-btn', win).addEventListener('click', e => {
     e.stopPropagation();
@@ -3114,11 +3201,98 @@ function fileLine(pid, name, size, mine) {
 function offerFile(pid, file) {
   const c = conns.get(pid);
   if (!c || !c.open) { sysMsg(pid, t('fCantSend')); return; }
+  // képeket azonnal küldünk, elfogadás-kérdés nélkül (mint a modern appokban)
+  if ((file.type || '').startsWith('image/') && file.size <= IMG_INSTANT_MAX) {
+    return sendImage(pid, file);
+  }
   const id = randId();
   const box = fileLine(pid, file.name, file.size, true);
   box.querySelector('.f-size').textContent = fmtSize(file.size) + t('fOfferWait');
   fileTx.set(id, { dir: 'out', pid, file, lineEl: box, cancelled: false });
   c.send({ t: 'file-offer', id, name: file.name.slice(0, 120), size: file.size, mime: file.type || 'application/octet-stream' });
+}
+
+// ---------- azonnali képküldés ----------
+const IMG_INSTANT_MAX = 16777216; // 16 MB-ig azonnali kép, felette fájlátvitel
+
+async function sendImage(pid, file) {
+  const c = conns.get(pid);
+  if (!c || !c.open) { sysMsg(pid, t('fCantSend')); return; }
+  const id = randId();
+  let buf;
+  try { buf = await file.arrayBuffer(); } catch { return; }
+  const mime = file.type || 'image/png';
+  const name = (file.name || 'kep.png').slice(0, 120);
+  const blob = new Blob([buf], { type: mime });
+  addImageMsg(pid, me.name, blob, name, true);
+  // darabokban megy át, hogy a nagy képek se akasszák meg a csatornát
+  const total = buf.byteLength;
+  c.send({ t: 'img-start', id, name, mime, size: total });
+  let sent = 0;
+  while (sent < total) {
+    while (c.dataChannel && c.dataChannel.bufferedAmount > BUF_LIMIT) {
+      await new Promise(r => setTimeout(r, 10));
+      if (!c.open) return;
+    }
+    const end = Math.min(sent + CHUNK, total);
+    c.send({ t: 'img-chunk', id, last: end >= total, data: buf.slice(sent, end) });
+    sent = end;
+  }
+}
+
+const imgRx = new Map(); // id -> { pid, name, mime, parts }
+
+function onImgStart(pid, d) {
+  if (typeof d.size !== 'number' || d.size < 0 || d.size > IMG_INSTANT_MAX) return;
+  imgRx.set(d.id, {
+    pid,
+    name: String(d.name || 'kep.png').slice(0, 120),
+    mime: String(d.mime || '').startsWith('image/') ? d.mime : 'image/png',
+    parts: [],
+  });
+}
+
+function onImgChunk(pid, d) {
+  const rx = imgRx.get(d.id);
+  if (!rx || rx.pid !== pid) return;
+  let bytes = d.data;
+  if (bytes instanceof ArrayBuffer) bytes = new Uint8Array(bytes);
+  if (bytes) rx.parts.push(bytes);
+  if (d.last) {
+    imgRx.delete(d.id);
+    const blob = new Blob(rx.parts, { type: rx.mime });
+    const isNew = !chatWins.has(pid) || chatWins.get(pid).win.style.display === 'none';
+    openChat(pid);
+    addImageMsg(pid, dispName(pid), blob, rx.name, false);
+    if (isNew) sndAlert(); else sndMsg();
+  }
+}
+
+// kép megjelenítése a beszélgetésben (kattintásra külön ablak)
+function addImageMsg(pid, name, blob, fileName, mine) {
+  const w = openChat(pid);
+  const url = URL.createObjectURL(blob);
+  const m = el('div', 'msg' + (mine ? ' mine' : ''));
+  const h = el('div', 'm-head');
+  h.innerHTML = tf('imgSent', escHtml(name)) + '<span class="m-time">' + now() + '</span>';
+  m.appendChild(h);
+  const line = el('div', 'img-msg');
+  const img = document.createElement('img');
+  img.src = url;
+  img.alt = fileName || '';
+  img.title = t('imgWin');
+  img.addEventListener('click', () => showImageWin(url, fileName));
+  line.appendChild(img);
+  const dl = document.createElement('a');
+  dl.href = url;
+  dl.download = fileName || 'kep.png';
+  dl.textContent = t('fSave');
+  dl.className = 'img-dl';
+  line.appendChild(dl);
+  m.appendChild(line);
+  w.msgs.appendChild(m);
+  w.msgs.scrollTop = w.msgs.scrollHeight;
+  pushHist(pid, { k: 's', x: '🖼️ ' + tf('imgSent', name) + ' ' + (fileName || '') });
 }
 
 function onFileOffer(pid, d) {

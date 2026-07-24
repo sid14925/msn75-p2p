@@ -1382,6 +1382,19 @@ html, body {
 /* beállítás-ablak elválasztó és ürítő gombok */
 .set-sep { border-top: 1px solid #dbe6f0; margin: 10px 0 8px; }
 .setwin .set-row .xp-btn { width: 100%; }
+
+/* átvitel megszakítása gomb */
+.cancel-btn {
+  min-width: 0;
+  height: 20px;
+  font-size: 10px;
+  padding: 0 8px;
+  border-color: #a33;
+  color: #8a1a0a;
+  background: linear-gradient(180deg, #fff5f3, #f6d6d0);
+}
+.cancel-btn:hover { box-shadow: inset 0 0 0 1px #d05a44; }
+@media (max-width: 820px) { .cancel-btn { height: 30px; font-size: 13px; padding: 0 12px; } }
 </style>
 </head>
 <body>
@@ -1556,6 +1569,11 @@ window.MSN_ASSETS = {
 
 'use strict';
 
+// ---------- verzió ----------
+const APP_VERSION = '2.1.0';
+const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
+const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
+
 // ---------- nyelv ----------
 const LANGS = {
   hu: {
@@ -1683,6 +1701,12 @@ const LANGS = {
     mediaCleared: '$1 média-elem eltávolítva.',
     deviceSlot: 'Ez az eszközöd külön csatlakozási helyen van',
     updating: 'Frissítés…',
+    miCheckUpdate: 'Frissítés keresése…',
+    upToDate: 'A program naprakész (v$1).',
+    updateFound: 'Új verzió érhető el: $1 — a lap alján a Frissítés gombbal telepítheted.',
+    updateCheckFailed: 'A frissítés-ellenőrzés nem sikerült (nincs internet?).',
+    versionLbl: 'Verzió: $1',
+    cancelTransfer: 'Átvitel megszakítása',
     updateHide: 'Elrejtés',
   },
   en: {
@@ -1810,6 +1834,12 @@ const LANGS = {
     mediaCleared: '$1 media items removed.',
     deviceSlot: 'This device uses a separate connection slot',
     updating: 'Updating…',
+    miCheckUpdate: 'Check for updates…',
+    upToDate: 'You are up to date (v$1).',
+    updateFound: 'A new version is available: $1 — use the Update button at the bottom.',
+    updateCheckFailed: 'Update check failed (no internet?).',
+    versionLbl: 'Version: $1',
+    cancelTransfer: 'Cancel transfer',
     updateHide: 'Hide',
   },
 };
@@ -2592,7 +2622,7 @@ function applyStaticTexts() {
   $('#addCancel').textContent = t('cancel');
   $('#addOk').textContent = t('add');
   $('#bannerTxt').textContent = t('bannerTxt');
-  $('#footP2p').textContent = t('footP2p');
+  $('#footP2p').textContent = t('footP2p') + ' — v' + APP_VERSION;
   $('#myDp').title = t('dpTip');
   const ms = $('#meStatus');
   const mcur = ms.value;
@@ -2627,15 +2657,18 @@ function buildMainMenus() {
       { label: t('miLangEn'), act: 'lang-en', checked: lang === 'en' },
     ]},
     { label: t('menuHelp'), items: [
+      { label: t('miCheckUpdate'), act: 'checkupd' },
+      '-',
       { label: t('miAbout'), act: 'about' },
     ]},
   ], act => {
-    if (act === 'signout') { try { peer?.destroy(); } catch {} location.reload(); }
+    if (act === 'checkupd') { checkUpdate(true); }
+    else if (act === 'signout') { try { peer?.destroy(); } catch {} location.reload(); }
     else if (act === 'addcontact') { $('#addForm').classList.add('open'); $('#addId').focus(); }
     else if (act === 'mute') { muted = !muted; localStorage.setItem('msn75_muted', muted ? '1' : '0'); buildMainMenus(); }
     else if (act === 'lang-hu' || act === 'lang-en') { setLang(act.slice(5)); }
     else if (act === 'appearance') { openSettings(); }
-    else if (act === 'about') { alert(t('aboutText')); }
+    else if (act === 'about') { alert(t('aboutText') + String.fromCharCode(10, 10) + tf('versionLbl', APP_VERSION)); }
   });
 }
 
@@ -2690,6 +2723,7 @@ function setLang(l) {
   } catch {}
   $('#inLang').value = lang;
   applyStaticTexts();
+  setTimeout(() => checkUpdate(false), 2500);
   // mobilon a bejelentkezés az első képernyő (a főablak csak belépés után)
   if (isMobile()) {
     $('#mainWin').style.display = 'none';
@@ -3016,6 +3050,7 @@ function onData(pid, d) {
     case 'gmsg': onGmsg(pid, d); break;
     case 'img-start': onImgStart(pid, d); break;
     case 'img-chunk': onImgChunk(pid, d); break;
+    case 'img-cancel': imgRx.delete(d.id); break;
     case 'vid-offer': onVidOffer(pid, d); break;
     case 'vid-request': onVidRequest(pid, d); break;
     case 'vid-stop': onVidStop(pid, d); break;
@@ -4113,6 +4148,17 @@ function fileLine(pid, name, size, mine) {
   return box;
 }
 
+// Mégse gomb hozzáadása egy folyamatban lévő átvitelhez
+function addCancelBtn(box, onCancel) {
+  let btns = box.querySelector('.f-btns');
+  if (!btns) { btns = el('div', 'f-btns'); box.appendChild(btns); }
+  btns.innerHTML = '';
+  const b = el('button', 'xp-btn cancel-btn', t('cancelTransfer'));
+  b.addEventListener('click', e => { e.stopPropagation(); onCancel(); b.remove(); });
+  btns.appendChild(b);
+  return b;
+}
+
 function offerFile(pid, file) {
   const c = conns.get(pid);
   if (!c || !c.open) { sysMsg(pid, t('fCantSend')); return; }
@@ -4126,12 +4172,21 @@ function offerFile(pid, file) {
   const id = randId();
   const box = fileLine(pid, file.name, file.size, true);
   box.querySelector('.f-size').textContent = fmtSize(file.size) + t('fOfferWait');
-  fileTx.set(id, { dir: 'out', pid, file, lineEl: box, cancelled: false });
+  const tx = { dir: 'out', pid, file, lineEl: box, cancelled: false };
+  fileTx.set(id, tx);
+  addCancelBtn(box, () => {
+    tx.cancelled = true;
+    fileTx.delete(id);
+    box.querySelector('.f-size').textContent = t('fCancelled');
+    const cc = conns.get(pid);
+    if (cc && cc.open) cc.send({ t: 'file-cancel', id });
+  });
   c.send({ t: 'file-offer', id, name: file.name.slice(0, 120), size: file.size, mime: file.type || 'application/octet-stream' });
 }
 
 // ---------- azonnali képküldés ----------
-const IMG_INSTANT_MAX = 16777216; // 16 MB-ig azonnali kép, felette fájlátvitel
+const IMG_INSTANT_MAX = 16777216;
+const imgSending = new Map(); // folyamatban levo kepkuldesek // 16 MB-ig azonnali kép, felette fájlátvitel
 
 async function sendImage(pid, file) {
   const c = conns.get(pid);
@@ -4142,20 +4197,38 @@ async function sendImage(pid, file) {
   const mime = file.type || 'image/png';
   const name = (file.name || 'kep.png').slice(0, 120);
   const blob = new Blob([buf], { type: mime });
-  addImageMsg(pid, me.name, blob, name, true);
-  // darabokban megy át, hogy a nagy képek se akasszák meg a csatornát
+  const ui = addImageMsg(pid, me.name, blob, name, true);
+  const st = { cancelled: false };
+  imgSending.set(id, st);
   const total = buf.byteLength;
+  // nagyobb kepnel megjelenik a Megse gomb
+  if (ui && ui.line && total > CHUNK) {
+    const btns = el('div', 'f-btns');
+    const b = el('button', 'xp-btn cancel-btn', t('cancelTransfer'));
+    b.addEventListener('click', () => {
+      st.cancelled = true;
+      const cc = conns.get(pid);
+      if (cc && cc.open) cc.send({ t: 'img-cancel', id });
+      btns.textContent = t('fCancelled');
+    });
+    btns.appendChild(b);
+    ui.line.appendChild(btns);
+    st.btns = btns;
+  }
   c.send({ t: 'img-start', id, name, mime, size: total });
   let sent = 0;
   while (sent < total) {
+    if (st.cancelled) { imgSending.delete(id); return; }
     while (c.dataChannel && c.dataChannel.bufferedAmount > BUF_LIMIT) {
       await new Promise(r => setTimeout(r, 10));
-      if (!c.open) return;
+      if (!c.open || st.cancelled) { imgSending.delete(id); return; }
     }
     const end = Math.min(sent + CHUNK, total);
     c.send({ t: 'img-chunk', id, last: end >= total, data: buf.slice(sent, end) });
     sent = end;
   }
+  imgSending.delete(id);
+  if (st.btns) st.btns.remove();
 }
 
 // ---------- videóküldés (menet közben nézhető) ----------
@@ -4332,6 +4405,19 @@ function onVidStart(pid, d) {
   pend.box.remove();
   pend.btns.remove();
   const ui = attachVideoPlayer(pend.line, pend.info, name, d.size, pend.mode);
+  {
+    // az atvitel barmikor megszakithato
+    const cbtns = el('div', 'f-btns');
+    const cb = el('button', 'xp-btn cancel-btn', t('cancelTransfer'));
+    cb.addEventListener('click', () => {
+      const cc = conns.get(pid);
+      if (cc && cc.open) cc.send({ t: 'vid-stop', id: d.id });
+      vidRx.delete(d.id);
+      cbtns.textContent = t('fCancelled');
+    });
+    cbtns.appendChild(cb);
+    pend.line.appendChild(cbtns);
+  }
   const rx = { pid, name, mime, size: d.size, got: 0, parts: [], ui, ms: null, sb: null,
                queue: [], mode: pend.mode };
 
@@ -4547,6 +4633,7 @@ function addImageMsg(pid, name, blob, fileName, mine) {
   w.msgs.appendChild(m);
   w.msgs.scrollTop = w.msgs.scrollHeight;
   pushHist(pid, { k: 's', x: '🖼️ ' + tf('imgSent', name) + ' ' + (fileName || '') });
+  return { line, msg: m };
 }
 
 // kis (max 48 px) előnézet készítése az idézethez
@@ -4580,6 +4667,16 @@ function onFileOffer(pid, d) {
   const tx = { dir: 'in', pid, name, size: d.size, mime, parts: [], got: 0, lineEl: box, writable: null, wq: Promise.resolve() };
   fileTx.set(d.id, tx);
   ok.addEventListener('click', async () => {
+    // a Mégse gomb azonnal elérhető legyen (a mentési hely kiválasztása előtt is)
+    btns.innerHTML = '';
+    box.querySelector('.f-size').textContent = fmtSize(d.size) + t('fRecv');
+    addCancelBtn(box, () => {
+      tx.cancelled = true;
+      fileTx.delete(d.id);
+      box.querySelector('.f-size').textContent = t('fCancelled');
+      const cc = conns.get(pid);
+      if (cc && cc.open) cc.send({ t: 'file-cancel', id: d.id });
+    });
     // nagy, nem képi fájloknál közvetlenül a lemezre mentünk (ha a
     // böngésző támogatja) — így nincs memórialimit
     const preferMemory = mime.startsWith('image/') && d.size < 52428800;
@@ -4591,8 +4688,7 @@ function onFileOffer(pid, d) {
         tx.writable = null; // mégsem választott helyet — memóriában fogadjuk
       }
     }
-    btns.innerHTML = '';
-    box.querySelector('.f-size').textContent = fmtSize(d.size) + t('fRecv');
+    if (tx.cancelled) return;
     const c = conns.get(pid);
     if (c && c.open) c.send({ t: 'file-accept', id: d.id });
   });
@@ -4637,7 +4733,7 @@ async function onFileAccept(pid, d) {
 
 function onFileChunk(pid, d) {
   const tx = fileTx.get(d.id);
-  if (!tx || tx.dir !== 'in' || tx.pid !== pid) return;
+  if (!tx || tx.dir !== 'in' || tx.pid !== pid || tx.cancelled) return;
   let bytes = d.data;
   if (bytes instanceof ArrayBuffer) bytes = new Uint8Array(bytes);
   if (!bytes) return;
@@ -5035,8 +5131,6 @@ function closeViewer(pid) {
 }
 
 // ---------- verzió és frissítés-ellenőrzés ----------
-const APP_VERSION = '2.0.1';
-const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 
 function cmpVer(a, b) {
   const pa = String(a).split('.').map(n => parseInt(n, 10) || 0);
@@ -5050,22 +5144,52 @@ function cmpVer(a, b) {
 
 // Halkan megnézi, van-e újabb kiadás. Hiba esetén csendben marad —
 // a program offline is teljesen működik.
-async function checkUpdate() {
+// A verzió-adatot <script> elemmel töltjük be, nem fetch-csel: így
+// file:// alól (asztali alkalmazás) és a WebView-ból is működik, ahol a
+// fetch CORS miatt elbukna.
+function loadLatestInfo() {
+  return new Promise((res, rej) => {
+    const sc = document.createElement('script');
+    sc.src = VERSION_JS_URL + '?t=' + Date.now();
+    sc.onload = () => {
+      sc.remove();
+      const d = window.__msnLatest;
+      if (d && typeof d === 'object') res(d);
+      else rej(new Error('nincs adat'));
+    };
+    sc.onerror = () => { sc.remove(); rej(new Error('nem toltodott be')); };
+    document.head.appendChild(sc);
+    setTimeout(() => rej(new Error('idotullepes')), 12000);
+  });
+}
+
+async function checkUpdate(manual) {
   try {
-    const r = await fetch(VERSION_URL, { cache: 'no-store' });
-    if (!r.ok) return;
-    const d = await r.json();
+    const d = await loadLatestInfo();
     const latest = String(d.version || '');
-    if (!/^\d+(\.\d+){0,2}$/.test(latest)) return;
-    if (cmpVer(latest, APP_VERSION) <= 0) return;
+    if (!/^\d+(\.\d+){0,2}$/.test(latest)) throw new Error('bad');
+    const url = typeof d.url === 'string' && d.url.startsWith('https://') ? d.url : null;
+    if (cmpVer(latest, APP_VERSION) <= 0) {
+      if (manual) alert(tf('upToDate', APP_VERSION));
+      return;
+    }
+    // kézi keresésnél a korábbi "elrejtés" ne némítson el
+    if (manual) localStorage.removeItem('msn75_skipver');
     if (localStorage.getItem('msn75_skipver') === latest) return;
-    showUpdateBar(latest, typeof d.url === 'string' && d.url.startsWith('https://') ? d.url : null);
-  } catch { /* nincs net vagy nem elérhető — nem szólunk */ }
+    showUpdateBar(latest, url);
+    if (manual) alert(tf('updateFound', latest));
+  } catch {
+    // hálózati hiba: automatikus keresésnél csendben maradunk
+    if (manual) alert(t('updateCheckFailed'));
+  }
 }
 
 function showUpdateBar(latest, url) {
-  const foot = $('.main-foot');
-  if (!foot || $('#updateBar')) return;
+  if ($('#updateBar')) return;
+  // bejelentkezés előtt a belépő ablakban, utána a főablak alján
+  const loggedIn = $('#mainWin').style.display === 'flex';
+  const foot = loggedIn ? $('.main-foot') : $('.login-foot');
+  if (!foot) return;
   const bar = el('div', 'update-bar');
   bar.id = 'updateBar';
   const txt = el('span', 'ub-text', tf('updateAvail', latest));

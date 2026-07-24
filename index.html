@@ -15,6 +15,8 @@
   --panel: #ebf3fb;
   --deep: #1a3e6e;
   --link: #3b5a82;
+  --win-col: #1557d0;
+  --win-border: #0831D9;
 }
 
 html, body {
@@ -30,7 +32,7 @@ html, body {
 .win {
   position: absolute;
   background: #ECE9D8;
-  border: 1px solid #0831D9;
+  border: 1px solid var(--win-border);
   border-radius: 8px 8px 4px 4px;
   box-shadow: 2px 4px 16px rgba(0,0,0,.45);
   display: flex;
@@ -40,7 +42,12 @@ html, body {
 .titlebar {
   height: 26px;
   border-radius: 7px 7px 0 0;
-  background: linear-gradient(180deg, #58a2f7 0%, #2a70e0 8%, #1557d0 40%, #1a63e2 85%, #0b3fa8 100%);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--win-col) 45%, #ffffff) 0%,
+    color-mix(in srgb, var(--win-col) 80%, #ffffff) 8%,
+    var(--win-col) 40%,
+    color-mix(in srgb, var(--win-col) 88%, #ffffff) 85%,
+    color-mix(in srgb, var(--win-col) 62%, #000000) 100%);
   color: #fff;
   font-weight: bold;
   font-size: 12px;
@@ -857,6 +864,153 @@ html, body {
   background: linear-gradient(90deg, #d6e5f5, #b6cfeb);
   border: 1px solid #9ebedd; border-radius: 7px;
 }
+
+/* ---------- Átméretezhető ablakok ---------- */
+.chatwin, .viewerwin, .callwin, .imgwin, #mainWin {
+  resize: both;
+  overflow: hidden;
+  min-height: 300px;
+}
+
+/* ---------- Válasz (reply) ---------- */
+.msg { position: relative; }
+.msg .reply-btn {
+  position: absolute; right: 2px; top: 0;
+  display: none; cursor: pointer; color: #7a95b3;
+  font-size: 12px; padding: 0 3px;
+  background: #fff; border: 1px solid #d5e5f2; border-radius: 2px;
+}
+.msg:hover .reply-btn { display: inline-block; }
+.reply-q {
+  border-left: 3px solid #a9cdf0;
+  background: #f2f8fd;
+  color: #54749a;
+  padding: 2px 6px;
+  margin: 2px 0 2px 14px;
+  font-size: 11px;
+  max-width: 90%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.reply-q b { color: #38618c; }
+.reply-bar {
+  display: none;
+  gap: 6px; align-items: center;
+  background: #f2f8fd;
+  border-top: 1px solid var(--line);
+  padding: 3px 8px;
+  color: #54749a;
+  font-size: 10px;
+}
+.reply-bar.on { display: flex; }
+.reply-bar .rq { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reply-bar .rx { cursor: pointer; color: #b04030; font-weight: bold; padding: 0 4px; }
+
+/* ---------- Üzenetben linkek ---------- */
+.m-body a { color: #2a5da8; }
+
+/* ---------- Kép-néző ablak ---------- */
+.imgwin { width: 560px; height: 460px; }
+.imgwin .win-body { background: #1a1f26; }
+.imgwin .img-holder { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.imgwin img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.img-bar {
+  background: linear-gradient(180deg, #2c3540, #1a2129);
+  color: #cfe0ee; padding: 4px 8px;
+  display: flex; align-items: center; gap: 8px;
+  flex: 0 0 auto; font-size: 10px;
+}
+.img-bar button {
+  margin-left: auto;
+  border: 1px solid #4a5a6a; border-radius: 3px;
+  background: #2c3a48; color: #cfe0ee;
+  font-family: inherit; font-size: 10px;
+  padding: 2px 8px; cursor: pointer;
+}
+.file-line img.thumb { cursor: zoom-in; }
+
+/* ---------- Kacsintók ---------- */
+.chatwin .win-body { position: relative; }
+.wink-overlay { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 80; }
+.wink-p { position: absolute; top: -30px; font-size: 22px; animation: winkFall 2.6s ease-in forwards; }
+@keyframes winkFall {
+  0% { transform: translateY(0) scale(.6) rotate(0); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translateY(520px) rotate(50deg); opacity: 0; }
+}
+.wink-big {
+  position: absolute; left: 50%; top: 42%;
+  transform: translate(-50%,-50%) scale(0);
+  font-size: 72px;
+  animation: winkPop 2.3s ease forwards;
+}
+@keyframes winkPop {
+  0% { transform: translate(-50%,-50%) scale(0); opacity: 0; }
+  30% { transform: translate(-50%,-50%) scale(1.5); opacity: 1; }
+  70% { transform: translate(-50%,-50%) scale(1.15); opacity: 1; }
+  100% { transform: translate(-50%,-50%) scale(0); opacity: 0; }
+}
+.wink-pop {
+  position: absolute;
+  bottom: 26px; left: 150px;
+  background: #fff;
+  border: 1px solid #8ab1d8;
+  box-shadow: 2px 3px 8px rgba(0,0,0,.3);
+  padding: 6px;
+  display: none;
+  grid-template-columns: repeat(3, 52px);
+  gap: 4px;
+  z-index: 620;
+}
+.wink-pop.open { display: grid; }
+.wink-pop .wk-cell {
+  width: 52px; height: 44px;
+  border: 1px solid #b7cde8;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; cursor: pointer; background: #f7fbff;
+}
+.wink-pop .wk-cell:hover { border-color: #f0a030; background: #fdf3d7; }
+
+/* ---------- Meghívás-választó ---------- */
+.pickwin { width: 260px; }
+.pickwin .win-body { background: #fff; padding: 8px; }
+.pick-title { color: var(--deep); font-weight: bold; margin-bottom: 6px; }
+.pick-item {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 6px; cursor: pointer;
+  border: 1px solid transparent;
+}
+.pick-item:hover { background: #eaf3fc; border-color: #bcd8f2; }
+.pick-item .c-thumb { width: 26px; height: 26px; border: 1px solid #98b7d8; padding: 1px; }
+.pick-item .c-thumb img, .pick-item .c-thumb svg { width: 22px; height: 22px; display: block; }
+.pick-none { color: #8a9ab0; font-style: italic; padding: 6px; }
+.pick-row { text-align: right; margin-top: 8px; }
+
+/* csoportablak: nincs képoszlop */
+.groupwin .dp-col { display: none; }
+.groupwin .msgs-col { border-right: none; }
+
+/* ---------- Asztali beállítások (fogaskerék + ablak) ---------- */
+.desk-gear {
+  position: fixed;
+  right: 16px; bottom: 16px;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.22);
+  border: 1px solid rgba(255,255,255,.5);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  z-index: 4;
+  font-size: 20px;
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0,0,0,.5);
+}
+.desk-gear:hover { background: rgba(255,255,255,.38); }
+.setwin { width: 300px; }
+.setwin .win-body { background: #fff; padding: 12px; }
+.set-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.set-row label { flex: 1; color: #333; }
+.set-row input[type="color"] { width: 48px; height: 26px; border: 1px solid #7f9db9; padding: 0; cursor: pointer; }
+.set-btns { display: flex; justify-content: space-between; margin-top: 6px; }
 </style>
 </head>
 <body>
@@ -1061,6 +1215,7 @@ const LANGS = {
     miSoundsOn: 'Hangok bekapcsolása', miSoundsOff: 'Hangok kikapcsolása',
     miLangHu: 'Magyar', miLangEn: 'English',
     miAbout: 'Az MSN Messenger — P2P kiadás névjegye',
+    miAppearance: 'Megjelenés beállításai…',
     aboutText: 'MSN Messenger 7.5 — P2P kiadás. Szerver és regisztráció nélkül, WebRTC-vel. Az eredeti MSN 7.5 hangjaival és hangulatjeleivel.',
     today: 'MSN Ma',
     infoBanner: 'P2P mód: a partnerek egymás Peer ID-jával kapcsolódnak — kattints ide a névjegyhez.',
@@ -1078,16 +1233,13 @@ const LANGS = {
     blockedMark: 'TILTVA',
     convTitle: 'Beszélgetés', toLbl: 'Címzett:',
     awayBar: '$1 lehet, hogy nem válaszol, mert állapota: $2.',
-    warnLine: 'Jelszót és bankkártyaszámot soha ne adj meg csevegés közben.',
     tbInvite: 'Meghívás', tbFiles: 'Fájlküldés', tbWebcam: 'Webkamera',
-    tbVoice: 'Hang', tbStream: 'Stream', tbAct: 'Tevékenységek', tbGames: 'Játékok',
-    tbServerNote: 'Az eredeti szolgáltatás a Microsoft központi szerverét igényelte',
-    tbInviteNote: 'Több partneres beszélgetés — hamarosan',
+    tbVoice: 'Hang', tbStream: 'Stream',
+    tbInviteNote: 'Partner meghívása csoportos beszélgetésbe',
     blockRound: 'Partner tiltása',
     fontTip: 'Betűtípus és szín', emoTip: 'Hangulatjelek',
     vclipBtn: 'Hangüzenet', vclipTip: 'Hangüzenet felvétele (max 15 mp)',
-    winks: 'Kacsintók', winksNote: 'A Kacsintók letölthető Flash-tartalmak voltak — P2P-ben nem elérhetők',
-    bgs: 'Hátterek', nudgeTip: 'Rezgetés küldése',
+    winks: 'Kacsintók', bgs: 'Hátterek', nudgeTip: 'Rezgetés küldése',
     send: 'Küldés', search2: 'Keresés',
     writes: '$1 írja:', lastMsg: 'Utolsó üzenet: ', typing: '$1 éppen üzenetet ír…',
     sentNudge: 'Rezgetést küldtél.', gotNudge: '$1 megrezegtette a beszélgetőablakot!',
@@ -1100,6 +1252,7 @@ const LANGS = {
     fOfferWait: ' — várakozás a partner válaszára…',
     fRecv: ' — fogadás…', fRejected: 'Elutasítva.', fCancelled: 'Megszakítva.',
     fSending: ' — küldés: ', fSent: ' — elküldve ✓', fDone: ' — kész ✓',
+    fSavedDisk: ' — mentve a lemezre ✓',
     fSave: 'Mentés', fCantSend: 'A partner nem érhető el, a fájlt nem lehet elküldeni.',
     accept: 'Elfogadás', decline: 'Elutasítás',
     callVoiceStarted: 'Hanghívást indítottál.', callCamStarted: 'Webkamerás beszélgetést kezdeményeztél.',
@@ -1128,6 +1281,20 @@ const LANGS = {
     miNudge: 'Rezgetés küldése', miVoiceCall: 'Hanghívás indítása',
     miWebcam: 'Webkamerás beszélgetés', miSendFile: 'Fájl vagy fénykép küldése…',
     cut: 'Kivágás', copy: 'Másolás', paste: 'Beillesztés',
+    grpConv: 'Csoportos beszélgetés',
+    members: 'Résztvevők:',
+    invitePick: 'Kit hívsz meg a beszélgetésbe?',
+    noOneOnline: 'Nincs több elérhető partner.',
+    joined: '$1 csatlakozott a beszélgetéshez.',
+    youWereAdded: 'Csoportos beszélgetéshez adtak hozzá.',
+    replyTo: 'Válasz erre:',
+    replyBtn: 'Válasz',
+    sentWink: 'Kacsintót küldtél.', gotWink: '$1 kacsintót küldött!',
+    settings: 'Megjelenés beállításai',
+    deskCol: 'Asztal háttérszíne:',
+    winCol: 'Ablakok színe:',
+    reset: 'Alaphelyzet',
+    imgWin: 'Kép',
   },
   en: {
     brandSub: '— P2P Edition',
@@ -1154,6 +1321,7 @@ const LANGS = {
     miSoundsOn: 'Turn Sounds On', miSoundsOff: 'Turn Sounds Off',
     miLangHu: 'Magyar', miLangEn: 'English',
     miAbout: 'About MSN Messenger — P2P Edition',
+    miAppearance: 'Appearance settings…',
     aboutText: 'MSN Messenger 7.5 — P2P Edition. No server, no registration, powered by WebRTC. With the original MSN 7.5 sounds and emoticons.',
     today: 'MSN Today',
     infoBanner: 'P2P mode: contacts connect using each other\'s Peer ID — click here to learn more.',
@@ -1171,16 +1339,13 @@ const LANGS = {
     blockedMark: 'BLOCKED',
     convTitle: 'Conversation', toLbl: 'To:',
     awayBar: '$1 may not reply because his or her status is set to $2.',
-    warnLine: 'Never share your password or credit card number in an instant message conversation.',
     tbInvite: 'Invite', tbFiles: 'Send Files', tbWebcam: 'Webcam',
-    tbVoice: 'Voice', tbStream: 'Stream', tbAct: 'Activities', tbGames: 'Games',
-    tbServerNote: 'The original service required Microsoft\'s central server',
-    tbInviteNote: 'Multi-party conversations — coming soon',
+    tbVoice: 'Voice', tbStream: 'Stream',
+    tbInviteNote: 'Invite a contact to a group conversation',
     blockRound: 'Block contact',
     fontTip: 'Font and color', emoTip: 'Emoticons',
     vclipBtn: 'Voice Clip', vclipTip: 'Record a voice clip (max 15 s)',
-    winks: 'Winks', winksNote: 'Winks were downloadable Flash content — not available in P2P',
-    bgs: 'Backgrounds', nudgeTip: 'Send a nudge',
+    winks: 'Winks', bgs: 'Backgrounds', nudgeTip: 'Send a nudge',
     send: 'Send', search2: 'Search',
     writes: '$1 says:', lastMsg: 'Last message: ', typing: '$1 is writing a message…',
     sentNudge: 'You sent a nudge.', gotNudge: '$1 just sent you a nudge!',
@@ -1193,6 +1358,7 @@ const LANGS = {
     fOfferWait: ' — waiting for the contact to respond…',
     fRecv: ' — receiving…', fRejected: 'Declined.', fCancelled: 'Cancelled.',
     fSending: ' — sending: ', fSent: ' — sent ✓', fDone: ' — done ✓',
+    fSavedDisk: ' — saved to disk ✓',
     fSave: 'Save', fCantSend: 'The contact is unavailable, the file cannot be sent.',
     accept: 'Accept', decline: 'Decline',
     callVoiceStarted: 'You started a voice call.', callCamStarted: 'You started a webcam conversation.',
@@ -1221,6 +1387,20 @@ const LANGS = {
     miNudge: 'Send a nudge', miVoiceCall: 'Start a voice call',
     miWebcam: 'Start a webcam conversation', miSendFile: 'Send a file or photo…',
     cut: 'Cut', copy: 'Copy', paste: 'Paste',
+    grpConv: 'Group conversation',
+    members: 'Participants:',
+    invitePick: 'Who do you want to invite?',
+    noOneOnline: 'No other contacts are online.',
+    joined: '$1 joined the conversation.',
+    youWereAdded: 'You were added to a group conversation.',
+    replyTo: 'Replying to:',
+    replyBtn: 'Reply',
+    sentWink: 'You sent a wink.', gotWink: '$1 sent you a wink!',
+    settings: 'Appearance settings',
+    deskCol: 'Desktop background color:',
+    winCol: 'Window color:',
+    reset: 'Reset',
+    imgWin: 'Image',
   },
 };
 let lang = localStorage.getItem('msn75_lang') || 'hu';
@@ -1235,8 +1415,9 @@ const remote = new Map();
 const chatWins = new Map();
 const outCalls = new Map();
 const viewers = new Map();
-const calls = new Map();
+const calls = new Map();      // pid -> aktív hívásállapot (foglaltság-jelzéshez)
 const fileTx = new Map();
+const groups = new Map();     // gid -> { gid, members: Map(id->name), w }
 let screenStream = null;
 let zTop = 10;
 let muted = localStorage.getItem('msn75_muted') === '1';
@@ -1247,8 +1428,7 @@ try { Object.assign(myFmt, JSON.parse(localStorage.getItem('msn75_fmt') || '{}')
 
 const A = window.MSN_ASSETS || null;
 
-// A streamelés/hívások megbízhatóságához: STUN + ingyenes TURN relay-k.
-// TURN nélkül szigorú NAT/tűzfal mögött a médiakapcsolat nem jön létre.
+// STUN + ingyenes TURN relay-k (NAT/tűzfal mögötti médiakapcsolathoz)
 const RTC_CONFIG = {
   iceServers: [
     { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
@@ -1314,7 +1494,7 @@ function emotify(escaped) {
   const used = [];
   for (const [code, idx] of EMO_LOOKUP) {
     if (out.indexOf(code) !== -1) {
-      const ph = '\u0000' + used.length + '\u0001';
+      const ph = 'EMOPH' + used.length + 'HP';
       used.push([ph, emoHtml(idx, code)]);
       out = out.split(code).join(ph);
     }
@@ -1322,8 +1502,47 @@ function emotify(escaped) {
   for (const [ph, html] of used) out = out.split(ph).join(html);
   return out;
 }
+// escapelés + linkek + hangulatjelek + sortörések
+function renderBody(text) {
+  let s = escHtml(text);
+  const links = [];
+  s = s.replace(/(https?:\/\/[^\s<>"']+)/g, m => {
+    links.push(m);
+    return 'LNKPH' + (links.length - 1) + 'HP';
+  });
+  s = emotify(s);
+  links.forEach((u, i) => {
+    s = s.split('LNKPH' + i + 'HP').join('<a href="' + u + '" target="_blank" rel="noopener">' + u + '</a>');
+  });
+  return s.replace(/\n/g, '<br>');
+}
 
-// ---------- hátterek (beszélgetés) ----------
+// ---------- kacsintók ----------
+const WINKS = [
+  ['hearts', '💗'], ['fire', '🎆'], ['laugh', '😂'],
+  ['stars', '✨'], ['knock', '👊'], ['dance', '🕺'],
+];
+function playWink(pid, id) {
+  const w = openChat(pid);
+  const wk = WINKS.find(x => x[0] === id);
+  if (!wk) return;
+  const body = $('.win-body', w.win);
+  const ov = el('div', 'wink-overlay');
+  for (let i = 0; i < 22; i++) {
+    const p = el('span', 'wink-p', wk[1]);
+    p.style.left = (3 + Math.random() * 92) + '%';
+    p.style.animationDelay = (Math.random() * 1.1) + 's';
+    p.style.fontSize = (16 + Math.random() * 16) + 'px';
+    ov.appendChild(p);
+  }
+  const big = el('span', 'wink-big', wk[1]);
+  ov.appendChild(big);
+  body.appendChild(ov);
+  setTimeout(() => ov.remove(), 4000);
+  sndNudge();
+}
+
+// ---------- hátterek ----------
 const BGS = [
   ['none', '#ffffff'],
   ['sky', 'linear-gradient(180deg,#eaf6ff,#cfe8fb)'],
@@ -1354,10 +1573,27 @@ function hashCode(s) {
 function fmtSize(n) {
   if (n < 1024) return n + ' B';
   if (n < 1048576) return (n / 1024).toFixed(1) + ' KB';
-  return (n / 1048576).toFixed(1) + ' MB';
+  if (n < 1073741824) return (n / 1048576).toFixed(1) + ' MB';
+  return (n / 1073741824).toFixed(2) + ' GB';
 }
 function randId() { return Math.random().toString(36).slice(2, 10); }
 function sanitizeColor(c) { return /^#[0-9a-fA-F]{3,8}$/.test(String(c)) ? c : null; }
+
+// ---------- előzmények (chat history) ----------
+const HIST_MAX = 250;
+function histKey(pid) { return 'msn75_hist_' + me.id + '_' + pid; }
+function loadHist(pid) {
+  try { return JSON.parse(localStorage.getItem(histKey(pid)) || '[]'); }
+  catch { return []; }
+}
+function pushHist(pid, entry) {
+  try {
+    const arr = loadHist(pid);
+    arr.push(entry);
+    while (arr.length > HIST_MAX) arr.shift();
+    localStorage.setItem(histKey(pid), JSON.stringify(arr));
+  } catch { /* betelt a tároló — előzmény nélkül megy tovább */ }
+}
 
 // ---------- megjelenítendő képek ----------
 function dpHtml(pid) {
@@ -1437,6 +1673,70 @@ let contacts = loadContacts();
 function saveContacts() { localStorage.setItem('msn75_contacts', JSON.stringify(contacts)); }
 function saveBlocked() { localStorage.setItem('msn75_blocked', JSON.stringify([...blocked])); }
 function saveFmt() { localStorage.setItem('msn75_fmt', JSON.stringify(myFmt)); }
+
+// ---------- téma (asztal + ablakszín) ----------
+function applyTheme() {
+  const bg = localStorage.getItem('msn75_deskbg');
+  const wc = localStorage.getItem('msn75_wincol');
+  if (bg && sanitizeColor(bg)) {
+    document.body.style.background =
+      'linear-gradient(135deg, color-mix(in srgb, ' + bg + ' 70%, white) 0%, ' + bg + ' 55%, ' +
+      'color-mix(in srgb, ' + bg + ' 72%, black) 100%)';
+  } else {
+    document.body.style.background = '';
+  }
+  if (wc && sanitizeColor(wc)) {
+    document.documentElement.style.setProperty('--win-col', wc);
+    document.documentElement.style.setProperty('--win-border', wc);
+  } else {
+    document.documentElement.style.removeProperty('--win-col');
+    document.documentElement.style.removeProperty('--win-border');
+  }
+}
+let setWin = null;
+function openSettings() {
+  if (setWin) { bringToFront(setWin); return; }
+  const win = el('div', 'win setwin');
+  win.style.left = (window.innerWidth / 2 - 150) + 'px';
+  win.style.top = '160px';
+  const curBg = localStorage.getItem('msn75_deskbg') || '#2a5da8';
+  const curWc = localStorage.getItem('msn75_wincol') || '#1557d0';
+  win.innerHTML =
+    '<div class="titlebar"><span class="t-icon">⚙️</span>' +
+    '<span class="t-text">' + t('settings') + '</span>' +
+    '<span class="t-btns"><span class="tbtn close">✕</span></span></div>' +
+    '<div class="win-body">' +
+      '<div class="set-row"><label>' + t('deskCol') + '</label>' +
+      '<input type="color" class="set-bg" value="' + curBg + '"></div>' +
+      '<div class="set-row"><label>' + t('winCol') + '</label>' +
+      '<input type="color" class="set-wc" value="' + curWc + '"></div>' +
+      '<div class="set-btns">' +
+      '<button class="xp-btn set-reset">' + t('reset') + '</button>' +
+      '<button class="xp-btn primary set-ok">OK</button></div>' +
+    '</div>';
+  document.body.appendChild(win);
+  makeDraggable(win, $('.titlebar', win));
+  bringToFront(win);
+  setWin = win;
+  const close = () => { win.remove(); setWin = null; };
+  $('.tbtn.close', win).addEventListener('click', e => { e.stopPropagation(); close(); });
+  $('.set-ok', win).addEventListener('click', close);
+  $('.set-bg', win).addEventListener('input', e => {
+    localStorage.setItem('msn75_deskbg', e.target.value);
+    applyTheme();
+  });
+  $('.set-wc', win).addEventListener('input', e => {
+    localStorage.setItem('msn75_wincol', e.target.value);
+    applyTheme();
+  });
+  $('.set-reset', win).addEventListener('click', () => {
+    localStorage.removeItem('msn75_deskbg');
+    localStorage.removeItem('msn75_wincol');
+    $('.set-bg', win).value = '#2a5da8';
+    $('.set-wc', win).value = '#1557d0';
+    applyTheme();
+  });
+}
 
 // ---------- ablakok mozgatása ----------
 function makeDraggable(win, handle) {
@@ -1559,6 +1859,7 @@ function buildMainMenus() {
     ]},
     { label: t('menuTools'), items: [
       { label: muted ? t('miSoundsOn') : t('miSoundsOff'), act: 'mute' },
+      { label: t('miAppearance'), act: 'appearance' },
       '-',
       { label: t('miLangHu'), act: 'lang-hu', checked: lang === 'hu' },
       { label: t('miLangEn'), act: 'lang-en', checked: lang === 'en' },
@@ -1571,6 +1872,7 @@ function buildMainMenus() {
     else if (act === 'addcontact') { $('#addForm').classList.add('open'); $('#addId').focus(); }
     else if (act === 'mute') { muted = !muted; localStorage.setItem('msn75_muted', muted ? '1' : '0'); buildMainMenus(); }
     else if (act === 'lang-hu' || act === 'lang-en') { setLang(act.slice(5)); }
+    else if (act === 'appearance') { openSettings(); }
     else if (act === 'about') { alert(t('aboutText')); }
   });
 }
@@ -1603,19 +1905,17 @@ function setLang(l) {
     $('#bannerBfly').innerHTML = buddySvg(26, 'online');
   }
   $('#envIc').innerHTML = '<svg viewBox="0 0 16 12" width="15" height="11"><rect x="0" y="0" width="16" height="12" rx="1" fill="#f7f3e8" stroke="#b0a880"/><path d="M0 0l8 7 8-7" fill="none" stroke="#b0a880"/></svg>';
-  const tabs = [
-    buddySvg(18, 'online'),
-    '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#2aa8d8"/><path d="M2 10h16M10 2c3 2.5 3 13.5 0 16M10 2c-3 2.5-3 13.5 0 16" stroke="#fff" stroke-width="1.2" fill="none"/></svg>',
-    '<svg viewBox="0 0 20 20"><path d="M10 1l2.4 5.6L18 7.3l-4.4 4 1.2 6L10 14.4 5.2 17.3l1.2-6L2 7.3l5.6-.7z" fill="#f0a030"/></svg>',
-    '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="5" fill="#ffd24a"/><g stroke="#ffd24a" stroke-width="1.6">' +
-      '<path d="M10 1v3M10 16v3M1 10h3M16 10h3M3.5 3.5l2 2M14.5 14.5l2 2M16.5 3.5l-2 2M5.5 14.5l-2 2"/></g></svg>',
-  ];
+  // bal oldali fülsáv: csak a működő (partnerlista) fül
   const strip = $('#tabstrip');
-  tabs.forEach((svg, i) => {
-    const tb = el('div', 'tab' + (i === 0 ? ' active' : ''));
-    tb.innerHTML = svg;
-    strip.appendChild(tb);
-  });
+  const tb = el('div', 'tab active');
+  tb.innerHTML = buddySvg(18, 'online');
+  strip.appendChild(tb);
+  // asztali beállítások fogaskerék
+  const gear = el('div', 'desk-gear', '⚙');
+  gear.title = t('settings');
+  gear.addEventListener('click', openSettings);
+  document.body.appendChild(gear);
+  applyTheme();
   try {
     const saved = JSON.parse(localStorage.getItem('msn75_login') || 'null');
     if (saved) {
@@ -1873,7 +2173,7 @@ function onData(pid, d) {
     case 'msg': {
       const isNew = !chatWins.has(pid) || chatWins.get(pid).win.style.display === 'none';
       openChat(pid);
-      addMsg(pid, dispName(pid), String(d.text).slice(0, 4000), false, d.fmt);
+      addMsg(pid, dispName(pid), String(d.text).slice(0, 4000), false, d.fmt, d.rp);
       if (isNew) sndAlert(); else sndMsg();
       break;
     }
@@ -1886,12 +2186,21 @@ function onData(pid, d) {
       sndNudge();
       break;
     }
+    case 'wink': {
+      openChat(pid);
+      sysMsg(pid, tf('gotWink', dispName(pid)));
+      playWink(pid, d.id);
+      break;
+    }
     case 'bg': {
-      const w = chatWins.get(pid) || openChat(pid);
+      openChat(pid);
+      const w = chatWins.get(pid);
       const bg = BGS.find(b => b[0] === d.id);
       if (bg && w) $('.msgs', w.win).style.background = bg[1];
       break;
     }
+    case 'ginv': onGinv(pid, d); break;
+    case 'gmsg': onGmsg(pid, d); break;
     case 'vclip': onVclip(pid, d); break;
     case 'file-offer': onFileOffer(pid, d); break;
     case 'file-accept': onFileAccept(pid, d); break;
@@ -1927,6 +2236,7 @@ function onData(pid, d) {
 }
 
 function dispName(pid) {
+  if (pid === me.id) return me.name;
   const r = remote.get(pid);
   if (r && r.name) return r.name;
   const ct = contacts.find(x => x.id === pid);
@@ -2019,7 +2329,8 @@ function toggleBlock(pid) {
     saveBlocked();
     const c = conns.get(pid);
     if (c) { try { c.close(); } catch {} }
-    endCall(pid);
+    const st = calls.get(pid);
+    if (st) endCallState(pid, st);
     stopStream(pid, true);
     closeViewer(pid);
     renderContacts();
@@ -2049,6 +2360,202 @@ function addContact() {
   connectTo(id);
 }
 
+// ---------- partner-választó (meghíváshoz) ----------
+function pickContact(excludeIds, cb) {
+  const win = el('div', 'win pickwin');
+  win.style.left = (window.innerWidth / 2 - 130) + 'px';
+  win.style.top = '140px';
+  win.innerHTML =
+    '<div class="titlebar"><span class="t-text">' + t('tbInvite') + '</span>' +
+    '<span class="t-btns"><span class="tbtn close">✕</span></span></div>' +
+    '<div class="win-body"><div class="pick-title">' + t('invitePick') + '</div>' +
+    '<div class="pick-list"></div>' +
+    '<div class="pick-row"><button class="xp-btn">' + t('cancel') + '</button></div></div>';
+  const list = $('.pick-list', win);
+  let any = false;
+  for (const ct of contacts) {
+    if (!conns.has(ct.id) || excludeIds.includes(ct.id) || blocked.has(ct.id)) continue;
+    any = true;
+    const item = el('div', 'pick-item');
+    const th = el('span', 'c-thumb');
+    th.innerHTML = dpHtml(ct.id);
+    item.appendChild(th);
+    item.appendChild(el('span', null, dispName(ct.id)));
+    item.addEventListener('click', () => { win.remove(); cb(ct.id); });
+    list.appendChild(item);
+  }
+  if (!any) list.appendChild(el('div', 'pick-none', t('noOneOnline')));
+  document.body.appendChild(win);
+  makeDraggable(win, $('.titlebar', win));
+  bringToFront(win);
+  $('.tbtn.close', win).addEventListener('click', e => { e.stopPropagation(); win.remove(); });
+  $('.pick-row .xp-btn', win).addEventListener('click', () => win.remove());
+}
+
+// ---------- csoportos beszélgetés ----------
+function groupMembersArr(g) {
+  return [...g.members.entries()].map(([i, n]) => ({ i, n }));
+}
+function ensureGroup(gid, ms) {
+  let g = groups.get(gid);
+  if (!g) {
+    g = { gid, members: new Map(), w: null };
+    groups.set(gid, g);
+  }
+  if (Array.isArray(ms)) {
+    for (const m of ms) {
+      if (m && typeof m.i === 'string' && /^[a-zA-Z0-9_-]{3,40}$/.test(m.i)) {
+        const had = g.members.has(m.i);
+        g.members.set(m.i, String(m.n || m.i).slice(0, 40));
+        if (!had && m.i !== me.id && g.w) gSysMsg(g, tf('joined', m.n || m.i));
+        if (m.i !== me.id) connectTo(m.i);
+      }
+    }
+  }
+  if (!g.w) openGroupWin(g);
+  refreshGroupHead(g);
+  return g;
+}
+function refreshGroupHead(g) {
+  if (!g.w) return;
+  const names = [...g.members.entries()].filter(([i]) => i !== me.id).map(([, n]) => n);
+  $('.t-text', g.w.win).textContent = t('grpConv') + ' (' + g.members.size + ')';
+  $('.to-line', g.w.win).textContent = t('members') + ' ' + names.join(', ');
+}
+function openGroupWin(g) {
+  const win = el('div', 'win chatwin groupwin');
+  win.style.left = (360 + (cascade % 6) * 34) + 'px';
+  win.style.top = (30 + (cascade % 6) * 28) + 'px';
+  cascade++;
+  const iconImg = A ? '<img src="' + A.buddies + '" alt="">' : buddySvg(16, 'online');
+  win.innerHTML =
+    '<div class="titlebar">' +
+      '<span class="t-icon">' + iconImg + '</span>' +
+      '<span class="t-text">' + t('grpConv') + '</span>' +
+      '<span class="t-btns"><span class="tbtn close">✕</span></span>' +
+    '</div>' +
+    '<div class="win-body">' +
+      '<div class="to-line"></div>' +
+      '<div class="chat-toolbar">' +
+        '<button class="tb-big g-invite">' + TB_ICONS.invite + t('tbInvite') + '</button>' +
+      '</div>' +
+      '<div class="chat-mid">' +
+        '<div class="msgs-col"><div class="msgs"></div></div>' +
+      '</div>' +
+      '<div class="fmt-bar">' +
+        '<button class="fmt-btn emo-btn" title="' + t('emoTip') + '">' +
+          (A ? '<span class="emo" style="background-position:0 0"></span>' : '🙂') + ' ▾</button>' +
+      '</div>' +
+      '<div class="input-area">' +
+        '<textarea></textarea>' +
+        '<div class="send-col"><button class="send-btn">' + t('send') + '</button></div>' +
+      '</div>' +
+      '<div class="chat-status"></div>' +
+      '<div class="emo-pop"></div>' +
+    '</div>';
+  document.body.appendChild(win);
+  makeDraggable(win, $('.titlebar', win));
+  bringToFront(win);
+
+  const gw = { win, msgs: $('.msgs', win), ta: $('textarea', win), status: $('.chat-status', win) };
+  g.w = gw;
+
+  $('.tbtn.close', win).addEventListener('click', e => { e.stopPropagation(); win.style.display = 'none'; });
+
+  const send = () => {
+    const text = gw.ta.value.trim();
+    if (!text) return;
+    const fmt = { color: sanitizeColor(myFmt.color) || undefined, bold: !!myFmt.bold || undefined, italic: !!myFmt.italic || undefined };
+    const msg = { t: 'gmsg', gid: g.gid, ms: groupMembersArr(g), text, fmt };
+    for (const id of g.members.keys()) {
+      if (id === me.id) continue;
+      const c = conns.get(id);
+      if (c && c.open) c.send(msg);
+    }
+    addGroupMsg(g, me.name, text, fmt);
+    gw.ta.value = '';
+    gw.ta.focus();
+  };
+  $('.send-btn', win).addEventListener('click', send);
+  gw.ta.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  });
+
+  $('.g-invite', win).addEventListener('click', () => {
+    pickContact([...g.members.keys()], pid2 => {
+      g.members.set(pid2, dispName(pid2));
+      const inv = { t: 'ginv', gid: g.gid, ms: groupMembersArr(g) };
+      for (const id of g.members.keys()) {
+        if (id === me.id) continue;
+        const c = conns.get(id);
+        if (c && c.open) c.send(inv);
+      }
+      refreshGroupHead(g);
+      gSysMsg(g, tf('joined', dispName(pid2)));
+    });
+  });
+
+  const pop = $('.emo-pop', win);
+  EMO.forEach((codes, idx) => {
+    const cell = el('span', 'emo-cell');
+    cell.title = codes[0];
+    cell.innerHTML = A
+      ? '<span class="emo" style="background-position:-' + (idx * 19) + 'px 0"></span>'
+      : EMO_FALLBACK[idx];
+    cell.addEventListener('click', () => {
+      gw.ta.value += (gw.ta.value && !gw.ta.value.endsWith(' ') ? ' ' : '') + codes[0] + ' ';
+      pop.classList.remove('open');
+      gw.ta.focus();
+    });
+    pop.appendChild(cell);
+  });
+  $('.emo-btn', win).addEventListener('click', e => {
+    e.stopPropagation();
+    pop.classList.toggle('open');
+  });
+  win.addEventListener('click', e => {
+    if (!e.target.closest('.emo-pop') && !e.target.closest('.emo-btn')) pop.classList.remove('open');
+  });
+}
+function addGroupMsg(g, name, text, fmt) {
+  const m = el('div', 'msg');
+  const h = el('div', 'm-head');
+  h.innerHTML = tf('writes', escHtml(name)) + '<span class="m-time">' + now() + '</span>';
+  m.appendChild(h);
+  const b = el('div', 'm-body');
+  b.innerHTML = renderBody(text);
+  if (fmt) {
+    const col = sanitizeColor(fmt.color);
+    if (col) b.style.color = col;
+    if (fmt.bold) b.style.fontWeight = 'bold';
+    if (fmt.italic) b.style.fontStyle = 'italic';
+  }
+  m.appendChild(b);
+  g.w.msgs.appendChild(m);
+  g.w.msgs.scrollTop = g.w.msgs.scrollHeight;
+}
+function gSysMsg(g, text) {
+  const m = el('div', 'msg sys', text);
+  g.w.msgs.appendChild(m);
+  g.w.msgs.scrollTop = g.w.msgs.scrollHeight;
+}
+function onGinv(pid, d) {
+  if (typeof d.gid !== 'string') return;
+  const isNew = !groups.has(d.gid);
+  const g = ensureGroup(d.gid, d.ms);
+  g.w.win.style.display = 'flex';
+  bringToFront(g.w.win);
+  if (isNew) { gSysMsg(g, t('youWereAdded')); sndAlert(); }
+}
+function onGmsg(pid, d) {
+  if (typeof d.gid !== 'string') return;
+  const g = ensureGroup(d.gid, d.ms);
+  g.w.win.style.display = 'flex';
+  const name = g.members.get(pid) || dispName(pid);
+  addGroupMsg(g, name, String(d.text).slice(0, 4000), d.fmt);
+  sndMsg();
+}
+
 // ---------- csevegőablak ----------
 let cascade = 0;
 
@@ -2058,13 +2565,10 @@ const TB_ICONS = {
   stream: '<svg viewBox="0 0 24 24"><rect x="2" y="5" width="15" height="12" rx="2" fill="#274d77"/><rect x="4" y="7" width="11" height="8" fill="#7fd0ff"/><path d="M17 9l5-3v10l-5-3z" fill="#274d77"/><circle cx="20" cy="19" r="3" fill="#d02818"/></svg>',
   webcam: '<svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="7" fill="#8aa5c4"/><circle cx="12" cy="10" r="4" fill="#274d77"/><circle cx="12" cy="10" r="1.6" fill="#7fd0ff"/><path d="M8 17l-2 5h12l-2-5" fill="#8aa5c4"/></svg>',
   voice: '<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" fill="#8aa5c4"/><path d="M6 11a6 6 0 0012 0M12 17v4M8 21h8" stroke="#8aa5c4" stroke-width="2" fill="none"/></svg>',
-  act: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" fill="#f0a030"/><rect x="13" y="3" width="8" height="8" fill="#3faf22"/><rect x="3" y="13" width="8" height="8" fill="#2a70e0"/><rect x="13" y="13" width="8" height="8" fill="#d02818"/></svg>',
-  games: '<svg viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="10" rx="5" fill="#8aa5c4"/><path d="M7 11v4M5 13h4" stroke="#fff" stroke-width="1.6"/><circle cx="16" cy="12" r="1.3" fill="#fff"/><circle cx="19" cy="14" r="1.3" fill="#fff"/></svg>',
-  nudge: '<svg viewBox="0 0 16 16"><path d="M8 1l2 5h4l-3.5 3 1.5 5L8 11l-4 3 1.5-5L2 6h4z" fill="#f0a030"/></svg>',
+  nudge: '<svg viewBox="0 0 16 16" width="14" height="14"><path d="M8 1l2 5h4l-3.5 3 1.5 5L8 11l-4 3 1.5-5L2 6h4z" fill="#f0a030"/></svg>',
   bg: '<svg viewBox="0 0 16 16" width="14" height="14"><rect x="1" y="2" width="14" height="11" fill="#7fd0ff"/><circle cx="5" cy="6" r="1.6" fill="#ffe680"/><path d="M1 13l5-5 3 3 2-2 4 4z" fill="#3faf22"/></svg>',
   mic: '<svg viewBox="0 0 16 16" width="13" height="13"><rect x="6" y="1" width="4" height="8" rx="2" fill="#4a71a3"/><path d="M4 7a4 4 0 008 0M8 11v3M6 14h4" stroke="#4a71a3" stroke-width="1.4" fill="none"/></svg>',
   winks: '<svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="7" fill="#ffd24a"/><path d="M4.5 6.5h2.4M9 6.2c.4-.7 1.6-.7 2 0" stroke="#7a5c00" stroke-width="1.1" fill="none"/><path d="M5 10c1.5 1.6 4.5 1.6 6 0" stroke="#7a5c00" stroke-width="1.1" fill="none"/></svg>',
-  lock: '<svg viewBox="0 0 12 12" width="11" height="11"><rect x="2" y="5" width="8" height="6" rx="1" fill="#b0a880"/><path d="M4 5V3.5a2 2 0 014 0V5" stroke="#8a8460" stroke-width="1.2" fill="none"/></svg>',
 };
 
 function chatTemplate(pid) {
@@ -2083,13 +2587,11 @@ function chatTemplate(pid) {
       '<div class="to-line">' + t('toLbl') + ' <b>' + escHtml(dispName(pid)) + '</b> <span class="pid">&lt;' + escHtml(pid) + '&gt;</span></div>' +
       '<div class="away-bar"><span class="ib-i">i</span><span class="ab-text"></span></div>' +
       '<div class="chat-toolbar">' +
-        '<button class="tb-big" disabled title="' + t('tbInviteNote') + '">' + TB_ICONS.invite + t('tbInvite') + '</button>' +
+        '<button class="tb-big" data-act="invite" title="' + t('tbInviteNote') + '">' + TB_ICONS.invite + t('tbInvite') + '</button>' +
         '<button class="tb-big" data-act="sendfile">' + TB_ICONS.file + t('tbFiles') + '</button>' +
         '<button class="tb-big" data-act="webcam">' + TB_ICONS.webcam + t('tbWebcam') + '</button>' +
         '<button class="tb-big" data-act="voice">' + TB_ICONS.voice + t('tbVoice') + '</button>' +
         '<button class="tb-big" data-act="stream">' + TB_ICONS.stream + t('tbStream') + '</button>' +
-        '<button class="tb-big" disabled title="' + t('tbServerNote') + '">' + TB_ICONS.act + t('tbAct') + '</button>' +
-        '<button class="tb-big" disabled title="' + t('tbServerNote') + '">' + TB_ICONS.games + t('tbGames') + '</button>' +
         '<span class="tb-round" data-act="block" title="' + t('blockRound') + '">⊘</span>' +
         msnLogo +
       '</div>' +
@@ -2097,7 +2599,6 @@ function chatTemplate(pid) {
         '<button class="stop" data-act="stopstream">' + t('stopStreamBtn') + '</button></div>' +
       '<div class="chat-mid">' +
         '<div class="msgs-col">' +
-          '<div class="warn-line">' + TB_ICONS.lock + '<span>' + t('warnLine') + '</span></div>' +
           '<div class="msgs"></div>' +
         '</div>' +
         '<div class="dp-col">' +
@@ -2109,12 +2610,13 @@ function chatTemplate(pid) {
           '<div class="dp-tag">' + escHtml(me.name) + '</div></div>' +
         '</div>' +
       '</div>' +
+      '<div class="reply-bar"><span>↩ ' + t('replyTo') + '</span><span class="rq"></span><span class="rx">✕</span></div>' +
       '<div class="fmt-bar">' +
         '<button class="fmt-btn font-btn" title="' + t('fontTip') + '"><b style="font-size:13px;font-family:serif">A</b></button>' +
         '<button class="fmt-btn emo-btn" title="' + t('emoTip') + '">' +
           (A ? '<span class="emo" style="background-position:0 0"></span>' : '🙂') + ' ▾</button>' +
         '<button class="fmt-btn vclip-btn" title="' + t('vclipTip') + '">' + TB_ICONS.mic + ' ' + t('vclipBtn') + '</button>' +
-        '<button class="fmt-btn" disabled title="' + t('winksNote') + '">' + TB_ICONS.winks + ' ' + t('winks') + ' ▾</button>' +
+        '<button class="fmt-btn wink-btn" title="' + t('winks') + '">' + TB_ICONS.winks + ' ' + t('winks') + ' ▾</button>' +
         '<button class="fmt-btn bg-btn" title="' + t('bgs') + '">' + TB_ICONS.bg + ' ' + t('bgs') + ' ▾</button>' +
         '<span class="fmt-sep"></span>' +
         '<button class="fmt-btn nudge-btn" title="' + t('nudgeTip') + '">' + TB_ICONS.nudge + '</button>' +
@@ -2124,6 +2626,7 @@ function chatTemplate(pid) {
           '<button class="fmt-btn fmt-i' + (myFmt.italic ? ' toggled' : '') + '"><i>I</i></button>' +
         '</div>' +
         '<div class="bg-pop"></div>' +
+        '<div class="wink-pop"></div>' +
       '</div>' +
       '<div class="input-area">' +
         '<textarea></textarea>' +
@@ -2162,6 +2665,7 @@ function openChat(pid) {
     lastTypeSent: 0,
     lastMsgAt: null,
     recorder: null,
+    reply: null,
   };
   chatWins.set(pid, w);
   refreshChatHead(pid);
@@ -2180,6 +2684,7 @@ function openChat(pid) {
       { label: t('miVoiceCall'), act: 'voice' },
       { label: t('miWebcam'), act: 'webcam' },
       { label: t('youStream'), act: 'stream' },
+      { label: t('tbInvite'), act: 'invite' },
       { label: t('miSendFile'), act: 'sendfile' },
       '-',
       { label: t('blockC'), act: 'block' },
@@ -2203,6 +2708,10 @@ function openChat(pid) {
   });
   w.fileInput = fIn;
 
+  // válasz-sáv
+  const rbar = $('.reply-bar', win);
+  $('.rx', rbar).addEventListener('click', () => { w.reply = null; rbar.classList.remove('on'); });
+
   const send = () => {
     const text = w.ta.value.trim();
     if (!text) return;
@@ -2213,8 +2722,11 @@ function openChat(pid) {
       return;
     }
     const fmt = { color: sanitizeColor(myFmt.color) || undefined, bold: !!myFmt.bold || undefined, italic: !!myFmt.italic || undefined };
-    c.send({ t: 'msg', text, fmt });
-    addMsg(pid, me.name, text, true, fmt);
+    const rp = w.reply ? { n: w.reply.n, x: w.reply.x } : undefined;
+    c.send({ t: 'msg', text, fmt, rp });
+    addMsg(pid, me.name, text, true, fmt, rp);
+    w.reply = null;
+    rbar.classList.remove('on');
     w.ta.value = '';
     w.ta.focus();
   };
@@ -2237,6 +2749,7 @@ function openChat(pid) {
     e.stopPropagation();
     fontPop.classList.toggle('open');
     $('.bg-pop', win).classList.remove('open');
+    $('.wink-pop', win).classList.remove('open');
   });
   $('.fmt-color', win).addEventListener('input', e => { myFmt.color = e.target.value; saveFmt(); });
   $('.fmt-b', win).addEventListener('click', e => {
@@ -2267,6 +2780,29 @@ function openChat(pid) {
     e.stopPropagation();
     bgPop.classList.toggle('open');
     fontPop.classList.remove('open');
+    $('.wink-pop', win).classList.remove('open');
+  });
+
+  // kacsintók
+  const wkPop = $('.wink-pop', win);
+  for (const [id, emoji] of WINKS) {
+    const cell = el('span', 'wk-cell', emoji);
+    cell.title = id;
+    cell.addEventListener('click', () => {
+      wkPop.classList.remove('open');
+      const c = conns.get(pid);
+      if (!c || !c.open) { sysMsg(pid, t('notAvailShort')); return; }
+      c.send({ t: 'wink', id });
+      sysMsg(pid, t('sentWink'));
+      playWink(pid, id);
+    });
+    wkPop.appendChild(cell);
+  }
+  $('.wink-btn', win).addEventListener('click', e => {
+    e.stopPropagation();
+    wkPop.classList.toggle('open');
+    fontPop.classList.remove('open');
+    bgPop.classList.remove('open');
   });
 
   const doNudge = () => {
@@ -2307,6 +2843,7 @@ function openChat(pid) {
     if (!e.target.closest('.emo-pop') && !e.target.closest('.emo-btn')) pop.classList.remove('open');
     if (!e.target.closest('.font-pop') && !e.target.closest('.font-btn')) fontPop.classList.remove('open');
     if (!e.target.closest('.bg-pop') && !e.target.closest('.bg-btn')) bgPop.classList.remove('open');
+    if (!e.target.closest('.wink-pop') && !e.target.closest('.wink-btn')) wkPop.classList.remove('open');
   });
 
   win.addEventListener('click', e => {
@@ -2314,6 +2851,12 @@ function openChat(pid) {
     if (!act) return;
     runChatAction(pid, act);
   });
+
+  // korábbi beszélgetés visszatöltése
+  for (const en of loadHist(pid)) {
+    if (en.k === 'm') addMsg(pid, en.n, en.x, en.mi, en.f, en.r, { noHist: true, ts: en.ts });
+    else sysMsg(pid, en.x, { noHist: true });
+  }
 
   return w;
 }
@@ -2329,6 +2872,21 @@ function runChatAction(pid, act) {
   else if (act === 'voice') startCall(pid, 'voice');
   else if (act === 'webcam') startCall(pid, 'webcam');
   else if (act === 'block') { toggleBlock(pid); w.win.style.display = 'none'; }
+  else if (act === 'invite') {
+    pickContact([pid], pid2 => {
+      const gid = randId();
+      const g = { gid, members: new Map([[me.id, me.name], [pid, dispName(pid)], [pid2, dispName(pid2)]]), w: null };
+      groups.set(gid, g);
+      const inv = { t: 'ginv', gid, ms: groupMembersArr(g) };
+      for (const id of [pid, pid2]) {
+        const c = conns.get(id);
+        if (c && c.open) c.send(inv);
+      }
+      openGroupWin(g);
+      refreshGroupHead(g);
+      gSysMsg(g, tf('joined', dispName(pid2)));
+    });
+  }
   else if (act === 'mute') {
     muted = !muted;
     localStorage.setItem('msn75_muted', muted ? '1' : '0');
@@ -2361,14 +2919,21 @@ function refreshChatHead(pid) {
   }
 }
 
-function addMsg(pid, name, text, mine, fmt) {
+function addMsg(pid, name, text, mine, fmt, rp, opts) {
+  opts = opts || {};
   const w = openChat(pid);
   const m = el('div', 'msg' + (mine ? ' mine' : ''));
+  const ts = opts.ts || now();
   const h = el('div', 'm-head');
-  h.innerHTML = tf('writes', escHtml(name)) + '<span class="m-time">' + now() + '</span>';
+  h.innerHTML = tf('writes', escHtml(name)) + '<span class="m-time">' + escHtml(ts) + '</span>';
   m.appendChild(h);
+  if (rp && rp.x) {
+    const q = el('div', 'reply-q');
+    q.innerHTML = '<b>' + escHtml(String(rp.n || '').slice(0, 40)) + ':</b> ' + escHtml(String(rp.x).slice(0, 120));
+    m.appendChild(q);
+  }
   const b = el('div', 'm-body');
-  b.innerHTML = emotify(escHtml(text)).replace(/\n/g, '<br>');
+  b.innerHTML = renderBody(text);
   if (fmt) {
     const col = sanitizeColor(fmt.color);
     if (col) b.style.color = col;
@@ -2376,17 +2941,33 @@ function addMsg(pid, name, text, mine, fmt) {
     if (fmt.italic) b.style.fontStyle = 'italic';
   }
   m.appendChild(b);
+  // válasz gomb (mint a modern chat-appokban)
+  const rb = el('span', 'reply-btn', '↩');
+  rb.title = t('replyBtn');
+  rb.addEventListener('click', () => {
+    w.reply = { n: name, x: String(text).slice(0, 120) };
+    const rbar = $('.reply-bar', w.win);
+    $('.rq', rbar).textContent = name + ': ' + String(text).slice(0, 80);
+    rbar.classList.add('on');
+    w.ta.focus();
+  });
+  m.appendChild(rb);
   w.msgs.appendChild(m);
   w.msgs.scrollTop = w.msgs.scrollHeight;
-  w.lastMsgAt = now();
+  w.lastMsgAt = ts;
   if (!w.typingTimer) w.status.textContent = t('lastMsg') + w.lastMsgAt;
+  if (!opts.noHist) {
+    pushHist(pid, { k: 'm', n: name, x: String(text).slice(0, 4000), mi: !!mine, f: fmt, r: rp, ts });
+  }
 }
 
-function sysMsg(pid, text) {
+function sysMsg(pid, text, opts) {
+  opts = opts || {};
   const w = openChat(pid);
   const m = el('div', 'msg sys', text);
   w.msgs.appendChild(m);
   w.msgs.scrollTop = w.msgs.scrollHeight;
+  if (!opts.noHist) pushHist(pid, { k: 's', x: text });
   return m;
 }
 
@@ -2468,11 +3049,37 @@ function addVclip(pid, name, blob, mine) {
   m.appendChild(line);
   w.msgs.appendChild(m);
   w.msgs.scrollTop = w.msgs.scrollHeight;
+  pushHist(pid, { k: 's', x: '🎤 ' + tf('vclipSent', name) });
+}
+
+// ---------- kép-néző ablak ----------
+function showImageWin(url, name) {
+  const win = el('div', 'win imgwin');
+  win.style.left = (Math.max(20, window.innerWidth / 2 - 280) + (cascade % 4) * 20) + 'px';
+  win.style.top = (40 + (cascade % 4) * 20) + 'px';
+  cascade++;
+  win.innerHTML =
+    '<div class="titlebar"><span class="t-icon">🖼️</span>' +
+    '<span class="t-text">' + escHtml(name || t('imgWin')) + '</span>' +
+    '<span class="t-btns"><span class="tbtn close">✕</span></span></div>' +
+    '<div class="win-body">' +
+      '<div class="img-bar"><span>' + escHtml(name || '') + '</span>' +
+      '<button class="ifull">' + t('fullscreen') + '</button></div>' +
+      '<div class="img-holder"><img alt=""></div>' +
+    '</div>';
+  const img = $('img', win);
+  img.src = url;
+  document.body.appendChild(win);
+  makeDraggable(win, $('.titlebar', win));
+  bringToFront(win);
+  $('.tbtn.close', win).addEventListener('click', e => { e.stopPropagation(); win.remove(); });
+  $('.ifull', win).addEventListener('click', () => img.requestFullscreen?.());
+  img.addEventListener('dblclick', () => img.requestFullscreen?.());
 }
 
 // ---------- fájlküldés ----------
-const CHUNK = 49152;
-const BUF_LIMIT = 4194304;
+const CHUNK = 262144;        // 256 KB darabok — maximális áteresztéshez
+const BUF_LIMIT = 8388608;   // 8 MB WebRTC-puffer fölött rövid várakozás
 
 function fileLine(pid, name, size, mine) {
   const w = openChat(pid);
@@ -2498,7 +3105,7 @@ function offerFile(pid, file) {
 }
 
 function onFileOffer(pid, d) {
-  if (typeof d.size !== 'number' || d.size < 0 || d.size > 2147483648) return;
+  if (typeof d.size !== 'number' || d.size < 0) return;
   openChat(pid);
   const name = String(d.name || 'file').slice(0, 120);
   const box = fileLine(pid, name, d.size, false);
@@ -2507,8 +3114,21 @@ function onFileOffer(pid, d) {
   const no = el('button', 'xp-btn', t('decline'));
   btns.appendChild(ok); btns.appendChild(no);
   sndAlert();
-  fileTx.set(d.id, { dir: 'in', pid, name, size: d.size, mime: String(d.mime || ''), parts: [], got: 0, lineEl: box });
-  ok.addEventListener('click', () => {
+  const mime = String(d.mime || '');
+  const tx = { dir: 'in', pid, name, size: d.size, mime, parts: [], got: 0, lineEl: box, writable: null, wq: Promise.resolve() };
+  fileTx.set(d.id, tx);
+  ok.addEventListener('click', async () => {
+    // nagy, nem képi fájloknál közvetlenül a lemezre mentünk (ha a
+    // böngésző támogatja) — így nincs memórialimit
+    const preferMemory = mime.startsWith('image/') && d.size < 52428800;
+    if (window.showSaveFilePicker && !preferMemory) {
+      try {
+        const h = await window.showSaveFilePicker({ suggestedName: name });
+        tx.writable = await h.createWritable();
+      } catch {
+        tx.writable = null; // mégsem választott helyet — memóriában fogadjuk
+      }
+    }
     btns.innerHTML = '';
     box.querySelector('.f-size').textContent = fmtSize(d.size) + t('fRecv');
     const c = conns.get(pid);
@@ -2531,17 +3151,18 @@ async function onFileAccept(pid, d) {
   const box = tx.lineEl;
   const prog = box.querySelector('.f-prog > div');
   const sizeEl = box.querySelector('.f-size');
-  const buf = await tx.file.arrayBuffer();
-  const total = buf.byteLength;
+  const total = tx.file.size;
   let sent = 0, seq = 0;
   while (sent < total) {
     if (tx.cancelled || !c.open) return;
     while (c.dataChannel && c.dataChannel.bufferedAmount > BUF_LIMIT) {
-      await new Promise(r => setTimeout(r, 60));
+      await new Promise(r => setTimeout(r, 10));
       if (tx.cancelled || !c.open) return;
     }
     const end = Math.min(sent + CHUNK, total);
-    c.send({ t: 'file-chunk', id: d.id, seq, last: end >= total, data: buf.slice(sent, end) });
+    // darabonként olvasunk, így óriási fájlnál sem fogy el a memória
+    const part = await tx.file.slice(sent, end).arrayBuffer();
+    c.send({ t: 'file-chunk', id: d.id, seq, last: end >= total, data: part });
     sent = end; seq++;
     const pct = Math.round(sent / total * 100);
     prog.style.width = pct + '%';
@@ -2549,6 +3170,7 @@ async function onFileAccept(pid, d) {
   }
   sizeEl.textContent = fmtSize(total) + t('fSent');
   fileTx.delete(d.id);
+  pushHist(pid, { k: 's', x: '📄 ' + tx.file.name + ' (' + fmtSize(total) + ')' + t('fSent') });
 }
 
 function onFileChunk(pid, d) {
@@ -2557,25 +3179,37 @@ function onFileChunk(pid, d) {
   let bytes = d.data;
   if (bytes instanceof ArrayBuffer) bytes = new Uint8Array(bytes);
   if (!bytes) return;
-  tx.parts.push(bytes);
   tx.got += bytes.byteLength || bytes.length || 0;
-  if (tx.got > tx.size + CHUNK) { fileTx.delete(d.id); return; }
+  if (tx.writable) {
+    tx.wq = tx.wq.then(() => tx.writable.write(bytes)).catch(() => {});
+  } else {
+    tx.parts.push(bytes);
+  }
   const prog = tx.lineEl.querySelector('.f-prog > div');
-  const pct = Math.min(100, Math.round(tx.got / tx.size * 100));
+  const pct = tx.size ? Math.min(100, Math.round(tx.got / tx.size * 100)) : 100;
   prog.style.width = pct + '%';
   tx.lineEl.querySelector('.f-size').textContent = fmtSize(tx.size) + t('fRecv') + ' ' + pct + '%';
   if (d.last) {
-    const blob = new Blob(tx.parts, { type: tx.mime || 'application/octet-stream' });
-    const url = URL.createObjectURL(blob);
     const sizeEl = tx.lineEl.querySelector('.f-size');
-    sizeEl.innerHTML = fmtSize(blob.size) + t('fDone') + ' &nbsp;<a href="' + url + '" download="' +
-      escHtml(tx.name) + '">' + t('fSave') + '</a>';
-    if ((tx.mime || '').startsWith('image/') && blob.size < 8388608) {
-      const img = document.createElement('img');
-      img.className = 'thumb';
-      img.src = url;
-      tx.lineEl.appendChild(img);
+    if (tx.writable) {
+      tx.wq.then(() => tx.writable.close()).then(() => {
+        sizeEl.textContent = fmtSize(tx.got) + t('fSavedDisk');
+      }).catch(() => {});
+    } else {
+      const blob = new Blob(tx.parts, { type: tx.mime || 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      sizeEl.innerHTML = fmtSize(blob.size) + t('fDone') + ' &nbsp;<a href="' + url + '" download="' +
+        escHtml(tx.name) + '">' + t('fSave') + '</a>';
+      if ((tx.mime || '').startsWith('image/')) {
+        const img = document.createElement('img');
+        img.className = 'thumb';
+        img.src = url;
+        img.title = t('imgWin');
+        img.addEventListener('click', () => showImageWin(url, tx.name));
+        tx.lineEl.appendChild(img);
+      }
     }
+    pushHist(pid, { k: 's', x: '📄 ' + tx.name + ' (' + fmtSize(tx.got) + ')' + t('fDone') });
     fileTx.delete(d.id);
     sndMsg();
   }
@@ -2667,6 +3301,7 @@ function openCallWin(pid, kind, call, localStream, outgoing) {
       '<div class="call-bar">' +
         '<span class="timer">0:00</span>' +
         '<button class="mute">' + t('muteMic') + '</button>' +
+        '<button class="cunmute" style="display:none">' + t('unmute') + '</button>' +
         '<button class="hang">' + t('hangUp') + '</button>' +
       '</div>' +
     '</div>';
@@ -2674,22 +3309,44 @@ function openCallWin(pid, kind, call, localStream, outgoing) {
   makeDraggable(win, $('.titlebar', win));
   bringToFront(win);
 
-  const state = { kind, call, win, localStream, secs: 0, timer: null };
-  calls.set(pid, state);
+  // Minden hívásnak saját, egyedi állapota van — a bezárás mindig
+  // pontosan ezt az ablakot zárja, sosem egy másikét.
+  const state = { kind, call, win, localStream, secs: 0, timer: null, done: false };
+  if (!calls.has(pid)) calls.set(pid, state);
+
+  const closeThis = () => endCallState(pid, state);
 
   if (kind === 'webcam') $('.self', win).srcObject = localStream;
 
   call.on('stream', rs => {
+    const unmuteBtn = $('.cunmute', win);
     if (kind === 'webcam') {
       const v = $('.remote', win);
       v.srcObject = rs;
-      v.play().catch(() => { v.muted = true; v.play().catch(() => {}); });
+      // Autoplay-védelem: ha hangosan nem indulhat, némán indítjuk,
+      // és a Hang bekapcsolása gombbal jön vissza a hang.
+      v.play().catch(() => {
+        v.muted = true;
+        v.play().catch(() => {});
+        unmuteBtn.style.display = 'inline-block';
+        unmuteBtn.addEventListener('click', () => {
+          v.muted = false;
+          v.play().catch(() => {});
+          unmuteBtn.style.display = 'none';
+        });
+      });
     } else {
       const a = document.createElement('audio');
       a.autoplay = true;
       a.srcObject = rs;
       win.appendChild(a);
-      a.play().catch(() => {});
+      a.play().catch(() => {
+        unmuteBtn.style.display = 'inline-block';
+        unmuteBtn.addEventListener('click', () => {
+          a.play().catch(() => {});
+          unmuteBtn.style.display = 'none';
+        });
+      });
       const cs = $('.callstate', win);
       if (cs) cs.textContent = t('inCall');
     }
@@ -2701,8 +3358,8 @@ function openCallWin(pid, kind, call, localStream, outgoing) {
       }, 1000);
     }
   });
-  call.on('close', () => endCall(pid));
-  call.on('error', () => endCall(pid));
+  call.on('close', closeThis);
+  call.on('error', closeThis);
 
   $('.mute', win).addEventListener('click', e => {
     const tr = localStream.getAudioTracks()[0];
@@ -2711,14 +3368,14 @@ function openCallWin(pid, kind, call, localStream, outgoing) {
     e.currentTarget.textContent = tr.enabled ? t('muteMic') : t('unmuteMic');
     e.currentTarget.classList.toggle('mute-on', !tr.enabled);
   });
-  $('.hang', win).addEventListener('click', () => endCall(pid));
-  $('.tbtn.close', win).addEventListener('click', () => endCall(pid));
+  $('.hang', win).addEventListener('click', closeThis);
+  $('.tbtn.close', win).addEventListener('click', e => { e.stopPropagation(); closeThis(); });
 }
 
-function endCall(pid) {
-  const st = calls.get(pid);
-  if (!st) return;
-  calls.delete(pid);
+function endCallState(pid, st) {
+  if (st.done) return;
+  st.done = true;
+  if (calls.get(pid) === st) calls.delete(pid);
   try { st.call.close(); } catch {}
   try { st.localStream.getTracks().forEach(tk => tk.stop()); } catch {}
   clearInterval(st.timer);
@@ -2821,7 +3478,6 @@ function handleIncomingScreen(call) {
     call.on('stream', stream => { got = true; showViewer(pid, stream); });
     call.on('close', () => closeViewer(pid));
     call.on('error', () => closeViewer(pid));
-    // ha 20 mp alatt sem jön a videó, jelezzük (NAT/tűzfal gond)
     setTimeout(() => { if (!got) sysMsg(pid, t('streamWaiting')); }, 20000);
   });
   no.addEventListener('click', () => { decided = true; ask.remove(); try { call.close(); } catch {} });
@@ -2860,8 +3516,6 @@ function showViewer(pid, stream) {
 
   const vstate = $('.vstate', win);
   const unmuteBtn = $('.vunmute', win);
-  // Autoplay-védelem: ha hangosan nem indulhat el a videó, némán
-  // indítjuk, és egy gombbal felajánljuk a hang bekapcsolását.
   video.play().then(() => { vstate.textContent = ''; }).catch(() => {
     video.muted = true;
     video.play().then(() => {
@@ -2877,7 +3531,7 @@ function showViewer(pid, stream) {
   });
 
   $('.vfull', win).addEventListener('click', () => video.requestFullscreen?.());
-  $('.tbtn.close', win).addEventListener('click', () => closeViewer(pid));
+  $('.tbtn.close', win).addEventListener('click', e => { e.stopPropagation(); closeViewer(pid); });
   stream.getVideoTracks()[0]?.addEventListener('ended', () => closeViewer(pid));
 
   viewers.set(pid, { win, stream });

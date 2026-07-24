@@ -377,9 +377,6 @@ html, body {
 .contact.offline .c-name { color: #8a8a8a; }
 .contact .c-x { visibility: hidden; color: #b04030; font-weight: bold; cursor: pointer; padding: 0 3px; }
 .contact:hover .c-x { visibility: visible; }
-.contact.blockedc .c-name { color: #b04030; text-decoration: line-through; }
-.contact .c-blk { visibility: hidden; cursor: pointer; padding: 0 3px; font-size: 10px; }
-.contact:hover .c-blk { visibility: visible; }
 
 .add-form { border-top: 1px solid #cbdcee; background: #f4f9fe; padding: 8px; display: none; }
 .add-form.open { display: block; }
@@ -504,18 +501,6 @@ html, body {
 .tb-big:hover:not(:disabled) { background: #e8f3fd; border-color: #a9cdf0; }
 .tb-big:disabled { color: #9aa7b5; cursor: default; filter: grayscale(1) opacity(.6); }
 .tb-big.active { background: #d5ecc9; border-color: #7fb36a; }
-.tb-round {
-  width: 22px; height: 22px;
-  border-radius: 50%;
-  border: 1px solid #b7cde8;
-  background: linear-gradient(180deg, #fff, #e4eefb);
-  margin: 8px 2px 0;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px;
-  color: #b04030;
-}
-.tb-round:hover { background: #fbeae6; }
 .tb-msn {
   margin-left: auto;
   padding: 8px 6px 0;
@@ -1080,7 +1065,7 @@ html, body {
   .contact { padding: 7px 10px 7px 14px; }
   .contact .c-thumb { width: 40px; height: 40px; }
   .contact .c-thumb img, .contact .c-thumb svg { width: 36px; height: 36px; }
-  .contact .c-x, .contact .c-blk { visibility: visible; padding: 0 7px; font-size: 13px; }
+  .contact .c-x { visibility: visible; padding: 0 7px; font-size: 13px; }
   .grp-head { padding: 9px 8px 7px; }
   .xp-btn { height: 34px; min-width: 96px; font-size: 12px; }
   .fld input, .fld select { height: 34px; font-size: 13px; }
@@ -1612,14 +1597,12 @@ const LANGS = {
     netOk: 'Kapcsolódva', netBad: 'Kapcsolat megszakadt…',
     pmPlaceholder: '<Írj személyes üzenetet>',
     invalidId: 'Érvénytelen Peer ID.', ownId: 'Ez a saját azonosítód. :)',
-    delContact: 'Partner törlése', blockC: 'Partner tiltása', unblockC: 'Tiltás feloldása',
-    blockedMark: 'TILTVA',
+    delContact: 'Partner törlése',
     convTitle: 'Beszélgetés', toLbl: 'Címzett:',
     awayBar: '$1 lehet, hogy nem válaszol, mert állapota: $2.',
     tbInvite: 'Meghívás', tbFiles: 'Fájlküldés', tbWebcam: 'Webkamera',
     tbVoice: 'Hang', tbStream: 'Stream',
     tbInviteNote: 'Partner meghívása csoportos beszélgetésbe',
-    blockRound: 'Partner tiltása',
     fontTip: 'Betűtípus és szín', emoTip: 'Hangulatjelek',
     vclipBtn: 'Hangüzenet', vclipTip: 'Hangüzenet felvétele (max 15 mp)',
     winks: 'Kacsintók', bgs: 'Hátterek', nudgeTip: 'Rezgetés küldése',
@@ -1741,14 +1724,12 @@ const LANGS = {
     netOk: 'Connected', netBad: 'Connection lost…',
     pmPlaceholder: '<Type a personal message>',
     invalidId: 'Invalid Peer ID.', ownId: 'That is your own ID. :)',
-    delContact: 'Delete contact', blockC: 'Block contact', unblockC: 'Unblock contact',
-    blockedMark: 'BLOCKED',
+    delContact: 'Delete contact',
     convTitle: 'Conversation', toLbl: 'To:',
     awayBar: '$1 may not reply because his or her status is set to $2.',
     tbInvite: 'Invite', tbFiles: 'Send Files', tbWebcam: 'Webcam',
     tbVoice: 'Voice', tbStream: 'Stream',
     tbInviteNote: 'Invite a contact to a group conversation',
-    blockRound: 'Block contact',
     fontTip: 'Font and color', emoTip: 'Emoticons',
     vclipBtn: 'Voice Clip', vclipTip: 'Record a voice clip (max 15 s)',
     winks: 'Winks', bgs: 'Backgrounds', nudgeTip: 'Send a nudge',
@@ -1882,7 +1863,7 @@ let screenStream = null;
 let zTop = 10;
 let muted = localStorage.getItem('msn75_muted') === '1';
 let myDp = localStorage.getItem('msn75_mydp') || null;
-let blocked = new Set(JSON.parse(localStorage.getItem('msn75_blocked') || '[]'));
+// A tiltás funkció megszűnt: mindenki elérhető marad.
 let myFmt = { color: '#000000', bold: false, italic: false };
 try { Object.assign(myFmt, JSON.parse(localStorage.getItem('msn75_fmt') || '{}')); } catch {}
 
@@ -2196,7 +2177,6 @@ const sndRing   = mkSound(A?.sndRing,   [[740, .2], [740, .2]]);
 // A partnerlista és a tiltólista a SAJÁT azonosítóhoz kötött, így másik
 // Peer ID-vel belépve tiszta, külön fiókot kapunk.
 function contactsKey() { return me.id ? 'msn75_contacts_' + me.id : 'msn75_contacts'; }
-function blockedKey() { return me.id ? 'msn75_blocked_' + me.id : 'msn75_blocked'; }
 
 function loadContacts() {
   try { return JSON.parse(localStorage.getItem(contactsKey()) || '[]'); }
@@ -2204,13 +2184,14 @@ function loadContacts() {
 }
 let contacts = [];
 function saveContacts() { localStorage.setItem(contactsKey(), JSON.stringify(contacts)); }
-function saveBlocked() { localStorage.setItem(blockedKey(), JSON.stringify([...blocked])); }
 
 // belépéskor a fiókhoz tartozó listákat töltjük be
 function loadAccountData() {
   contacts = loadContacts();
-  try { blocked = new Set(JSON.parse(localStorage.getItem(blockedKey()) || '[]')); }
-  catch { blocked = new Set(); }
+  // a régi tiltólistákat töröljük, hogy senki ne maradjon véletlenül kizárva
+  for (const k of Object.keys(localStorage)) {
+    if (k.startsWith('msn75_blocked')) localStorage.removeItem(k);
+  }
 }
 function saveFmt() { localStorage.setItem('msn75_fmt', JSON.stringify(myFmt)); }
 
@@ -2778,7 +2759,6 @@ function startPeerWithSlot(base, slot) {
   });
 
   peer.on('connection', c => {
-    if (blocked.has(baseOf(c.peer))) { try { c.close(); } catch {} return; }
     setupConn(c, true);
   });
   peer.on('call', call => handleIncomingCall(call));
@@ -2920,7 +2900,6 @@ function setupConn(c, incoming) {
   const base = baseOf(c.peer);
 
   c.on('open', () => {
-    if (blocked.has(base)) { try { c.close(); } catch {} return; }
     const wasOnline = conns.has(base);
     addDeviceConn(base, c);
     // a fő kapcsolat a partnerhez (a többi eszköze is megkapja az üzeneteket)
@@ -2958,7 +2937,7 @@ function setupConn(c, incoming) {
 
 function connectTo(base) {
   if (!peer || peer.destroyed || peer.disconnected) return;
-  if (base === me.baseId || blocked.has(base)) return;
+  if (base === me.baseId) return;
   const known = deviceConns.get(base);
   for (let n = 1; n <= DEVICE_SLOTS; n++) {
     const pid = slotId(base, n);
@@ -2970,7 +2949,7 @@ function connectTo(base) {
 }
 
 function onData(pid, d) {
-  if (!d || typeof d !== 'object' || blocked.has(pid)) return;
+  if (!d || typeof d !== 'object') return;
   switch (d.t) {
     case 'hello': {
       remote.set(pid, {
@@ -3124,8 +3103,7 @@ function buildGroup(title, list, isOnline) {
     box.textContent = hidden ? '−' : '+';
   });
   for (const ct of list) {
-    const isBlocked = blocked.has(ct.id);
-    const row = el('div', 'contact' + (isOnline ? '' : ' offline') + (isBlocked ? ' blockedc' : ''));
+    const row = el('div', 'contact' + (isOnline ? '' : ' offline'));
     const r = remote.get(ct.id);
     if (isOnline) {
       const th = el('span', 'c-thumb');
@@ -3133,22 +3111,18 @@ function buildGroup(title, list, isOnline) {
       row.appendChild(th);
     } else {
       const ic = el('span');
-      ic.innerHTML = buddyDot(isBlocked ? 'busy' : 'offline');
+      ic.innerHTML = buddyDot('offline');
       row.appendChild(ic.firstChild);
     }
     const nm = el('span', 'c-name', dispName(ct.id));
-    nm.title = ct.id + (isBlocked ? ' — ' + t('blockedMark') : (r && isOnline ? ' — ' + stText(r.status) : ' — ' + t('stOffline')));
+    nm.title = ct.id + (r && isOnline ? ' — ' + stText(r.status) : ' — ' + t('stOffline'));
     row.appendChild(nm);
-    if (isOnline && r && !isBlocked) {
+    if (isOnline && r) {
       let extra = '';
       if (r.status && r.status !== 'online') extra = '(' + stText(r.status) + ')';
       if (r.pm) extra = extra ? extra + ' – ' + r.pm : '– ' + r.pm;
       if (extra) row.appendChild(el('span', 'c-pm', ' ' + extra));
     }
-    const blk = el('span', 'c-blk', isBlocked ? '✔' : '🚫');
-    blk.title = isBlocked ? t('unblockC') : t('blockC');
-    blk.addEventListener('click', ev => { ev.stopPropagation(); toggleBlock(ct.id); });
-    row.appendChild(blk);
     const x = el('span', 'c-x', '✕');
     x.title = t('delContact');
     x.addEventListener('click', ev => {
@@ -3158,35 +3132,15 @@ function buildGroup(title, list, isOnline) {
       renderContacts();
     });
     row.appendChild(x);
-    row.addEventListener('dblclick', () => { if (!isBlocked) openChat(ct.id); });
+    row.addEventListener('dblclick', () => openChat(ct.id));
     // érintőképernyőn egy koppintás is nyissa meg (offline partnernél is)
     row.addEventListener('click', () => {
-      if (isBlocked) return;
       if (isOnline || isMobile()) openChat(ct.id);
     });
     cont.appendChild(row);
   }
   frag.appendChild(cont);
   return frag;
-}
-
-function toggleBlock(pid) {
-  if (blocked.has(pid)) {
-    blocked.delete(pid);
-    saveBlocked();
-    renderContacts();
-    connectTo(pid);
-  } else {
-    blocked.add(pid);
-    saveBlocked();
-    const c = conns.get(pid);
-    if (c) { try { c.close(); } catch {} }
-    const st = calls.get(pid);
-    if (st) endCallState(pid, st);
-    stopStream(pid, true);
-    closeViewer(pid);
-    renderContacts();
-  }
 }
 
 $('#addToggle').addEventListener('click', () => {
@@ -3226,7 +3180,7 @@ function pickContact(excludeIds, cb) {
   const list = $('.pick-list', win);
   let any = false;
   for (const ct of contacts) {
-    if (!conns.has(ct.id) || excludeIds.includes(ct.id) || blocked.has(ct.id)) continue;
+    if (!conns.has(ct.id) || excludeIds.includes(ct.id)) continue;
     any = true;
     const item = el('div', 'pick-item');
     const th = el('span', 'c-thumb');
@@ -3595,7 +3549,6 @@ function chatTemplate(pid) {
         '<button class="tb-big" data-act="webcam">' + TB_ICONS.webcam + t('tbWebcam') + '</button>' +
         '<button class="tb-big" data-act="voice">' + TB_ICONS.voice + t('tbVoice') + '</button>' +
         '<button class="tb-big" data-act="stream">' + TB_ICONS.stream + t('tbStream') + '</button>' +
-        '<span class="tb-round" data-act="block" title="' + t('blockRound') + '">⊘</span>' +
         msnLogo +
       '</div>' +
       '<div class="stream-bar"><span>' + t('streamYouSend') + '</span>' +
@@ -3695,8 +3648,6 @@ function openChat(pid) {
       { label: t('youStream'), act: 'stream' },
       { label: t('tbInvite'), act: 'invite' },
       { label: t('miSendFile'), act: 'sendfile' },
-      '-',
-      { label: t('blockC'), act: 'block' },
     ]},
     { label: t('menuTools'), items: [
       { label: muted ? t('miSoundsOn') : t('miSoundsOff'), act: 'mute' },
@@ -3932,7 +3883,6 @@ function runChatAction(pid, act) {
   else if (act === 'savetxt') exportChatTxt(pid);
   else if (act === 'voice') startCall(pid, 'voice');
   else if (act === 'webcam') startCall(pid, 'webcam');
-  else if (act === 'block') { toggleBlock(pid); w.win.style.display = 'none'; }
   else if (act === 'invite') {
     pickContact([pid], pid2 => {
       const gid = randId();
@@ -4748,7 +4698,6 @@ async function startCall(pid, kind) {
 
 function handleIncomingCall(call) {
   const pid = baseOf(call.peer);
-  if (blocked.has(pid)) { try { call.close(); } catch {} return; }
   const kind = call.metadata?.kind;
   if (kind === 'screen') return handleIncomingScreen(call);
   if (kind !== 'voice' && kind !== 'webcam') { try { call.close(); } catch {} return; }
@@ -5086,7 +5035,7 @@ function closeViewer(pid) {
 }
 
 // ---------- verzió és frissítés-ellenőrzés ----------
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '2.0.1';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 
 function cmpVer(a, b) {

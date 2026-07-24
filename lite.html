@@ -1165,6 +1165,22 @@ html, body {
   max-width: 150px;
 }
 .set-row .scale-val { color: #1a3e6e; font-weight: bold; min-width: 46px; text-align: right; }
+
+/* ---------- Méretezés-vezérlők ---------- */
+.set-scale-btns { gap: 6px; }
+.set-scale-btns .xp-btn { min-width: 0; flex: 1; }
+
+/* ---------- Idézet-előnézet (képre válasz) ---------- */
+.reply-q { display: flex; align-items: center; gap: 5px; }
+.rq-th, .reply-bar .rq-th {
+  width: 26px; height: 26px;
+  object-fit: cover;
+  border: 1px solid #a9cdf0;
+  border-radius: 2px;
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+.reply-bar .rq { display: flex; align-items: center; gap: 5px; }
 </style>
 </head>
 <body>
@@ -1819,16 +1835,41 @@ function saveFmt() { localStorage.setItem('msn75_fmt', JSON.stringify(myFmt)); }
 // ---------- téma (asztal + ablakszín + méretezés) ----------
 // A méretezés úgy működik, mint a Windows kijelző-méretezése: minden
 // (szöveg, ikon, ablak) arányosan nagyobb lesz.
+const SCALE_MIN = 100, SCALE_MAX = 200, SCALE_STEP = 5;
+function defaultScale() { return window.innerWidth <= 820 ? 175 : 125; }
+
 function applyScale() {
   let s = parseInt(localStorage.getItem('msn75_scale') || '0', 10);
-  if (!s) {
-    // első indításkor a kijelzőhöz igazítunk (mobilon nagyobb alapérték)
-    s = window.innerWidth <= 820 ? 150 : 100;
-  }
-  s = Math.max(100, Math.min(250, s));
+  if (!s) s = defaultScale();
+  s = Math.max(SCALE_MIN, Math.min(SCALE_MAX, s));
   document.documentElement.style.setProperty('--ui-scale', (s / 100).toString());
   document.body.style.zoom = (s / 100).toString();
+  // nagyításkor a látható terület zsugorodik — a képernyőn kívülre
+  // került ablakokat visszahúzzuk, hogy sose vesszenek el
+  clampWindows(s / 100);
   return s;
+}
+
+// minden ablak maradjon a látható területen belül
+function clampWindows(zoom) {
+  const vw = window.innerWidth / zoom;
+  const vh = window.innerHeight / zoom;
+  document.querySelectorAll('.win').forEach(w => {
+    if (w.style.display === 'none' || !w.offsetWidth) return;
+    const left = parseFloat(w.style.left);
+    const top = parseFloat(w.style.top);
+    if (!isNaN(left)) {
+      const maxL = Math.max(0, vw - Math.min(w.offsetWidth, vw) * 0.35);
+      if (left > maxL) w.style.left = Math.max(0, maxL) + 'px';
+    }
+    if (!isNaN(top)) {
+      const maxT = Math.max(0, vh - 40);
+      if (top > maxT) w.style.top = Math.max(0, maxT) + 'px';
+    }
+    // a túl nagy ablakok se lógjanak ki
+    if (w.offsetWidth > vw) w.style.width = Math.round(vw) + 'px';
+    if (w.offsetHeight > vh) w.style.height = Math.round(vh) + 'px';
+  });
 }
 
 function applyTheme() {
@@ -1850,11 +1891,28 @@ function applyTheme() {
   }
 }
 let setWin = null;
+function recenterSettings() {
+  if (!setWin) return;
+  const z = (parseInt(localStorage.getItem('msn75_scale') || '0', 10) || defaultScale()) / 100;
+  setWin.style.left = Math.max(0, (window.innerWidth / z - (setWin.offsetWidth || 300)) / 2) + 'px';
+  setWin.style.top = Math.max(0, Math.min(60, window.innerHeight / z - 120)) + 'px';
+}
+
 function openSettings() {
-  if (setWin) { bringToFront(setWin); return; }
+  // ha az ablak közben kikerült a DOM-ból, engedjük újranyitni
+  if (setWin && !document.body.contains(setWin)) setWin = null;
+  if (setWin) {
+    // már nyitva van — mindig húzzuk vissza a képernyőre, hogy nagy
+    // nagyításnál se lehessen "elveszíteni"
+    recenterSettings();
+    bringToFront(setWin);
+    mobileShow(setWin);
+    return;
+  }
   const win = el('div', 'win setwin');
-  win.style.left = (window.innerWidth / 2 - 150) + 'px';
-  win.style.top = '160px';
+  const z0 = (parseInt(localStorage.getItem('msn75_scale') || '0', 10) || defaultScale()) / 100;
+  win.style.left = Math.max(0, (window.innerWidth / z0 - 300) / 2) + 'px';
+  win.style.top = Math.max(0, Math.min(80, window.innerHeight / z0 - 120)) + 'px';
   const curBg = localStorage.getItem('msn75_deskbg') || '#2a5da8';
   const curWc = localStorage.getItem('msn75_wincol') || '#1557d0';
   const curScale = applyScale();
@@ -1865,8 +1923,13 @@ function openSettings() {
     '<div class="win-body">' +
       '<div class="set-row"><label>' + t('uiScale') + '</label>' +
       '<span class="scale-val">' + curScale + '%</span></div>' +
-      '<div class="set-row"><input type="range" class="set-scale" min="100" max="250" step="25" ' +
+      '<div class="set-row"><input type="range" class="set-scale" min="' + SCALE_MIN + '" ' +
+      'max="' + SCALE_MAX + '" step="' + SCALE_STEP + '" ' +
       'value="' + curScale + '" style="flex:1"></div>' +
+      '<div class="set-row set-scale-btns">' +
+      '<button class="xp-btn scale-minus">−</button>' +
+      '<button class="xp-btn scale-def">100%</button>' +
+      '<button class="xp-btn scale-plus">+</button></div>' +
       '<div class="set-row"><label>' + t('deskCol') + '</label>' +
       '<input type="color" class="set-bg" value="' + curBg + '"></div>' +
       '<div class="set-row"><label>' + t('winCol') + '</label>' +
@@ -1892,11 +1955,23 @@ function openSettings() {
     localStorage.setItem('msn75_wincol', e.target.value);
     applyTheme();
   });
-  $('.set-scale', win).addEventListener('input', e => {
-    localStorage.setItem('msn75_scale', e.target.value);
-    $('.scale-val', win).textContent = e.target.value + '%';
+  const setScale = v => {
+    v = Math.max(SCALE_MIN, Math.min(SCALE_MAX, v));
+    localStorage.setItem('msn75_scale', String(v));
+    $('.set-scale', win).value = v;
+    $('.scale-val', win).textContent = v + '%';
     applyScale();
-  });
+    // a beállítás-ablak mindig maradjon a képernyőn
+    const z = v / 100;
+    win.style.left = Math.max(0, (window.innerWidth / z - win.offsetWidth) / 2) + 'px';
+    win.style.top = Math.max(0, Math.min(60, window.innerHeight / z - 100)) + 'px';
+  };
+  $('.set-scale', win).addEventListener('input', e => setScale(parseInt(e.target.value, 10)));
+  $('.scale-minus', win).addEventListener('click', () =>
+    setScale(parseInt($('.set-scale', win).value, 10) - SCALE_STEP));
+  $('.scale-plus', win).addEventListener('click', () =>
+    setScale(parseInt($('.set-scale', win).value, 10) + SCALE_STEP));
+  $('.scale-def', win).addEventListener('click', () => setScale(100));
   $('.set-reset', win).addEventListener('click', () => {
     localStorage.removeItem('msn75_deskbg');
     localStorage.removeItem('msn75_wincol');
@@ -1907,6 +1982,8 @@ function openSettings() {
     $('.set-scale', win).value = s;
     $('.scale-val', win).textContent = s + '%';
     applyTheme();
+    win.style.left = Math.max(0, (window.innerWidth / (s / 100) - win.offsetWidth) / 2) + 'px';
+    win.style.top = '40px';
   });
 }
 
@@ -3011,7 +3088,7 @@ function openChat(pid) {
       return;
     }
     const fmt = { color: sanitizeColor(myFmt.color) || undefined, bold: !!myFmt.bold || undefined, italic: !!myFmt.italic || undefined, font: sanitizeFont(myFmt.font) || undefined };
-    const rp = w.reply ? { n: w.reply.n, x: w.reply.x } : undefined;
+    const rp = w.reply ? { n: w.reply.n, x: w.reply.x, th: w.reply.th || undefined } : undefined;
     c.send({ t: 'msg', text, fmt, rp });
     addMsg(pid, me.name, text, true, fmt, rp);
     w.reply = null;
@@ -3272,7 +3349,10 @@ function addMsg(pid, name, text, mine, fmt, rp, opts) {
   m.appendChild(h);
   if (rp && rp.x) {
     const q = el('div', 'reply-q');
-    q.innerHTML = '<b>' + escHtml(String(rp.n || '').slice(0, 40)) + ':</b> ' + escHtml(String(rp.x).slice(0, 120));
+    const th = typeof rp.th === 'string' && rp.th.startsWith('data:image/') && rp.th.length < 40000
+      ? '<img class="rq-th" src="' + rp.th + '" alt="">' : '';
+    q.innerHTML = th + '<b>' + escHtml(String(rp.n || '').slice(0, 40)) + ':</b> ' +
+      escHtml(String(rp.x).slice(0, 120));
     m.appendChild(q);
   }
   const b = el('div', 'm-body');
@@ -3533,9 +3613,42 @@ function addImageMsg(pid, name, blob, fileName, mine) {
   dl.className = 'img-dl';
   line.appendChild(dl);
   m.appendChild(line);
+
+  // válasz erre a képre — kis előnézettel az idézetben
+  const rb = el('span', 'reply-btn', '↩');
+  rb.title = t('replyBtn');
+  rb.addEventListener('click', () => {
+    makeThumb(img, thumb => {
+      w.reply = { n: name, x: '🖼️ ' + (fileName || t('imgWin')), th: thumb };
+      const rbar = $('.reply-bar', w.win);
+      $('.rq', rbar).innerHTML = (thumb ? '<img class="rq-th" src="' + thumb + '" alt="">' : '') +
+        escHtml(name + ': 🖼️ ' + (fileName || t('imgWin')));
+      rbar.classList.add('on');
+      w.ta.focus();
+    });
+  });
+  m.appendChild(rb);
+
   w.msgs.appendChild(m);
   w.msgs.scrollTop = w.msgs.scrollHeight;
   pushHist(pid, { k: 's', x: '🖼️ ' + tf('imgSent', name) + ' ' + (fileName || '') });
+}
+
+// kis (max 48 px) előnézet készítése az idézethez
+function makeThumb(imgEl, cb) {
+  const draw = () => {
+    try {
+      const max = 48;
+      const r = Math.min(max / imgEl.naturalWidth, max / imgEl.naturalHeight, 1);
+      const cv = document.createElement('canvas');
+      cv.width = Math.max(1, Math.round(imgEl.naturalWidth * r));
+      cv.height = Math.max(1, Math.round(imgEl.naturalHeight * r));
+      cv.getContext('2d').drawImage(imgEl, 0, 0, cv.width, cv.height);
+      cb(cv.toDataURL('image/jpeg', 0.6));
+    } catch { cb(null); }
+  };
+  if (imgEl.complete && imgEl.naturalWidth) draw();
+  else imgEl.addEventListener('load', draw, { once: true });
 }
 
 function onFileOffer(pid, d) {

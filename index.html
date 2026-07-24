@@ -1393,6 +1393,10 @@ html, body {
   .vid-offer { max-width: 88vw; }
   .vid-noposter { width: 70vw; height: 120px; }
 }
+
+/* beállítás-ablak elválasztó és ürítő gombok */
+.set-sep { border-top: 1px solid #dbe6f0; margin: 10px 0 8px; }
+.setwin .set-row .xp-btn { width: 100%; }
 </style>
 </head>
 <body>
@@ -1519,11 +1523,6 @@ html, body {
         <span class="banner-t1">MSN 7.5</span>
         <span class="banner-t2" id="bannerTxt"></span>
       </div>
-    </div>
-
-    <div class="search-row">
-      <input id="webSearch">
-      <button id="webSearchBtn" class="search-btn"></button>
     </div>
 
     <div class="main-foot">
@@ -1692,6 +1691,14 @@ const LANGS = {
     updateAvail: 'Új verzió érhető el: $1',
     updateGet: 'Letöltés',
     updateNow: 'Frissítés',
+    miSaveTxt: 'Beszélgetés mentése szövegfájlba…',
+    clearMsgs: 'Üzenetek törlése',
+    clearMedia: 'Képek és videók törlése',
+    confirmClearMsgs: 'Biztosan törlöd az összes beszélgetés-előzményt ezen a gépen?',
+    confirmClearMedia: 'Biztosan eltávolítod a beszélgetésekben megjelenített képeket és videókat?',
+    doneCleared: 'Az előzmények törölve.',
+    mediaCleared: '$1 média-elem eltávolítva.',
+    deviceSlot: 'Ez az eszközöd külön csatlakozási helyen van',
     updating: 'Frissítés…',
     updateHide: 'Elrejtés',
   },
@@ -1813,6 +1820,14 @@ const LANGS = {
     updateAvail: 'A new version is available: $1',
     updateGet: 'Download',
     updateNow: 'Update',
+    miSaveTxt: 'Save conversation to a text file…',
+    clearMsgs: 'Clear messages',
+    clearMedia: 'Clear pictures and videos',
+    confirmClearMsgs: 'Delete all conversation history on this computer?',
+    confirmClearMedia: 'Remove the pictures and videos shown in conversations?',
+    doneCleared: 'History cleared.',
+    mediaCleared: '$1 media items removed.',
+    deviceSlot: 'This device uses a separate connection slot',
     updating: 'Updating…',
     updateHide: 'Hide',
   },
@@ -1823,7 +1838,38 @@ function tf(k, a, b) { return t(k).replace('$1', a).replace('$2', b); }
 
 // ---------- állapot ----------
 let peer = null;
-const me = { name: '', id: '', status: 'online', pm: '' };
+const me = { name: '', id: '', baseId: '', status: 'online', pm: '' };
+
+// Ugyanaz a fiók több eszközön: a tenyleges Peer ID kaphat eszköz-utótagot
+// (pl. "sid", "sid--d2", "sid--d3"). A partnerek minden helyet végigpróbálnak,
+// így a telefon és a gép egyszerre lehet bent ütközés nélkül.
+const DEVICE_SLOTS = 4;
+function slotId(base, n) { return n <= 1 ? base : base + '_dev' + n; }
+function baseOf(peerId) {
+  const m = /^(.*)_dev\d+$/.exec(String(peerId));
+  return m ? m[1] : String(peerId);
+}
+// base -> Map(tényleges peerId -> kapcsolat): egy partner több eszköze
+const deviceConns = new Map();
+function addDeviceConn(base, c) {
+  if (!deviceConns.has(base)) deviceConns.set(base, new Map());
+  deviceConns.get(base).set(c.peer, c);
+}
+function removeDeviceConn(base, peerId) {
+  const m = deviceConns.get(base);
+  if (!m) return;
+  m.delete(peerId);
+  if (!m.size) deviceConns.delete(base);
+}
+// üzenet küldése a partner MINDEN bejelentkezett eszközére
+function sendTo(base, obj) {
+  const m = deviceConns.get(base);
+  let sent = false;
+  if (m) for (const c of m.values()) {
+    if (c.open) { try { c.send(obj); sent = true; } catch {} }
+  }
+  return sent;
+}
 const conns = new Map();
 const remote = new Map();
 const chatWins = new Map();
@@ -2312,6 +2358,9 @@ function openSettings() {
       '<input type="color" class="set-bg" value="' + curBg + '"></div>' +
       '<div class="set-row"><label>' + t('winCol') + '</label>' +
       '<input type="color" class="set-wc" value="' + curWc + '"></div>' +
+      '<div class="set-sep"></div>' +
+      '<div class="set-row"><button class="xp-btn set-clr-msg">' + t('clearMsgs') + '</button></div>' +
+      '<div class="set-row"><button class="xp-btn set-clr-media">' + t('clearMedia') + '</button></div>' +
       '<div class="set-btns">' +
       '<button class="xp-btn set-reset">' + t('reset') + '</button>' +
       '<button class="xp-btn primary set-ok">OK</button></div>' +
@@ -2325,6 +2374,8 @@ function openSettings() {
   const close = () => { win.remove(); setWin = null; mobileBack(); };
   $('.tbtn.close', win).addEventListener('click', e => { e.stopPropagation(); close(); });
   $('.set-ok', win).addEventListener('click', close);
+  $('.set-clr-msg', win).addEventListener('click', clearAllHistory);
+  $('.set-clr-media', win).addEventListener('click', clearAllMedia);
   $('.set-bg', win).addEventListener('input', e => {
     localStorage.setItem('msn75_deskbg', e.target.value);
     applyTheme();
@@ -2560,8 +2611,6 @@ function applyStaticTexts() {
   $('#addCancel').textContent = t('cancel');
   $('#addOk').textContent = t('add');
   $('#bannerTxt').textContent = t('bannerTxt');
-  $('#webSearch').placeholder = t('searchPh');
-  $('#webSearchBtn').textContent = t('searchBtn');
   $('#footP2p').textContent = t('footP2p');
   $('#myDp').title = t('dpTip');
   const ms = $('#meStatus');
@@ -2670,12 +2719,6 @@ function setLang(l) {
 $('#inLang').addEventListener('change', () => setLang($('#inLang').value));
 $('#infoBannerClose').addEventListener('click', () => { $('#infoBanner').style.display = 'none'; });
 $('#infoBannerText').addEventListener('click', () => alert(t('aboutText')));
-$('#webSearchBtn').addEventListener('click', doWebSearch);
-$('#webSearch').addEventListener('keydown', e => { if (e.key === 'Enter') doWebSearch(); });
-function doWebSearch() {
-  const q = $('#webSearch').value.trim();
-  if (q) window.open('https://www.bing.com/search?q=' + encodeURIComponent(q), '_blank');
-}
 
 // ---------- bejelentkezés ----------
 $('#loginBtn').addEventListener('click', doLogin);
@@ -2699,7 +2742,17 @@ function doLogin() {
   $('#loginBtn').disabled = true;
   $('#loginStatus').textContent = t('connecting');
 
-  peer = new Peer(id, { debug: 1, config: RTC_CONFIG });
+  me.baseId = id;
+  startPeerWithSlot(id, 1);
+}
+
+// megpróbáljuk a fiók azonosítóját; ha foglalt (másik eszköz már bent
+// van vele), automatikusan a következő eszköz-helyet kapjuk
+function startPeerWithSlot(base, slot) {
+  const err = $('#loginErr');
+  const actual = slotId(base, slot);
+  me.id = actual;
+  peer = new Peer(actual, { debug: 1, config: RTC_CONFIG });
 
   peer.on('open', () => {
     $('#loginWin').style.display = 'none';
@@ -2708,7 +2761,10 @@ function doLogin() {
     mobileShow($('#mainWin'));
     applyDeskLayout();
     $('#meName').textContent = me.name;
-    $('#meId').textContent = me.id;
+    $('#meId').textContent = me.baseId;
+    if (me.id !== me.baseId) {
+      $('#meId').title = t('deviceSlot') + ' (' + me.id + ')';
+    }
     $('#meStatus').value = me.status;
     $('#meStText').textContent = '(' + stText(me.status) + ')';
     $('#myDp').innerHTML = dpHtml(me.id);
@@ -2722,7 +2778,7 @@ function doLogin() {
   });
 
   peer.on('connection', c => {
-    if (blocked.has(c.peer)) { try { c.close(); } catch {} return; }
+    if (blocked.has(baseOf(c.peer))) { try { c.close(); } catch {} return; }
     setupConn(c, true);
   });
   peer.on('call', call => handleIncomingCall(call));
@@ -2734,11 +2790,17 @@ function doLogin() {
 
   peer.on('error', e => {
     if (e.type === 'unavailable-id') {
-      $('#loginBtn').disabled = false;
-      $('#loginStatus').textContent = '';
-      err.textContent = t('errTaken');
       try { peer.destroy(); } catch {}
       peer = null;
+      if (slot < DEVICE_SLOTS) {
+        // másik eszközünk már használja — a következő helyre lépünk
+        $('#loginStatus').textContent = t('connecting');
+        startPeerWithSlot(base, slot + 1);
+      } else {
+        $('#loginBtn').disabled = false;
+        $('#loginStatus').textContent = '';
+        err.textContent = t('errTaken');
+      }
     } else if (e.type === 'peer-unavailable') {
       // a jelenlét-figyelő újrapróbálja
     } else if (!peer || peer.destroyed) {
@@ -2848,46 +2910,63 @@ dpInput.addEventListener('change', () => {
 });
 
 function broadcast(obj) {
-  for (const c of conns.values()) if (c.open) c.send(obj);
+  for (const m of deviceConns.values()) {
+    for (const c of m.values()) if (c.open) { try { c.send(obj); } catch {} }
+  }
 }
 
 // ---------- adatkapcsolatok ----------
 function setupConn(c, incoming) {
+  const base = baseOf(c.peer);
+
   c.on('open', () => {
-    const old = conns.get(c.peer);
-    if (old && old !== c && old.open) { try { c.close(); } catch {} return; }
-    const wasOnline = conns.has(c.peer);
-    conns.set(c.peer, c);
-    c.send({ t: 'hello', name: me.name, status: me.status, pm: me.pm, dp: myDp || undefined });
-    if (incoming && !contacts.find(x => x.id === c.peer)) {
-      contacts.push({ id: c.peer, name: c.peer });
+    if (blocked.has(base)) { try { c.close(); } catch {} return; }
+    const wasOnline = conns.has(base);
+    addDeviceConn(base, c);
+    // a fő kapcsolat a partnerhez (a többi eszköze is megkapja az üzeneteket)
+    conns.set(base, c);
+    c.send({ t: 'hello', name: me.name, status: me.status, pm: me.pm,
+             base: me.baseId, dp: myDp || undefined });
+    if (incoming && !contacts.find(x => x.id === base)) {
+      contacts.push({ id: base, name: base });
       saveContacts();
     }
     if (!wasOnline) sndOnline();
     renderContacts();
   });
 
-  c.on('data', d => onData(c.peer, d));
+  c.on('data', d => onData(base, d));
 
   const drop = () => {
-    if (conns.get(c.peer) === c) {
-      conns.delete(c.peer);
-      const r = remote.get(c.peer);
-      if (r && chatWins.has(c.peer)) sysMsg(c.peer, tf('left', r.name || c.peer));
-      remote.delete(c.peer);
-      renderContacts();
-      refreshChatHead(c.peer);
+    removeDeviceConn(base, c.peer);
+    const still = deviceConns.get(base);
+    if (still && still.size) {
+      // másik eszköze még bent van — a partner online marad
+      conns.set(base, [...still.values()][0]);
+      return;
     }
+    if (conns.get(base) === c || !conns.has(base)) conns.delete(base);
+    const r = remote.get(base);
+    if (r && chatWins.has(base)) sysMsg(base, tf('left', r.name || base));
+    remote.delete(base);
+    renderContacts();
+    refreshChatHead(base);
   };
   c.on('close', drop);
   c.on('error', drop);
 }
 
-function connectTo(peerId) {
+function connectTo(base) {
   if (!peer || peer.destroyed || peer.disconnected) return;
-  if (conns.has(peerId) || peerId === me.id || blocked.has(peerId)) return;
-  const c = peer.connect(peerId, { reliable: true });
-  setupConn(c, false);
+  if (base === me.baseId || blocked.has(base)) return;
+  const known = deviceConns.get(base);
+  for (let n = 1; n <= DEVICE_SLOTS; n++) {
+    const pid = slotId(base, n);
+    if (pid === me.id) continue;
+    if (known && known.has(pid)) continue;
+    const c = peer.connect(pid, { reliable: true });
+    setupConn(c, false);
+  }
 }
 
 function onData(pid, d) {
@@ -2960,6 +3039,7 @@ function onData(pid, d) {
     case 'img-chunk': onImgChunk(pid, d); break;
     case 'vid-offer': onVidOffer(pid, d); break;
     case 'vid-request': onVidRequest(pid, d); break;
+    case 'vid-stop': onVidStop(pid, d); break;
     case 'vid-start': onVidStart(pid, d); break;
     case 'vid-chunk': onVidChunk(pid, d); break;
     case 'vclip': onVclip(pid, d); break;
@@ -3601,6 +3681,7 @@ function openChat(pid) {
   buildMenus($('.chat-menubar', win), [
     { label: t('menuFile'), items: [
       { label: t('miSendFile'), act: 'sendfile' },
+      { label: t('miSaveTxt'), act: 'savetxt' },
       '-',
       { label: t('miClose'), act: 'close' },
     ]},
@@ -3651,7 +3732,7 @@ function openChat(pid) {
     }
     const fmt = { color: sanitizeColor(myFmt.color) || undefined, bold: !!myFmt.bold || undefined, italic: !!myFmt.italic || undefined, font: sanitizeFont(myFmt.font) || undefined };
     const rp = w.reply ? { n: w.reply.n, x: w.reply.x, th: w.reply.th || undefined } : undefined;
-    c.send({ t: 'msg', text, fmt, rp });
+    sendTo(pid, { t: 'msg', text, fmt, rp });
     addMsg(pid, me.name, text, true, fmt, rp);
     w.reply = null;
     rbar.classList.remove('on');
@@ -3848,6 +3929,7 @@ function runChatAction(pid, act) {
   else if (act === 'stream') startStream(pid);
   else if (act === 'stopstream') stopStream(pid);
   else if (act === 'sendfile') w.fileInput.click();
+  else if (act === 'savetxt') exportChatTxt(pid);
   else if (act === 'voice') startCall(pid, 'voice');
   else if (act === 'webcam') startCall(pid, 'webcam');
   else if (act === 'block') { toggleBlock(pid); w.win.style.display = 'none'; }
@@ -4182,19 +4264,35 @@ async function onVidRequest(pid, d) {
   if (!c || !c.open) return;
   const file = off.file;
   const total = file.size;
+  const mode = d.mode === 'save' ? 'save' : 'stream';
+  off.stopped = false;
+  vidSending.set(d.id, off);
   c.send({ t: 'vid-start', id: d.id, name: file.name, mime: file.type || 'video/mp4',
-           size: total, mode: d.mode === 'save' ? 'save' : 'stream' });
+           size: total, mode });
+  // Streamelésnél kisebb elore-puffert tartunk: csak annyit kuldunk,
+  // amennyit a masik oldal eppen nez. Mentesnél teljes sebesseggel megy.
+  const STREAM_AHEAD = 3145728; // 3 MB elore-puffer
   let sent = 0;
   while (sent < total) {
-    while (c.dataChannel && c.dataChannel.bufferedAmount > BUF_LIMIT) {
-      await new Promise(r => setTimeout(r, 10));
-      if (!c.open) return;
+    if (off.stopped || !c.open) { vidSending.delete(d.id); return; }
+    const limit = mode === 'stream' ? Math.min(BUF_LIMIT, STREAM_AHEAD) : BUF_LIMIT;
+    while (c.dataChannel && c.dataChannel.bufferedAmount > limit) {
+      await new Promise(r => setTimeout(r, 40));
+      if (off.stopped || !c.open) { vidSending.delete(d.id); return; }
     }
     const end = Math.min(sent + CHUNK, total);
     const part = await file.slice(sent, end).arrayBuffer();
     c.send({ t: 'vid-chunk', id: d.id, last: end >= total, data: part });
     sent = end;
   }
+  vidSending.delete(d.id);
+}
+
+// folyamatban lévő küldések (leállíthatók, ha a másik fél abbahagyja)
+const vidSending = new Map();
+function onVidStop(pid, d) {
+  const off = vidSending.get(d.id);
+  if (off && off.pid === pid) off.stopped = true;
 }
 
 // beérkező ajánlat: csak előnézet, semmit nem töltünk le
@@ -4240,6 +4338,20 @@ function addVideoOffer(pid, name, offerId, fileName, size, poster) {
   m.appendChild(line);
   w.msgs.appendChild(m);
   w.msgs.scrollTop = w.msgs.scrollHeight;
+
+  // válasz erre a videóra
+  const rb = el('span', 'reply-btn', '↩');
+  rb.title = t('replyBtn');
+  rb.addEventListener('click', e => {
+    e.stopPropagation();
+    w.reply = { n: name, x: '🎬 ' + (fileName || 'video'), th: poster || undefined };
+    const rbar = $('.reply-bar', w.win);
+    $('.rq', rbar).innerHTML = (poster ? '<img class="rq-th" src="' + poster + '" alt="">' : '') +
+      escHtml(name + ': 🎬 ' + (fileName || 'video'));
+    rbar.classList.add('on');
+    w.ta.focus();
+  });
+  m.appendChild(rb);
 
   const ask = mode => {
     const c = conns.get(pid);
@@ -4389,6 +4501,16 @@ function addVideoMsg(pid, name, url, fileName, mine, got, size) {
   if (url) dl.href = url; else dl.style.display = 'none';
   line.appendChild(dl);
   m.appendChild(line);
+  const rbv = el('span', 'reply-btn', '↩');
+  rbv.title = t('replyBtn');
+  rbv.addEventListener('click', () => {
+    w.reply = { n: name, x: '🎬 ' + (fileName || 'video') };
+    const rbar = $('.reply-bar', w.win);
+    $('.rq', rbar).textContent = name + ': 🎬 ' + (fileName || 'video');
+    rbar.classList.add('on');
+    w.ta.focus();
+  });
+  m.appendChild(rbv);
   w.msgs.appendChild(m);
   w.msgs.scrollTop = w.msgs.scrollHeight;
   return {
@@ -4618,14 +4740,14 @@ async function startCall(pid, kind) {
     sysMsg(pid, kind === 'webcam' ? t('camDenied') : t('micDenied'));
     return;
   }
-  const call = peer.call(pid, stream, { metadata: { kind, name: me.name } });
+  const call = peer.call(conns.get(pid)?.peer || pid, stream, { metadata: { kind, name: me.name } });
   watchIce(call, pid);
   openCallWin(pid, kind, call, stream, true);
   sysMsg(pid, kind === 'webcam' ? t('callCamStarted') : t('callVoiceStarted'));
 }
 
 function handleIncomingCall(call) {
-  const pid = call.peer;
+  const pid = baseOf(call.peer);
   if (blocked.has(pid)) { try { call.close(); } catch {} return; }
   const kind = call.metadata?.kind;
   if (kind === 'screen') return handleIncomingScreen(call);
@@ -4815,7 +4937,7 @@ function placeStreamCall(pid) {
   if (!screenStream || !screenStream.active) return;
   const old = outCalls.get(pid);
   if (old) { try { old.close(); } catch {} }
-  const call = peer.call(pid, screenStream, { metadata: { kind: 'screen', name: me.name } });
+  const call = peer.call(conns.get(pid)?.peer || pid, screenStream, { metadata: { kind: 'screen', name: me.name } });
   watchIce(call, pid);
   outCalls.set(pid, call);
   const w = chatWins.get(pid);
@@ -4853,7 +4975,7 @@ function cleanupOutCall(pid) {
 }
 
 function handleIncomingScreen(call) {
-  const pid = call.peer;
+  const pid = baseOf(call.peer);
   openChat(pid);
   const w = chatWins.get(pid);
 
@@ -4964,7 +5086,7 @@ function closeViewer(pid) {
 }
 
 // ---------- verzió és frissítés-ellenőrzés ----------
-const APP_VERSION = '1.9.0';
+const APP_VERSION = '2.0.0';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 
 function cmpVer(a, b) {
@@ -5016,6 +5138,69 @@ function showUpdateBar(latest, url) {
   });
   bar.appendChild(x);
   foot.before(bar);
+}
+
+// ---------- beszélgetés mentése és tárolt adatok ürítése ----------
+function exportChatTxt(pid) {
+  const hist = loadHist(pid);
+  const lines = [];
+  lines.push('MSN Messenger 7.5 — P2P');
+  lines.push(t('convTitle') + ': ' + dispName(pid) + ' <' + pid + '>');
+  lines.push(new Date().toLocaleString());
+  lines.push('-'.repeat(50));
+  for (const en of hist) {
+    if (en.k === 'm') lines.push('[' + (en.ts || '') + '] ' + en.n + ': ' + en.x);
+    else lines.push('* ' + en.x);
+  }
+  const blob = new Blob([lines.join(String.fromCharCode(13, 10))], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'beszelgetes-' + pid + '.txt';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+// az összes beszélgetés-előzmény törlése (csak a saját fiókban)
+function clearAllHistory() {
+  if (!confirm(t('confirmClearMsgs'))) return;
+  const pre = 'msn75_hist_' + me.id + '_';
+  const preBase = 'msn75_hist_' + me.baseId + '_';
+  for (const k of Object.keys(localStorage)) {
+    if (k.startsWith(pre) || k.startsWith(preBase)) localStorage.removeItem(k);
+  }
+  for (const [pid, w] of chatWins) {
+    w.msgs.innerHTML = '';
+    w.lastMsgAt = null;
+  }
+  alert(t('doneCleared'));
+}
+
+// a beszélgetésekben megjelenített képek/videók elengedése
+function clearAllMedia() {
+  if (!confirm(t('confirmClearMedia'))) return;
+  let n = 0;
+  for (const [, w] of chatWins) {
+    w.win.querySelectorAll('.img-msg, .vid-msg').forEach(node => {
+      node.querySelectorAll('img, video, a').forEach(el2 => {
+        const u = el2.src || el2.href;
+        if (u && u.startsWith('blob:')) { try { URL.revokeObjectURL(u); } catch {} }
+      });
+      const msg = node.closest('.msg');
+      (msg || node).remove();
+      n++;
+    });
+  }
+  // az előzményekből is kivesszük a média-bejegyzéseket
+  const pres = ['msn75_hist_' + me.id + '_', 'msn75_hist_' + me.baseId + '_'];
+  for (const k of Object.keys(localStorage)) {
+    if (!pres.some(pr => k.startsWith(pr))) continue;
+    try {
+      const arr = JSON.parse(localStorage.getItem(k) || '[]')
+        .filter(e => !(e.k === 's' && /^(🖼️|🎬|📄|🎤)/.test(String(e.x || ''))));
+      localStorage.setItem(k, JSON.stringify(arr));
+    } catch {}
+  }
+  alert(tf('mediaCleared', n));
 }
 
 // Frissítés egy gombbal:

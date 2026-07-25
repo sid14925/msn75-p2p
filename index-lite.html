@@ -3,9 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <title>MSN Messenger 7.5 — P2P (Escargot)</title>
 <style>
 /* ===== MSN Messenger 7.5 — P2P kiadás | hű MSN 7.5 / Windows XP kinézet ===== */
@@ -832,8 +829,6 @@ html, body {
 }
 .viewer-bar button:hover { background: #3a4c5e; }
 .viewer-bar .vunmute { background: #6a5a18; border-color: #9a8a3a; display: none; }
-.viewer-bar .vretry { background: #1a4f85; border-color: #2b70b5; color: #fff; margin-left: 6px; }
-.viewer-bar .vretry:hover { background: #2664a3; }
 .viewer-bar .vfull { margin-left: auto; }
 
 .ask-box {
@@ -1677,7 +1672,7 @@ window.MSN_ASSETS = null;
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.2.1';
+const APP_VERSION = '2.1.0';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -1762,7 +1757,7 @@ const LANGS = {
     streamAsk: '$1 streamelni szeretné neked a képernyőjét.',
     streamLive: 'ÉLŐ', streamOf: '$1 képernyője', streamWin: 'Stream',
     streamYouSend: '🔴 Képernyődet streameled neki', stopStreamBtn: 'Stream leállítása',
-    streamConnecting: 'kapcsolódás…', streamRetry: '🔄 Stream frissítése', streamPaused: ' (szüneteltetve / minimálison)',
+    streamConnecting: 'kapcsolódás…',
     streamFailed: 'A stream kapcsolat nem jött létre (tűzfal/NAT). Próbáljátok újra!',
     streamWaiting: 'A stream még nem érkezett meg — ha fél percen belül nem indul el, próbáljátok újra.',
     streamGot: '$1 streamje elindult.',
@@ -1895,7 +1890,7 @@ const LANGS = {
     streamAsk: '$1 wants to stream their screen to you.',
     streamLive: 'LIVE', streamOf: '$1\'s screen', streamWin: 'Stream',
     streamYouSend: '🔴 You are streaming your screen', stopStreamBtn: 'Stop streaming',
-    streamConnecting: 'connecting…', streamRetry: '🔄 Refresh stream', streamPaused: ' (paused / minimized)',
+    streamConnecting: 'connecting…',
     streamFailed: 'The stream connection could not be established (firewall/NAT). Please try again!',
     streamWaiting: 'The stream has not arrived yet — if it does not start within half a minute, try again.',
     streamGot: '$1\'s stream has started.',
@@ -5167,20 +5162,7 @@ async function startStream(pid) {
   if (outCalls.has(pid)) { sysMsg(pid, t('streamAlready')); return; }
   try {
     if (!screenStream || !screenStream.active) {
-      try {
-        screenStream = await navigator.mediaDevices.getDisplayMedia({
-          video: {
-            cursor: 'always',
-            displaySurface: 'monitor',
-            frameRate: { ideal: 30, max: 60 }
-          },
-          audio: true
-        });
-      } catch (e) {
-        screenStream = await navigator.mediaDevices.getDisplayMedia({
-          video: { cursor: 'always', frameRate: { ideal: 30 } }
-        });
-      }
+      screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
       screenStream.getVideoTracks()[0].addEventListener('ended', () => {
         for (const id of [...outCalls.keys()]) stopStream(id);
         screenStream = null;
@@ -5296,7 +5278,6 @@ function showViewer(pid, stream) {
       '<div class="viewer-bar"><span class="live">' + t('streamLive') + '</span>' +
       '<span>' + tf('streamOf', escHtml(dispName(pid))) + '</span>' +
       '<span class="vstate">' + t('streamConnecting') + '</span>' +
-      '<button class="vretry" title="' + t('streamRetry') + '">' + t('streamRetry') + '</button>' +
       '<button class="vunmute">' + t('unmute') + '</button>' +
       '<button class="vfull">' + t('fullscreen') + '</button></div>' +
     '</div>';
@@ -5314,57 +5295,27 @@ function showViewer(pid, stream) {
 
   const vstate = $('.vstate', win);
   const unmuteBtn = $('.vunmute', win);
-  const retryBtn = $('.vretry', win);
-
-  const playVideo = () => {
-    video.play().then(() => { vstate.textContent = ''; }).catch(() => {
-      video.muted = true;
-      video.play().then(() => {
-        vstate.textContent = '';
-        if (stream.getAudioTracks().length) unmuteBtn.style.display = 'inline-block';
-      }).catch(() => {});
-    });
-  };
-
-  playVideo();
-
+  video.play().then(() => { vstate.textContent = ''; }).catch(() => {
+    video.muted = true;
+    video.play().then(() => {
+      vstate.textContent = '';
+      if (stream.getAudioTracks().length) unmuteBtn.style.display = 'inline-block';
+    }).catch(() => {});
+  });
   video.addEventListener('playing', () => { vstate.textContent = ''; });
-  video.addEventListener('pause', () => { if (stream.active) playVideo(); });
-  video.addEventListener('resize', playVideo);
-
   unmuteBtn.addEventListener('click', () => {
     video.muted = false;
-    playVideo();
+    video.play().catch(() => {});
     unmuteBtn.style.display = 'none';
   });
 
-  const requestRetry = () => {
-    vstate.textContent = t('streamConnecting');
-    playVideo();
-    const c = conns.get(pid);
-    if (c && c.open) c.send({ t: 'stream-retry' });
-  };
-
-  retryBtn.addEventListener('click', requestRetry);
-
-  const videoTrack = stream.getVideoTracks()[0];
-  if (videoTrack) {
-    videoTrack.addEventListener('mute', () => {
-      vstate.textContent = t('streamPaused');
-    });
-    videoTrack.addEventListener('unmute', () => {
-      vstate.textContent = '';
-      video.srcObject = stream;
-      playVideo();
-    });
-    videoTrack.addEventListener('ended', () => closeViewer(pid));
-  }
-
   $('.vfull', win).addEventListener('click', () => video.requestFullscreen?.());
   $('.tbtn.close', win).addEventListener('click', e => { e.stopPropagation(); closeViewer(pid); });
+  stream.getVideoTracks()[0]?.addEventListener('ended', () => closeViewer(pid));
 
   viewers.set(pid, { win, stream });
   sysMsg(pid, tf('streamGot', dispName(pid)));
+  // a rendszerüzenet előhozza a csevegőablakot — a stream maradjon elöl
   bringToFront(win);
   mobileShow(win);
   win.focus?.();

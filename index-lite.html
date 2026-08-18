@@ -1674,7 +1674,7 @@ window.MSN_ASSETS = null;
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.3.0';
+const APP_VERSION = '2.3.3';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -3283,9 +3283,12 @@ function onData(pid, d) {
       sysMsg(pid, tf('streamTheirStop', dispName(pid)));
       break;
     }
+    case 'stream-keyframe':
     case 'stream-retry': {
-      // a fogadó nem kapta meg a videót — újraépítjük a hívást
-      if (outCalls.has(pid) && screenStream && screenStream.active) {
+      // a fogadó kéri a kulcsképkockát vagy a hívás újraépítését
+      const call = outCalls.get(pid);
+      if (call) forceKeyFrame(call);
+      if (d.t === 'stream-retry' && outCalls.has(pid) && screenStream && screenStream.active) {
         placeStreamCall(pid);
       }
       break;
@@ -5211,6 +5214,25 @@ function placeStreamCall(pid) {
   }
   call.on('close', () => { if (outCalls.get(pid) === call) cleanupOutCall(pid); });
   call.on('error', () => { if (outCalls.get(pid) === call) cleanupOutCall(pid); });
+
+  // Kulcsképkocka kérése a WebRTC kódolótól a csatlakozáskor
+  setTimeout(() => forceKeyFrame(call), 400);
+  setTimeout(() => forceKeyFrame(call), 1200);
+  setTimeout(() => forceKeyFrame(call), 2500);
+}
+
+function forceKeyFrame(call) {
+  if (!call) return;
+  try {
+    const pc = call.peerConnection;
+    if (pc && pc.getSenders) {
+      for (const s of pc.getSenders()) {
+        if (s.track && s.track.kind === 'video' && s.generateKeyFrame) {
+          s.generateKeyFrame();
+        }
+      }
+    }
+  } catch {}
 }
 
 function stopStream(pid, silent) {
@@ -5314,6 +5336,8 @@ function showViewer(pid, stream) {
   video.autoplay = true;
   video.playsInline = true;
   video.muted = true;
+  video.setAttribute('playsinline', '');
+  video.setAttribute('webkit-playsinline', '');
   video.srcObject = stream;
   $('.win-body', win).appendChild(video);
 
@@ -5341,10 +5365,20 @@ function showViewer(pid, stream) {
     unmuteBtn.style.display = 'inline-block';
   }
 
+  const updateStats = () => {
+    if (video.videoWidth > 0 && video.videoHeight > 0) {
+      vstate.textContent = video.videoWidth + 'x' + video.videoHeight;
+      vstate.style.color = '#7ec87e';
+    } else {
+      vstate.textContent = t('streamConnecting');
+      vstate.style.color = '#8fa8c0';
+    }
+  };
+
   const playVideo = () => {
-    video.play().then(() => { vstate.textContent = ''; }).catch(() => {
+    video.play().then(updateStats).catch(() => {
       video.muted = true;
-      video.play().then(() => { vstate.textContent = ''; }).catch(() => {});
+      video.play().then(updateStats).catch(() => {});
     });
     if (audioEl) {
       audioEl.play().catch(() => {});
@@ -5354,10 +5388,24 @@ function showViewer(pid, stream) {
   playVideo();
   video.onloadedmetadata = playVideo;
   video.oncanplay = playVideo;
-
-  video.addEventListener('playing', () => { vstate.textContent = ''; });
+  video.addEventListener('playing', updateStats);
+  video.addEventListener('resize', updateStats);
   video.addEventListener('pause', () => { if (stream.active) playVideo(); });
-  video.addEventListener('resize', playVideo);
+
+  // Időszakos kulcsképkocka kérés a küldőtől, amíg nincs videó kép (videoWidth === 0)
+  let kfInterval = setInterval(() => {
+    if (!viewers.has(pid)) {
+      clearInterval(kfInterval);
+      return;
+    }
+    if (video.videoWidth === 0) {
+      const c = conns.get(pid);
+      if (c && c.open) c.send({ t: 'stream-keyframe' });
+    } else {
+      clearInterval(kfInterval);
+      updateStats();
+    }
+  }, 1500);
 
   unmuteBtn.addEventListener('click', () => {
     if (audioEl) {
@@ -5369,6 +5417,7 @@ function showViewer(pid, stream) {
 
   const requestRetry = () => {
     vstate.textContent = t('streamConnecting');
+    vstate.style.color = '#8fa8c0';
     playVideo();
     const c = conns.get(pid);
     if (c && c.open) c.send({ t: 'stream-retry' });
@@ -5380,6 +5429,7 @@ function showViewer(pid, stream) {
   if (videoTrack) {
     videoTrack.addEventListener('mute', () => {
       vstate.textContent = t('streamPaused');
+      vstate.style.color = '#f5c056';
     });
     videoTrack.addEventListener('unmute', () => {
       vstate.textContent = '';
@@ -5392,7 +5442,7 @@ function showViewer(pid, stream) {
   $('.vfull', win).addEventListener('click', () => video.requestFullscreen?.());
   $('.tbtn.close', win).addEventListener('click', e => { e.stopPropagation(); closeViewer(pid); });
 
-  viewers.set(pid, { win, stream, audioEl });
+  viewers.set(pid, { win, stream, audioEl, kfInterval });
   sysMsg(pid, tf('streamGot', dispName(pid)));
   bringToFront(win);
   mobileShow(win);
@@ -5402,6 +5452,7 @@ function showViewer(pid, stream) {
 function closeViewer(pid) {
   const v = viewers.get(pid);
   if (!v) return;
+  if (v.kfInterval) clearInterval(v.kfInterval);
   try { v.stream.getTracks().forEach(tk => tk.stop()); } catch {}
   if (v.audioEl) { try { v.audioEl.pause(); v.audioEl.srcObject = null; v.audioEl.remove(); } catch {} }
   v.win.remove();

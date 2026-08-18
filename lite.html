@@ -1509,6 +1509,121 @@ html, body {
   }
 }
 
+/* ---------- Üzenet szerkesztés ---------- */
+.msg .edit-btn {
+  position: absolute; right: 22px; top: 0;
+  display: none; cursor: pointer; color: #7a95b3;
+  font-size: 12px; padding: 0 3px;
+  background: #fff; border: 1px solid #d5e5f2; border-radius: 2px;
+}
+.msg.mine:hover .edit-btn { display: inline-block; }
+.edit-area {
+  width: 100%;
+  min-height: 36px;
+  border: 2px solid #4a8dce;
+  border-radius: 3px;
+  padding: 4px 6px;
+  font-family: inherit;
+  font-size: inherit;
+  background: #fffef0;
+  resize: vertical;
+  box-sizing: border-box;
+  margin: 2px 0;
+}
+.m-edited {
+  color: #9ab;
+  font-size: 9px;
+  margin-left: 6px;
+  font-style: italic;
+}
+
+/* ---------- Üzenet-flash (hivatkozás ugrás) ---------- */
+@keyframes msg-flash {
+  0% { background: #ffefd0; }
+  60% { background: #fff9e8; }
+  100% { background: transparent; }
+}
+.msg.msg-flash {
+  animation: msg-flash 1.5s ease-out;
+}
+
+/* ---------- Válasz-blokk kattintható kurzor ---------- */
+.reply-q:hover {
+  background: #e8f0fa;
+  border-left-color: #6aace0;
+}
+
+/* ---------- Modális dialógus (eszköz/minőségválasztó) ---------- */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.42);
+  z-index: 99999;
+  display: flex; align-items: center; justify-content: center;
+}
+.picker-dialog {
+  background: linear-gradient(180deg, #f4f8fd, #e6eef8);
+  border: 2px solid #5a92cf;
+  border-radius: 6px;
+  padding: 14px 20px;
+  min-width: 280px;
+  max-width: 380px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.28);
+  font-family: inherit;
+}
+.picker-title {
+  font-weight: bold;
+  color: #234;
+  font-size: 13px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+.picker-label {
+  font-size: 11px;
+  color: #456;
+  margin: 8px 0 3px;
+  font-weight: bold;
+}
+.picker-select {
+  width: 100%;
+  padding: 5px 6px;
+  font-family: inherit;
+  font-size: 12px;
+  border: 1px solid #a0bce0;
+  border-radius: 3px;
+  background: #fff;
+}
+.picker-opt {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  margin: 4px 0;
+  border: 1px solid #a0bce0;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #fff, #eef4fb);
+  color: #234;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.picker-opt:hover { background: linear-gradient(180deg, #d8eaff, #c4daf5); }
+.picker-opt.selected {
+  border-color: #4a8dce;
+  background: linear-gradient(180deg, #dbeeff, #b8d6f5);
+  font-weight: bold;
+}
+.picker-opt.picker-cancel {
+  text-align: center;
+  background: linear-gradient(180deg, #f5f5f5, #e0e0e0);
+  border-color: #bbb;
+  color: #666;
+  margin-top: 8px;
+}
+.picker-opt.picker-cancel:hover { background: #ddd; }
+.picker-row {
+  display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end;
+}
 
 </style>
 </head>
@@ -1674,7 +1789,7 @@ window.MSN_ASSETS = null;
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.3.3';
+const APP_VERSION = '2.4.0';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -1765,6 +1880,12 @@ const LANGS = {
     streamGot: '$1 streamje elindult.',
     unmute: '🔊 Hang bekapcsolása', fullscreen: 'Teljes képernyő',
     youStream: 'Streamelés indítása',
+    streamQTitle: 'Stream minőség', streamQHigh: '🏎️ Magas (natív, 30 FPS)',
+    streamQMid: '⚖️ Közepes (720p, 20 FPS)', streamQLow: '🐢 Alacsony (480p, 15 FPS)',
+    editMsg: 'Szerkesztés', edited: '(szerkesztve)',
+    selectMic: 'Mikrofon kiválasztása', selectCam: 'Kamera kiválasztása',
+    selectDevice: 'Eszköz kiválasztása', noDevices: 'Nincs elérhető eszköz.',
+    defaultDevice: 'Alapértelmezett',
     dpTip: 'Megjelenítendő kép cseréje',
     miNudge: 'Rezgetés küldése', miVoiceCall: 'Hanghívás indítása',
     miWebcam: 'Webkamerás beszélgetés', miSendFile: 'Fájl vagy fénykép küldése…',
@@ -1777,6 +1898,7 @@ const LANGS = {
     youWereAdded: 'Csoportos beszélgetéshez adtak hozzá.',
     replyTo: 'Válasz erre:',
     replyBtn: 'Válasz',
+    editBtn: 'Szerkesztés',
     sentWink: 'Kacsintót küldtél.', gotWink: '$1 kacsintót küldött!',
     settings: 'Megjelenés beállításai',
     deskCol: 'Asztal háttérszíne:',
@@ -1898,6 +2020,12 @@ const LANGS = {
     streamGot: '$1\'s stream has started.',
     unmute: '🔊 Unmute', fullscreen: 'Full screen',
     youStream: 'Start streaming',
+    streamQTitle: 'Stream quality', streamQHigh: '🏎️ High (native, 30 FPS)',
+    streamQMid: '⚖️ Medium (720p, 20 FPS)', streamQLow: '🐢 Low (480p, 15 FPS)',
+    editMsg: 'Edit', edited: '(edited)',
+    selectMic: 'Select microphone', selectCam: 'Select camera',
+    selectDevice: 'Select device', noDevices: 'No devices available.',
+    defaultDevice: 'Default',
     dpTip: 'Change display picture',
     miNudge: 'Send a nudge', miVoiceCall: 'Start a voice call',
     miWebcam: 'Start a webcam conversation', miSendFile: 'Send a file or photo…',
@@ -1910,6 +2038,7 @@ const LANGS = {
     youWereAdded: 'You were added to a group conversation.',
     replyTo: 'Replying to:',
     replyBtn: 'Reply',
+    editBtn: 'Edit',
     sentWink: 'You sent a wink.', gotWink: '$1 sent you a wink!',
     settings: 'Appearance settings',
     deskCol: 'Desktop background color:',
@@ -1999,6 +2128,10 @@ let muted = localStorage.getItem('msn75_muted') === '1';
 let myDp = localStorage.getItem('msn75_mydp') || null;
 // A tiltás funkció megszűnt: mindenki elérhető marad.
 let myFmt = { color: '#000000', bold: false, italic: false };
+let msgIdCounter = 0;
+let preferredMic = localStorage.getItem('msn75_mic') || null;
+let preferredCam = localStorage.getItem('msn75_cam') || null;
+let preferredStreamQ = localStorage.getItem('msn75_streamq') || 'high';
 try { Object.assign(myFmt, JSON.parse(localStorage.getItem('msn75_fmt') || '{}')); } catch {}
 
 const A = window.MSN_ASSETS || null;
@@ -3221,8 +3354,22 @@ function onData(pid, d) {
     case 'msg': {
       const isNew = !chatWins.has(pid) || chatWins.get(pid).win.style.display === 'none';
       openChat(pid);
-      addMsg(pid, dispName(pid), String(d.text).slice(0, 4000), false, d.fmt, d.rp);
+      addMsg(pid, dispName(pid), String(d.text).slice(0, 4000), false, d.fmt, d.rp, { remoteId: d.mid });
       if (isNew) sndAlert(); else sndMsg();
+      break;
+    }
+    case 'msg-edit': {
+      const w = chatWins.get(pid);
+      if (!w || !d.mid) break;
+      const target = w.msgs.querySelector('[data-msg-id="' + CSS.escape(d.mid) + '"]');
+      if (target && !target.classList.contains('mine')) {
+        const body = target.querySelector('.m-body');
+        if (body) {
+          body.innerHTML = renderBody(String(d.text).slice(0, 4000));
+          let ed = target.querySelector('.m-edited');
+          if (!ed) { ed = document.createElement('span'); ed.className = 'm-edited'; ed.textContent = t('edited'); target.querySelector('.m-head').appendChild(ed); }
+        }
+      }
       break;
     }
     case 'typing': showTyping(pid); break;
@@ -3922,8 +4069,9 @@ function openChat(pid) {
     }
     const fmt = { color: sanitizeColor(myFmt.color) || undefined, bold: !!myFmt.bold || undefined, italic: !!myFmt.italic || undefined, font: sanitizeFont(myFmt.font) || undefined };
     const rp = w.reply ? { n: w.reply.n, x: w.reply.x, th: w.reply.th || undefined } : undefined;
-    sendTo(pid, { t: 'msg', text, fmt, rp });
-    addMsg(pid, me.name, text, true, fmt, rp);
+    const mid = me.baseId + '_' + Date.now() + '_' + (++msgIdCounter);
+    sendTo(pid, { t: 'msg', text, fmt, rp, mid });
+    addMsg(pid, me.name, text, true, fmt, rp, { msgId: mid });
     w.reply = null;
     rbar.classList.remove('on');
     w.ta.value = '';
@@ -4174,6 +4322,10 @@ function addMsg(pid, name, text, mine, fmt, rp, opts) {
   const w = openChat(pid);
   const m = el('div', 'msg' + (mine ? ' mine' : ''));
   const ts = opts.ts || now();
+  // üzenet azonosító: saját küldésnél opts.msgId, fogadásnál opts.remoteId
+  const mid = opts.msgId || opts.remoteId || (me.baseId + '_' + Date.now() + '_' + (++msgIdCounter));
+  m.setAttribute('data-msg-id', mid);
+  m.setAttribute('data-msg-text', String(text).slice(0, 200));
   const h = el('div', 'm-head');
   h.innerHTML = tf('writes', escHtml(name)) + '<span class="m-time">' + escHtml(ts) + '</span>';
   m.appendChild(h);
@@ -4183,6 +4335,22 @@ function addMsg(pid, name, text, mine, fmt, rp, opts) {
       ? '<img class="rq-th" src="' + rp.th + '" alt="">' : '';
     q.innerHTML = th + '<b>' + escHtml(String(rp.n || '').slice(0, 40)) + ':</b> ' +
       escHtml(String(rp.x).slice(0, 120));
+    // kattintásra az eredeti üzenethez scrollolás
+    q.style.cursor = 'pointer';
+    q.addEventListener('click', () => {
+      // keressük meg a hivatkozott üzenetet a szövege alapján
+      const rpText = String(rp.x).slice(0, 200);
+      const targets = w.msgs.querySelectorAll('.msg[data-msg-text]');
+      for (let i = targets.length - 1; i >= 0; i--) {
+        if (targets[i].getAttribute('data-msg-text') === rpText) {
+          targets[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targets[i].classList.remove('msg-flash');
+          void targets[i].offsetWidth;
+          targets[i].classList.add('msg-flash');
+          return;
+        }
+      }
+    });
     m.appendChild(q);
   }
   const b = el('div', 'm-body');
@@ -4196,7 +4364,7 @@ function addMsg(pid, name, text, mine, fmt, rp, opts) {
     if (ff) b.style.fontFamily = ff;
   }
   m.appendChild(b);
-  // válasz gomb (mint a modern chat-appokban)
+  // válasz gomb
   const rb = el('span', 'reply-btn', '↩');
   rb.title = t('replyBtn');
   rb.addEventListener('click', () => {
@@ -4207,6 +4375,13 @@ function addMsg(pid, name, text, mine, fmt, rp, opts) {
     w.ta.focus();
   });
   m.appendChild(rb);
+  // szerkesztés gomb (csak saját üzenetekre)
+  if (mine) {
+    const eb = el('span', 'edit-btn', '✏');
+    eb.title = t('editBtn');
+    eb.addEventListener('click', () => startEditMsg(pid, m, mid, fmt));
+    m.appendChild(eb);
+  }
   w.msgs.appendChild(m);
   bindYt(m);
   w.msgs.scrollTop = w.msgs.scrollHeight;
@@ -4215,6 +4390,38 @@ function addMsg(pid, name, text, mine, fmt, rp, opts) {
   if (!opts.noHist) {
     pushHist(pid, { k: 'm', n: name, x: String(text).slice(0, 4000), mi: !!mine, f: fmt, r: rp, ts });
   }
+}
+
+// üzenet szerkesztése (inline)
+function startEditMsg(pid, msgEl, mid, fmt) {
+  const body = msgEl.querySelector('.m-body');
+  if (!body || msgEl.querySelector('.edit-area')) return;
+  const oldText = body.textContent;
+  body.style.display = 'none';
+  const area = document.createElement('textarea');
+  area.className = 'edit-area';
+  area.value = oldText;
+  area.rows = Math.max(2, Math.ceil(oldText.length / 60));
+  msgEl.insertBefore(area, body.nextSibling);
+  area.focus();
+  area.selectionStart = area.selectionEnd = area.value.length;
+  const save = () => {
+    const newText = area.value.trim();
+    area.remove();
+    body.style.display = '';
+    if (!newText || newText === oldText) return;
+    body.innerHTML = renderBody(newText);
+    msgEl.setAttribute('data-msg-text', String(newText).slice(0, 200));
+    let ed = msgEl.querySelector('.m-edited');
+    if (!ed) { ed = document.createElement('span'); ed.className = 'm-edited'; ed.textContent = t('edited'); msgEl.querySelector('.m-head').appendChild(ed); }
+    // szerkesztés küldése a partnernek
+    sendTo(pid, { t: 'msg-edit', mid, text: newText });
+  };
+  area.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); save(); }
+    if (e.key === 'Escape') { area.remove(); body.style.display = ''; }
+  });
+  area.addEventListener('blur', save);
 }
 
 function sysMsg(pid, text, opts) {
@@ -4977,6 +5184,94 @@ function onFileChunk(pid, d) {
   }
 }
 
+// ---------- eszközválasztó (mikrofon/kamera) ----------
+async function showDevicePicker(kind) {
+  // kind: 'voice' | 'webcam'
+  // Megkérjük az engedélyt ha még nincs, hogy az eszközneveket lássuk
+  try {
+    const tmp = await navigator.mediaDevices.getUserMedia(
+      kind === 'webcam' ? { video: true, audio: true } : { audio: true });
+    tmp.getTracks().forEach(t => t.stop());
+  } catch { /* ha nincs engedély, a lista üres lesz */ }
+
+  const devices = await navigator.mediaDevices.enumerateDevices();
+  const mics = devices.filter(d => d.kind === 'audioinput');
+  const cams = kind === 'webcam' ? devices.filter(d => d.kind === 'videoinput') : [];
+
+  // Ha csak 1 mikrofon és (webcamnál) 1 kamera van, nem kérdezünk
+  if (mics.length <= 1 && cams.length <= 1) return { mic: null, cam: null };
+
+  return new Promise(resolve => {
+    const ov = el('div', 'modal-overlay');
+    const dlg = el('div', 'picker-dialog');
+    dlg.innerHTML = '<div class="picker-title">' + t('selectDevice') + '</div>';
+
+    let selectedMic = preferredMic;
+    let selectedCam = preferredCam;
+
+    // Mikrofon választó
+    if (mics.length > 0) {
+      const lbl = el('div', 'picker-label', t('selectMic'));
+      dlg.appendChild(lbl);
+      const sel = document.createElement('select');
+      sel.className = 'picker-select';
+      mics.forEach((d, i) => {
+        const opt = document.createElement('option');
+        opt.value = d.deviceId;
+        opt.textContent = d.label || (t('defaultDevice') + ' ' + (i + 1));
+        if (d.deviceId === preferredMic) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener('change', () => { selectedMic = sel.value; });
+      dlg.appendChild(sel);
+    }
+
+    // Kamera választó (csak webcamnál)
+    if (cams.length > 0) {
+      const lbl = el('div', 'picker-label', t('selectCam'));
+      dlg.appendChild(lbl);
+      const sel = document.createElement('select');
+      sel.className = 'picker-select';
+      cams.forEach((d, i) => {
+        const opt = document.createElement('option');
+        opt.value = d.deviceId;
+        opt.textContent = d.label || (t('defaultDevice') + ' ' + (i + 1));
+        if (d.deviceId === preferredCam) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener('change', () => { selectedCam = sel.value; });
+      dlg.appendChild(sel);
+    }
+
+    const row = el('div', 'picker-row');
+    const okBtn = el('button', 'xp-btn', 'OK');
+    const cancelBtn = el('button', 'xp-btn', t('cancel'));
+    row.appendChild(okBtn); row.appendChild(cancelBtn);
+    dlg.appendChild(row);
+    ov.appendChild(dlg);
+    document.body.appendChild(ov);
+
+    okBtn.addEventListener('click', () => {
+      if (selectedMic) { preferredMic = selectedMic; localStorage.setItem('msn75_mic', selectedMic); }
+      if (selectedCam) { preferredCam = selectedCam; localStorage.setItem('msn75_cam', selectedCam); }
+      ov.remove();
+      resolve({ mic: selectedMic, cam: selectedCam });
+    });
+    cancelBtn.addEventListener('click', () => { ov.remove(); resolve(null); });
+  });
+}
+
+async function buildMediaConstraints(kind) {
+  const pick = await showDevicePicker(kind);
+  if (!pick) throw new Error('cancelled');
+  const audio = pick.mic ? { deviceId: { exact: pick.mic } } : true;
+  if (kind === 'webcam') {
+    const video = pick.cam ? { deviceId: { exact: pick.cam } } : true;
+    return { video, audio };
+  }
+  return { audio };
+}
+
 // ---------- hívások ----------
 async function startCall(pid, kind) {
   const c = conns.get(pid);
@@ -4984,8 +5279,8 @@ async function startCall(pid, kind) {
   if (calls.has(pid)) { sysMsg(pid, t('callBusy')); return; }
   let stream;
   try {
-    stream = await navigator.mediaDevices.getUserMedia(
-      kind === 'webcam' ? { video: true, audio: true } : { audio: true });
+    const constraints = await buildMediaConstraints(kind);
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
   } catch {
     sysMsg(pid, kind === 'webcam' ? t('camDenied') : t('micDenied'));
     return;
@@ -5025,8 +5320,8 @@ function handleIncomingCall(call) {
     finish();
     let stream;
     try {
-      stream = await navigator.mediaDevices.getUserMedia(
-        kind === 'webcam' ? { video: true, audio: true } : { audio: true });
+      const constraints = await buildMediaConstraints(kind);
+      stream = await navigator.mediaDevices.getUserMedia(constraints);
     } catch {
       sysMsg(pid, t('callNoDev'));
       try { call.close(); } catch {}
@@ -5161,26 +5456,59 @@ function watchIce(call, pid) {
 }
 
 // ---------- képernyő-stream ----------
+const STREAM_PROFILES = {
+  high:  { width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 30, max: 60 }, cursor: 'always' },
+  mid:   { width: { max: 1280 }, height: { max: 720 },  frameRate: { ideal: 20, max: 30 }, cursor: 'always' },
+  low:   { width: { max: 854 },  height: { max: 480 },  frameRate: { ideal: 15, max: 20 }, cursor: 'always' },
+};
+
+function showStreamQualityPicker() {
+  return new Promise(resolve => {
+    const ov = el('div', 'modal-overlay');
+    const dlg = el('div', 'picker-dialog');
+    dlg.innerHTML = '<div class="picker-title">' + t('streamQTitle') + '</div>';
+    const opts = [
+      { key: 'high', label: t('streamQHigh') },
+      { key: 'mid',  label: t('streamQMid') },
+      { key: 'low',  label: t('streamQLow') },
+    ];
+    opts.forEach(o => {
+      const btn = el('button', 'picker-opt' + (preferredStreamQ === o.key ? ' selected' : ''), o.label);
+      btn.addEventListener('click', () => {
+        preferredStreamQ = o.key;
+        localStorage.setItem('msn75_streamq', o.key);
+        ov.remove();
+        resolve(o.key);
+      });
+      dlg.appendChild(btn);
+    });
+    const cancelBtn = el('button', 'picker-opt picker-cancel', t('cancel'));
+    cancelBtn.addEventListener('click', () => { ov.remove(); resolve(null); });
+    dlg.appendChild(cancelBtn);
+    ov.appendChild(dlg);
+    document.body.appendChild(ov);
+  });
+}
+
 async function startStream(pid) {
   const c = conns.get(pid);
   if (!c || !c.open) { sysMsg(pid, t('streamCantStart')); return; }
   if (outCalls.has(pid)) { sysMsg(pid, t('streamAlready')); return; }
+
+  // Minőségválasztó megjelenítése
+  const quality = await showStreamQualityPicker();
+  if (!quality) return; // felhasználó elutasította
+
   try {
     const vt = screenStream ? screenStream.getVideoTracks()[0] : null;
     if (!screenStream || !screenStream.active || !vt || vt.readyState !== 'live') {
-      try {
-        screenStream = await navigator.mediaDevices.getDisplayMedia({
-          video: {
-            cursor: 'always',
-            frameRate: { ideal: 30, max: 60 }
-          },
-          audio: true
-        });
-      } catch (e) {
-        screenStream = await navigator.mediaDevices.getDisplayMedia({
-          video: { cursor: 'always', frameRate: { ideal: 30 } }
-        });
-      }
+      const profile = STREAM_PROFILES[quality] || STREAM_PROFILES.high;
+      // FONTOS: CSAK video trackkel hozzuk létre a streamet!
+      // Az audio track okozza a fekete képernyőt a fogadó oldalon.
+      screenStream = await navigator.mediaDevices.getDisplayMedia({
+        video: profile,
+        audio: false
+      });
       const vTrack = screenStream.getVideoTracks()[0];
       if (vTrack) {
         if ('contentHint' in vTrack) vTrack.contentHint = 'motion';
@@ -5203,7 +5531,9 @@ function placeStreamCall(pid) {
   if (!screenStream || !screenStream.active) return;
   const old = outCalls.get(pid);
   if (old) { try { old.close(); } catch {} }
-  const call = peer.call(conns.get(pid)?.peer || pid, screenStream, { metadata: { kind: 'screen', name: me.name } });
+  // FONTOS: csak a videó trackeket küldjük, audio nélkül!
+  const videoOnly = new MediaStream(screenStream.getVideoTracks());
+  const call = peer.call(conns.get(pid)?.peer || pid, videoOnly, { metadata: { kind: 'screen', name: me.name } });
   watchIce(call, pid);
   outCalls.set(pid, call);
   const w = chatWins.get(pid);

@@ -5177,12 +5177,12 @@ async function startStream(pid) {
   if (!c || !c.open) { sysMsg(pid, t('streamCantStart')); return; }
   if (outCalls.has(pid)) { sysMsg(pid, t('streamAlready')); return; }
   try {
-    if (!screenStream || !screenStream.active) {
+    const vt = screenStream ? screenStream.getVideoTracks()[0] : null;
+    if (!screenStream || !screenStream.active || !vt || vt.readyState !== 'live') {
       try {
         screenStream = await navigator.mediaDevices.getDisplayMedia({
           video: {
             cursor: 'always',
-            displaySurface: 'monitor',
             frameRate: { ideal: 30, max: 60 }
           },
           audio: true
@@ -5192,10 +5192,14 @@ async function startStream(pid) {
           video: { cursor: 'always', frameRate: { ideal: 30 } }
         });
       }
-      screenStream.getVideoTracks()[0].addEventListener('ended', () => {
-        for (const id of [...outCalls.keys()]) stopStream(id);
-        screenStream = null;
-      });
+      const vTrack = screenStream.getVideoTracks()[0];
+      if (vTrack) {
+        if ('contentHint' in vTrack) vTrack.contentHint = 'motion';
+        vTrack.addEventListener('ended', () => {
+          for (const id of [...outCalls.keys()]) stopStream(id);
+          screenStream = null;
+        });
+      }
     }
   } catch {
     sysMsg(pid, t('streamDenied'));
@@ -5252,6 +5256,19 @@ function handleIncomingScreen(call) {
   openChat(pid);
   const w = chatWins.get(pid);
 
+  let remoteStream = null;
+  let decided = false;
+
+  // FONTOS: Az eseményfigyelőket azonos ponton kötjük be, nehogy lemaradjunk a médiafolyamról.
+  call.on('stream', stream => {
+    remoteStream = stream;
+    if (decided) {
+      showViewer(pid, stream);
+    }
+  });
+  call.on('close', () => closeViewer(pid));
+  call.on('error', () => closeViewer(pid));
+
   const ask = el('div', 'ask-box');
   const ic = A ? '<span class="emo" style="background-position:-' + (63 * 19) + 'px 0"></span> ' : '🖥️ ';
   const span = el('span');
@@ -5265,26 +5282,21 @@ function handleIncomingScreen(call) {
   $('.chat-toolbar', w.win).after(ask);
   sndRing();
 
-  let decided = false;
   ok.addEventListener('click', () => {
     decided = true; ask.remove();
-    // FONTOS: a stream-figyelőt az answer() ELŐTT kötjük be, hogy
-    // semmiképp ne maradjunk le a beérkező médiafolyamról.
-    let got = false;
-    call.on('stream', stream => { got = true; showViewer(pid, stream); });
-    call.on('close', () => closeViewer(pid));
-    call.on('error', () => closeViewer(pid));
     call.answer();
     watchIce(call, pid);
-    // Ha nem érkezik meg a videó, automatikusan újrakérjük a küldőtől.
-    setTimeout(() => {
-      if (!got) {
-        const c = conns.get(pid);
-        if (c && c.open) c.send({ t: 'stream-retry' });
-        sysMsg(pid, t('streamWaiting'));
-      }
-    }, 12000);
-    setTimeout(() => { if (!got) sysMsg(pid, t('streamFailed')); }, 30000);
+    if (remoteStream) {
+      showViewer(pid, remoteStream);
+    } else {
+      setTimeout(() => {
+        if (!viewers.has(pid)) {
+          const c = conns.get(pid);
+          if (c && c.open) c.send({ t: 'stream-retry' });
+          sysMsg(pid, t('streamWaiting'));
+        }
+      }, 10000);
+    }
   });
   no.addEventListener('click', () => { decided = true; ask.remove(); try { call.close(); } catch {} });
   setTimeout(() => { if (!decided) { ask.remove(); try { call.close(); } catch {} } }, 45000);
@@ -5312,29 +5324,20 @@ function showViewer(pid, stream) {
       '<button class="vfull">' + t('fullscreen') + '</button></div>' +
     '</div>';
 
-  const videoTracks = stream.getVideoTracks();
-  const audioTracks = stream.getAudioTracks();
-
   const video = document.createElement('video');
   video.autoplay = true;
   video.playsInline = true;
   video.muted = true;
-  // FONTOS: Csak a videó sávot adjuk át a <video> elemnek! Így a böngésző
-  // HTML5 A/V szinkronizálója sosem blokkolja a videó képkockákat a rendszerhang
-  // esetleges csúszása vagy csendje miatt.
-  if (videoTracks.length > 0) {
-    video.srcObject = new MediaStream(videoTracks);
-  } else {
-    video.srcObject = stream;
-  }
+  video.srcObject = stream;
   $('.win-body', win).appendChild(video);
 
-  // A rendszerhangot külön <audio> elem játssza le függetlenül
+  const audioTracks = stream.getAudioTracks();
   let audioEl = null;
   if (audioTracks.length > 0) {
     audioEl = document.createElement('audio');
     audioEl.autoplay = true;
     audioEl.srcObject = new MediaStream(audioTracks);
+    audioEl.muted = true;
     win.appendChild(audioEl);
   }
 
@@ -5363,6 +5366,8 @@ function showViewer(pid, stream) {
   };
 
   playVideo();
+  video.onloadedmetadata = playVideo;
+  video.oncanplay = playVideo;
 
   video.addEventListener('playing', () => { vstate.textContent = ''; });
   video.addEventListener('pause', () => { if (stream.active) playVideo(); });
@@ -5385,16 +5390,14 @@ function showViewer(pid, stream) {
 
   retryBtn.addEventListener('click', requestRetry);
 
-  const videoTrack = videoTracks[0];
+  const videoTrack = stream.getVideoTracks()[0];
   if (videoTrack) {
     videoTrack.addEventListener('mute', () => {
       vstate.textContent = t('streamPaused');
     });
     videoTrack.addEventListener('unmute', () => {
       vstate.textContent = '';
-      if (videoTracks.length > 0) {
-        video.srcObject = new MediaStream(videoTracks);
-      }
+      video.srcObject = stream;
       playVideo();
     });
     videoTrack.addEventListener('ended', () => closeViewer(pid));

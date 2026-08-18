@@ -1789,7 +1789,7 @@ window.MSN_ASSETS = null;
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.4.0';
+const APP_VERSION = '2.4.1';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -1880,8 +1880,9 @@ const LANGS = {
     streamGot: '$1 streamje elindult.',
     unmute: '🔊 Hang bekapcsolása', fullscreen: 'Teljes képernyő',
     youStream: 'Streamelés indítása',
-    streamQTitle: 'Stream minőség', streamQHigh: '🏎️ Magas (natív, 30 FPS)',
+    streamQTitle: 'Stream beállítások', streamQHigh: '🏎️ Magas (natív, 30 FPS)',
     streamQMid: '⚖️ Közepes (720p, 20 FPS)', streamQLow: '🐢 Alacsony (480p, 15 FPS)',
+    streamWithAudio: '🔊 Rendszerhangok megosztása', streamNoAudio: '🔇 Csak kép (hang nélkül)',
     editMsg: 'Szerkesztés', edited: '(szerkesztve)',
     selectMic: 'Mikrofon kiválasztása', selectCam: 'Kamera kiválasztása',
     selectDevice: 'Eszköz kiválasztása', noDevices: 'Nincs elérhető eszköz.',
@@ -2020,8 +2021,9 @@ const LANGS = {
     streamGot: '$1\'s stream has started.',
     unmute: '🔊 Unmute', fullscreen: 'Full screen',
     youStream: 'Start streaming',
-    streamQTitle: 'Stream quality', streamQHigh: '🏎️ High (native, 30 FPS)',
+    streamQTitle: 'Stream settings', streamQHigh: '🏎️ High (native, 30 FPS)',
     streamQMid: '⚖️ Medium (720p, 20 FPS)', streamQLow: '🐢 Low (480p, 15 FPS)',
+    streamWithAudio: '🔊 Share system audio', streamNoAudio: '🔇 Video only (no audio)',
     editMsg: 'Edit', edited: '(edited)',
     selectMic: 'Select microphone', selectCam: 'Select camera',
     selectDevice: 'Select device', noDevices: 'No devices available.',
@@ -5467,26 +5469,61 @@ function showStreamQualityPicker() {
     const ov = el('div', 'modal-overlay');
     const dlg = el('div', 'picker-dialog');
     dlg.innerHTML = '<div class="picker-title">' + t('streamQTitle') + '</div>';
+
+    // Minőség-címke
+    const qlbl = el('div', 'picker-label', '🎞️ Minőség / Quality');
+    dlg.appendChild(qlbl);
+
     const opts = [
       { key: 'high', label: t('streamQHigh') },
       { key: 'mid',  label: t('streamQMid') },
       { key: 'low',  label: t('streamQLow') },
     ];
+    let selectedQ = preferredStreamQ;
+    const qBtns = [];
     opts.forEach(o => {
       const btn = el('button', 'picker-opt' + (preferredStreamQ === o.key ? ' selected' : ''), o.label);
       btn.addEventListener('click', () => {
-        preferredStreamQ = o.key;
-        localStorage.setItem('msn75_streamq', o.key);
-        ov.remove();
-        resolve(o.key);
+        selectedQ = o.key;
+        qBtns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
       });
       dlg.appendChild(btn);
+      qBtns.push(btn);
     });
-    const cancelBtn = el('button', 'picker-opt picker-cancel', t('cancel'));
-    cancelBtn.addEventListener('click', () => { ov.remove(); resolve(null); });
-    dlg.appendChild(cancelBtn);
+
+    // Hang-címke
+    const albl = el('div', 'picker-label', '🔊 Hang / Audio');
+    dlg.appendChild(albl);
+
+    let withAudio = preferredStreamQ !== 'noaudio';
+    const audBtns = [];
+    [{ key: true, label: t('streamWithAudio') }, { key: false, label: t('streamNoAudio') }].forEach(o => {
+      const btn = el('button', 'picker-opt' + (withAudio === o.key ? ' selected' : ''), o.label);
+      btn.addEventListener('click', () => {
+        withAudio = o.key;
+        audBtns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      });
+      dlg.appendChild(btn);
+      audBtns.push(btn);
+    });
+
+    const row = el('div', 'picker-row');
+    const okBtn = el('button', 'xp-btn', '▶ Streamelés indítása');
+    const cancelBtn = el('button', 'xp-btn', t('cancel'));
+    row.appendChild(okBtn); row.appendChild(cancelBtn);
+    dlg.appendChild(row);
     ov.appendChild(dlg);
     document.body.appendChild(ov);
+
+    okBtn.addEventListener('click', () => {
+      preferredStreamQ = selectedQ;
+      localStorage.setItem('msn75_streamq', selectedQ);
+      ov.remove();
+      resolve({ quality: selectedQ, audio: withAudio });
+    });
+    cancelBtn.addEventListener('click', () => { ov.remove(); resolve(null); });
   });
 }
 
@@ -5495,20 +5532,35 @@ async function startStream(pid) {
   if (!c || !c.open) { sysMsg(pid, t('streamCantStart')); return; }
   if (outCalls.has(pid)) { sysMsg(pid, t('streamAlready')); return; }
 
-  // Minőségválasztó megjelenítése
-  const quality = await showStreamQualityPicker();
-  if (!quality) return; // felhasználó elutasította
+  // Minőség + hang-választó megjelenítése
+  const pick = await showStreamQualityPicker();
+  if (!pick) return; // felhasználó elutasította
+  const { quality, audio: wantAudio } = pick;
 
   try {
     const vt = screenStream ? screenStream.getVideoTracks()[0] : null;
     if (!screenStream || !screenStream.active || !vt || vt.readyState !== 'live') {
       const profile = STREAM_PROFILES[quality] || STREAM_PROFILES.high;
-      // FONTOS: CSAK video trackkel hozzuk létre a streamet!
-      // Az audio track okozza a fekete képernyőt a fogadó oldalon.
-      screenStream = await navigator.mediaDevices.getDisplayMedia({
-        video: profile,
-        audio: false
-      });
+      // Először megpróbáljuk hanggal, ha a felhasználó kérte
+      if (wantAudio) {
+        try {
+          screenStream = await navigator.mediaDevices.getDisplayMedia({
+            video: profile,
+            audio: true        // a felhasználó a böngésző dialog-ban választhat forrást
+          });
+        } catch {
+          // Ha az audio engedély megtagadásra került, csak videóval próbálkozunk
+          screenStream = await navigator.mediaDevices.getDisplayMedia({
+            video: profile,
+            audio: false
+          });
+        }
+      } else {
+        screenStream = await navigator.mediaDevices.getDisplayMedia({
+          video: profile,
+          audio: false
+        });
+      }
       const vTrack = screenStream.getVideoTracks()[0];
       if (vTrack) {
         if ('contentHint' in vTrack) vTrack.contentHint = 'motion';
@@ -5531,9 +5583,11 @@ function placeStreamCall(pid) {
   if (!screenStream || !screenStream.active) return;
   const old = outCalls.get(pid);
   if (old) { try { old.close(); } catch {} }
-  // FONTOS: csak a videó trackeket küldjük, audio nélkül!
-  const videoOnly = new MediaStream(screenStream.getVideoTracks());
-  const call = peer.call(conns.get(pid)?.peer || pid, videoOnly, { metadata: { kind: 'screen', name: me.name } });
+  // Külön video- és audio track-ek, de EGY MediaStream-be csomagolva.
+  // A fogadó oldal (showViewer) a video.srcObject-be CSAK a videót teszi
+  // (fekete kép ellenőrzés), az audio-t külön <audio> elembe.
+  const allTracks = new MediaStream(screenStream.getTracks());
+  const call = peer.call(conns.get(pid)?.peer || pid, allTracks, { metadata: { kind: 'screen', name: me.name } });
   watchIce(call, pid);
   outCalls.set(pid, call);
   const w = chatWins.get(pid);
@@ -5668,7 +5722,10 @@ function showViewer(pid, stream) {
   video.muted = true;
   video.setAttribute('playsinline', '');
   video.setAttribute('webkit-playsinline', '');
-  video.srcObject = stream;
+  // FONTOS: a video.srcObject-be csak video track-et teszünk!
+  // Ez garantálja hogy a videókép mindig megjelenjen, függetlenül az audio track állapotától.
+  const videoTracks = stream.getVideoTracks();
+  video.srcObject = videoTracks.length > 0 ? new MediaStream(videoTracks) : stream;
   $('.win-body', win).appendChild(video);
 
   const audioTracks = stream.getAudioTracks();
@@ -5677,7 +5734,7 @@ function showViewer(pid, stream) {
     audioEl = document.createElement('audio');
     audioEl.autoplay = true;
     audioEl.srcObject = new MediaStream(audioTracks);
-    audioEl.muted = true;
+    audioEl.muted = true;  // autoplay-védelem: a Hang gombbal kapcsolja be a user
     win.appendChild(audioEl);
   }
 

@@ -1,5 +1,5 @@
 {
-  "version": "2.4.0",
+  "version": "2.4.1",
   "url": "https://sid14925.github.io/msn75-p2p/",
-  "notes": "Video-only stream (fekete kep fix), stream minoseg valaszto, uzenet szerkesztes, kattinthato valasz hivatkozasok, mikrofon/kamera valaszto"
+  "notes": "Rendszerhang megosztas streamelesnél (audio:true fallback), video-only srcObject a fekete kep ellen, kombinalt minoseg+hang valaszto"
 }

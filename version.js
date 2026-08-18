@@ -1,5 +1,5 @@
 window.__msnLatest = {
-  version: "2.3.0",
+  version: "2.3.1",
   url: "https://sid14925.github.io/msn75-p2p/",
-  notes: "Stream fekete kep-hibak javítása, mute/unmute esemenyfigyeles es Stream frissitese gomb"
+  notes: "Rendszerhang streameles fekete kep-hiba javítva (video es audio savok szetvalasztasa)"
 };

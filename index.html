@@ -1803,7 +1803,7 @@ window.MSN_ASSETS = {
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.5.0';
+const APP_VERSION = '2.4.4';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -2103,7 +2103,7 @@ const me = { name: '', id: '', baseId: '', status: 'online', pm: '' };
 // Ugyanaz a fiók több eszközön: a tenyleges Peer ID kaphat eszköz-utótagot
 // (pl. "sid", "sid--d2", "sid--d3"). A partnerek minden helyet végigpróbálnak,
 // így a telefon és a gép egyszerre lehet bent ütközés nélkül.
-const DEVICE_SLOTS = 8;
+const DEVICE_SLOTS = 4;
 function slotId(base, n) { return n <= 1 ? base : base + '_dev' + n; }
 function baseOf(peerId) {
   const m = /^(.*)_dev\d+$/.exec(String(peerId));
@@ -3111,74 +3111,15 @@ function doLogin() {
   startPeerWithSlot(id, 1);
 }
 
-let reconnectAttempts = 0;
-let isRebuildingPeer = false;
-
-function handlePeerDisconnect() {
-  setNetState(false);
-  if (isRebuildingPeer) return;
-  if (!me.baseId) return;
-
-  reconnectAttempts++;
-  if (peer && !peer.destroyed && reconnectAttempts <= 2) {
-    try { peer.reconnect(); } catch {}
-  } else {
-    rebuildPeerConnection();
-  }
-}
-
-function rebuildPeerConnection() {
-  if (isRebuildingPeer) return;
-  if (!me.baseId) return;
-  isRebuildingPeer = true;
-  reconnectAttempts = 0;
-  setNetState(false);
-
-  const n = $('#netState');
-  if (n) { n.textContent = t('connecting'); n.className = 'bad'; }
-
-  if (peer && !peer.destroyed) {
-    try { peer.destroy(); } catch {}
-    peer = null;
-  }
-
-  setTimeout(() => {
-    isRebuildingPeer = false;
-    startPeerWithSlot(me.baseId, 1);
-  }, 250);
-}
-
 // megpróbáljuk a fiók azonosítóját; ha foglalt (másik eszköz már bent
 // van vele), automatikusan a következő eszköz-helyet kapjuk
 function startPeerWithSlot(base, slot) {
   const err = $('#loginErr');
   const actual = slotId(base, slot);
   me.id = actual;
-
-  // Ha korábbi peer objektum létezik, zárjuk le
-  if (peer && !peer.destroyed) {
-    try { peer.destroy(); } catch {}
-  }
-
   peer = new Peer(actual, { debug: 1, config: RTC_CONFIG });
 
-  // Biztonsági időzítő: ha 8 mp-en belül nem érkezik válasz a signaling szervertől, próbálkozunk
-  let loginTimer = setTimeout(() => {
-    if ($('#loginWin').style.display !== 'none') {
-      if (slot < DEVICE_SLOTS) {
-        startPeerWithSlot(base, slot + 1);
-      } else {
-        $('#loginBtn').disabled = false;
-        $('#loginStatus').textContent = '';
-        err.textContent = t('errNet') + ' (időtúllépés / timeout)';
-      }
-    }
-  }, 8000);
-
   peer.on('open', () => {
-    clearTimeout(loginTimer);
-    reconnectAttempts = 0;
-    isRebuildingPeer = false;
     $('#loginWin').style.display = 'none';
     $('#mainWin').style.display = 'flex';
     mobileStack.length = 0;
@@ -3207,31 +3148,28 @@ function startPeerWithSlot(base, slot) {
   peer.on('call', call => handleIncomingCall(call));
 
   peer.on('disconnected', () => {
-    handlePeerDisconnect();
+    setNetState(false);
+    try { peer.reconnect(); } catch {}
   });
 
   peer.on('error', e => {
-    clearTimeout(loginTimer);
     if (e.type === 'unavailable-id') {
       try { peer.destroy(); } catch {}
       peer = null;
       if (slot < DEVICE_SLOTS) {
         // másik eszközünk már használja — a következő helyre lépünk
-        $('#loginStatus').textContent = t('connecting') + ' (' + (slot + 1) + ')';
-        setTimeout(() => startPeerWithSlot(base, slot + 1), 100);
+        $('#loginStatus').textContent = t('connecting');
+        startPeerWithSlot(base, slot + 1);
       } else {
-        // Végső véletlenszerű slot próba (hogy sose ragadjon be a bejelentkezés)
-        const randSlot = Math.floor(Math.random() * 899) + 100;
-        setTimeout(() => startPeerWithSlot(base, randSlot), 100);
+        $('#loginBtn').disabled = false;
+        $('#loginStatus').textContent = '';
+        err.textContent = t('errTaken');
       }
     } else if (e.type === 'peer-unavailable') {
       // a jelenlét-figyelő újrapróbálja
-    } else {
+    } else if (!peer || peer.destroyed) {
       $('#loginBtn').disabled = false;
-      $('#loginStatus').textContent = '';
-      err.textContent = t('errNet') + (e.type ? ' (' + e.type + ')' : '');
-      try { peer.destroy(); } catch {}
-      peer = null;
+      err.textContent = t('errNet') + e.type;
     }
   });
 }
@@ -3241,11 +3179,7 @@ function setNetState(ok) {
   if (!n) return;
   n.textContent = ok ? t('netOk') : t('netBad');
   n.className = ok ? 'ok' : 'bad';
-  n.title = ok ? '' : (lang === 'hu' ? 'Kattints az újracsatlakozáshoz' : 'Click to reconnect');
 }
-$('#netState')?.addEventListener('click', () => {
-  rebuildPeerConnection();
-});
 
 // ---------- saját állapot / pm / kép ----------
 $('#meLine').addEventListener('click', () => {
@@ -3522,12 +3456,6 @@ function onData(pid, d) {
       }
       break;
     }
-    case 'ping': {
-      const c = conns.get(pid);
-      if (c && c.open) { try { c.send({ t: 'pong' }); } catch {} }
-      break;
-    }
-    case 'pong': break;
     case 'bye': {
       const c = conns.get(pid);
       if (c) { try { c.close(); } catch {} }
@@ -3544,53 +3472,12 @@ function dispName(pid) {
   return (ct && ct.name) || pid;
 }
 
-// ---------- jelenlét és háttér-stabilitás (Web Worker) ----------
+// ---------- jelenlét ----------
 function startPresenceLoop() {
-  const runHeartbeat = () => {
-    // 1. PeerJS kapcsolat ellenőrzése és újracsatlakozás ha megszakadt a háttérben
-    if (peer && !peer.destroyed) {
-      if (peer.disconnected) {
-        handlePeerDisconnect();
-      } else {
-        setNetState(true);
-      }
-    }
-    // 2. Partnerek újracsatlakoztatása
-    for (const ct of contacts) {
-      if (!conns.has(ct.id)) connectTo(ct.id);
-    }
-    // 3. Keepalive ping az aktív adatkapcsolatoknak (tűzfal/NAT ébrentartás háttérben)
-    for (const m of deviceConns.values()) {
-      for (const c of m.values()) {
-        if (c.open) { try { c.send({ t: 'ping' }); } catch {} }
-      }
-    }
-  };
-
-  // Azonnali első csatlakozás
   for (const ct of contacts) connectTo(ct.id);
-
-  // Háttérbeli Web Worker: a böngésző NEM fojtja le (throttling) más ablakban végzett munka közben
-  try {
-    const workerBlob = new Blob([
-      'setInterval(function() { postMessage("tick"); }, 4000);'
-    ], { type: 'application/javascript' });
-    const bgWorker = new Worker(URL.createObjectURL(workerBlob));
-    bgWorker.onmessage = runHeartbeat;
-  } catch {
-    setInterval(runHeartbeat, 5000);
-  }
-
-  // Lap-aktivitási és ablak-fókusz események kezelése
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') runHeartbeat();
-  });
-  window.addEventListener('focus', runHeartbeat);
-  window.addEventListener('online', () => {
-    setNetState(true);
-    if (peer && !peer.destroyed) { try { peer.reconnect(); } catch {} }
-    runHeartbeat();
-  });
+  setInterval(() => {
+    for (const ct of contacts) if (!conns.has(ct.id)) connectTo(ct.id);
+  }, 12000);
 }
 
 // ---------- partnerlista ----------
@@ -5390,32 +5277,15 @@ async function showDevicePicker(kind) {
   });
 }
 
-async function getCallUserMedia(kind) {
-  let pick = null;
-  try { pick = await showDevicePicker(kind); } catch {}
-  if (pick === null) {
-    pick = { mic: null, cam: null };
+async function buildMediaConstraints(kind) {
+  const pick = await showDevicePicker(kind);
+  if (!pick) throw new Error('cancelled');
+  const audio = pick.mic ? { deviceId: { exact: pick.mic } } : true;
+  if (kind === 'webcam') {
+    const video = pick.cam ? { deviceId: { exact: pick.cam } } : true;
+    return { video, audio };
   }
-
-  const audioConstraints = pick.mic
-    ? { deviceId: { ideal: pick.mic }, echoCancellation: true, noiseSuppression: true }
-    : { echoCancellation: true, noiseSuppression: true };
-
-  const videoConstraints = kind === 'webcam'
-    ? (pick.cam ? { deviceId: { ideal: pick.cam }, width: { ideal: 640 }, height: { ideal: 480 } } : true)
-    : false;
-
-  try {
-    return await navigator.mediaDevices.getUserMedia({
-      audio: audioConstraints,
-      video: videoConstraints
-    });
-  } catch (e1) {
-    // Fallback egyszerű megszorításokra (ha az eszközazonosító nem érvényes)
-    return await navigator.mediaDevices.getUserMedia(
-      kind === 'webcam' ? { video: true, audio: true } : { audio: true }
-    );
-  }
+  return { audio };
 }
 
 // ---------- hívások ----------
@@ -5425,7 +5295,8 @@ async function startCall(pid, kind) {
   if (calls.has(pid)) { sysMsg(pid, t('callBusy')); return; }
   let stream;
   try {
-    stream = await getCallUserMedia(kind);
+    const constraints = await buildMediaConstraints(kind);
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
   } catch {
     sysMsg(pid, kind === 'webcam' ? t('camDenied') : t('micDenied'));
     return;
@@ -5465,7 +5336,8 @@ function handleIncomingCall(call) {
     finish();
     let stream;
     try {
-      stream = await getCallUserMedia(kind);
+      const constraints = await buildMediaConstraints(kind);
+      stream = await navigator.mediaDevices.getUserMedia(constraints);
     } catch {
       sysMsg(pid, t('callNoDev'));
       try { call.close(); } catch {}
@@ -5494,7 +5366,7 @@ function openCallWin(pid, kind, call, localStream, outgoing) {
     '<div class="win-body">' +
       '<div class="call-stage">' +
         (kind === 'webcam'
-          ? '<video class="remote" autoplay playsinline muted></video><video class="self" autoplay playsinline muted></video>'
+          ? '<video class="remote" autoplay playsinline></video><video class="self" autoplay playsinline muted></video>'
           : '<div class="voice-face"><div class="dp dp-64">' + dpHtml(pid) + '</div>' +
             '<div>' + escHtml(dispName(pid)) + '</div><div class="callstate">' +
             (outgoing ? t('calling') : t('connectingCall')) + '</div></div>') +
@@ -5512,57 +5384,47 @@ function openCallWin(pid, kind, call, localStream, outgoing) {
   addMobileBack(win);
   mobileShow(win);
 
+  // Minden hívásnak saját, egyedi állapota van — a bezárás mindig
+  // pontosan ezt az ablakot zárja, sosem egy másikét.
   const state = { kind, call, win, localStream, secs: 0, timer: null, done: false };
   if (!calls.has(pid)) calls.set(pid, state);
 
   const closeThis = () => endCallState(pid, state);
 
-  if (kind === 'webcam') {
-    const selfVideo = $('.self', win);
-    if (selfVideo) {
-      selfVideo.muted = true;
-      selfVideo.srcObject = localStream;
-      selfVideo.play().catch(() => {});
-    }
-  }
+  if (kind === 'webcam') $('.self', win).srcObject = localStream;
 
-  const setRemoteMedia = (rs) => {
+  call.on('stream', rs => {
     const unmuteBtn = $('.cunmute', win);
     if (kind === 'webcam') {
       const v = $('.remote', win);
-      if (v) {
-        if (v.srcObject !== rs) v.srcObject = rs;
+      v.srcObject = rs;
+      // Autoplay-védelem: ha hangosan nem indulhat, némán indítjuk,
+      // és a Hang bekapcsolása gombbal jön vissza a hang.
+      v.play().catch(() => {
         v.muted = true;
         v.play().catch(() => {});
-        if (rs.getAudioTracks().length > 0) {
-          unmuteBtn.style.display = 'inline-block';
-          unmuteBtn.textContent = v.muted ? t('unmute') : ('🔇 ' + (lang === 'hu' ? 'Némítás' : 'Mute'));
-          unmuteBtn.onclick = () => {
-            v.muted = !v.muted;
-            unmuteBtn.textContent = v.muted ? t('unmute') : ('🔇 ' + (lang === 'hu' ? 'Némítás' : 'Mute'));
-          };
-        }
-      }
+        unmuteBtn.style.display = 'inline-block';
+        unmuteBtn.addEventListener('click', () => {
+          v.muted = false;
+          v.play().catch(() => {});
+          unmuteBtn.style.display = 'none';
+        });
+      });
     } else {
-      let a = win.querySelector('audio.remote-audio');
-      if (!a) {
-        a = document.createElement('audio');
-        a.className = 'remote-audio';
-        a.autoplay = true;
-        win.appendChild(a);
-      }
-      if (a.srcObject !== rs) a.srcObject = rs;
+      const a = document.createElement('audio');
+      a.autoplay = true;
+      a.srcObject = rs;
+      win.appendChild(a);
       a.play().catch(() => {
         unmuteBtn.style.display = 'inline-block';
-        unmuteBtn.onclick = () => { a.play().catch(() => {}); unmuteBtn.style.display = 'none'; };
+        unmuteBtn.addEventListener('click', () => {
+          a.play().catch(() => {});
+          unmuteBtn.style.display = 'none';
+        });
       });
       const cs = $('.callstate', win);
       if (cs) cs.textContent = t('inCall');
     }
-  };
-
-  call.on('stream', rs => {
-    setRemoteMedia(rs);
     if (!state.timer) {
       state.timer = setInterval(() => {
         state.secs++;
@@ -5571,15 +5433,6 @@ function openCallWin(pid, kind, call, localStream, outgoing) {
       }, 1000);
     }
   });
-
-  if (call.peerConnection) {
-    call.peerConnection.addEventListener('track', e => {
-      if (e.streams && e.streams[0]) {
-        setRemoteMedia(e.streams[0]);
-      }
-    });
-  }
-
   call.on('close', closeThis);
   call.on('error', closeThis);
 
@@ -5702,7 +5555,36 @@ async function startStream(pid) {
     const vt = screenStream ? screenStream.getVideoTracks()[0] : null;
     if (!screenStream || !screenStream.active || !vt || vt.readyState !== 'live') {
       const profile = STREAM_PROFILES[quality] || STREAM_PROFILES.high;
-      screenStream = await captureDisplayMediaWithFallback(profile, wantAudio);
+      if (wantAudio) {
+        try {
+          screenStream = await navigator.mediaDevices.getDisplayMedia({
+            video: profile,
+            audio: {
+              echoCancellation: false,
+              noiseSuppression: false,
+              autoGainControl: false,
+              suppressLocalAudioPlayback: false
+            }
+          });
+        } catch {
+          try {
+            screenStream = await navigator.mediaDevices.getDisplayMedia({
+              video: profile,
+              audio: true
+            });
+          } catch {
+            screenStream = await navigator.mediaDevices.getDisplayMedia({
+              video: profile,
+              audio: false
+            });
+          }
+        }
+      } else {
+        screenStream = await navigator.mediaDevices.getDisplayMedia({
+          video: profile,
+          audio: false
+        });
+      }
       const vTrack = screenStream.getVideoTracks()[0];
       if (vTrack) {
         if ('contentHint' in vTrack) vTrack.contentHint = 'motion';
@@ -5712,60 +5594,12 @@ async function startStream(pid) {
         });
       }
     }
-  } catch (err) {
-    console.error('getDisplayMedia failed:', err);
+  } catch {
     sysMsg(pid, t('streamDenied'));
     return;
   }
   placeStreamCall(pid);
   sysMsg(pid, t('streamStarted'));
-}
-
-async function captureDisplayMediaWithFallback(profile, wantAudio) {
-  // 1. Próba: profil szerinti videó + részletes audió megszorítások
-  if (wantAudio) {
-    try {
-      return await navigator.mediaDevices.getDisplayMedia({
-        video: profile,
-        audio: {
-          echoCancellation: false,
-          noiseSuppression: false,
-          autoGainControl: false,
-          suppressLocalAudioPlayback: false
-        }
-      });
-    } catch {}
-
-    // 2. Próba: profil szerinti videó + egyszerű audio: true
-    try {
-      return await navigator.mediaDevices.getDisplayMedia({
-        video: profile,
-        audio: true
-      });
-    } catch {}
-
-    // 3. Próba (Linux PipeWire / Wayland portál): video: true + audio: true
-    try {
-      return await navigator.mediaDevices.getDisplayMedia({
-        video: true,
-        audio: true
-      });
-    } catch {}
-  }
-
-  // 4. Próba: profil szerinti videó hang nélkül
-  try {
-    return await navigator.mediaDevices.getDisplayMedia({
-      video: profile,
-      audio: false
-    });
-  } catch {}
-
-  // 5. Próba (Végső Linux / Android / szabványos fallback): video: true, audio: false
-  return await navigator.mediaDevices.getDisplayMedia({
-    video: true,
-    audio: false
-  });
 }
 
 // a stream-hívás tényleges felépítése (első indításkor és újrapróbáláskor)

@@ -1,5 +1,5 @@
 {
-  "version": "2.5.0",
+  "version": "2.4.4",
   "url": "https://sid14925.github.io/msn75-p2p/",
-  "notes": "Full auto-rebuild recovery on disconnect & manual reconnect button"
+  "notes": "Fix critical stream race condition: reuse viewer window on second track arrival and prevent stopping live remote tracks"
 }

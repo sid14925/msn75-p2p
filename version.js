@@ -1,5 +1,5 @@
 window.__msnLatest = {
-  version: "2.5.1",
+  version: "2.5.2",
   url: "https://sid14925.github.io/msn75-p2p/",
-  notes: "Guaranteed login: 8 slots + auto random fallback, 6s timeout, clean peer destruction"
+  notes: "Automatic network/socket rate limit recovery across device slots with token refresh"
 };

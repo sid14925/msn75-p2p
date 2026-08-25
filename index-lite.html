@@ -1789,7 +1789,7 @@ window.MSN_ASSETS = null;
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.5.1';
+const APP_VERSION = '2.5.2';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -3109,7 +3109,8 @@ function startPeerWithSlot(base, slot) {
     peer = null;
   }
 
-  peer = new Peer(actual, { debug: 1, config: RTC_CONFIG });
+  const token = Math.random().toString(36).substring(2);
+  peer = new Peer(actual, { debug: 1, config: RTC_CONFIG, token });
 
   let loginTimer = setTimeout(() => {
     if ($('#loginWin').style.display !== 'none') {
@@ -3167,6 +3168,17 @@ function startPeerWithSlot(base, slot) {
       } else {
         const randSlot = Math.floor(Math.random() * 899) + 100;
         setTimeout(() => startPeerWithSlot(base, randSlot), 80);
+      }
+    } else if (e.type === 'network' || e.type === 'server-error' || e.type === 'socket-error' || e.type === 'socket-closed') {
+      if (slot < DEVICE_SLOTS) {
+        $('#loginStatus').textContent = t('connecting') + ' (' + (slot + 1) + ')';
+        try { peer.destroy(); } catch {}
+        peer = null;
+        setTimeout(() => startPeerWithSlot(base, slot + 1), 1200);
+      } else {
+        $('#loginBtn').disabled = false;
+        $('#loginStatus').textContent = '';
+        err.textContent = t('errNet') + ' ' + (e.type ? '(' + e.type + ')' : '');
       }
     } else if (e.type === 'peer-unavailable') {
       // a jelenlét-figyelő újrapróbálja

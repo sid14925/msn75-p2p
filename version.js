@@ -1,5 +1,5 @@
 window.__msnLatest = {
-  version: "2.4.3",
+  version: "2.4.4",
   url: "https://sid14925.github.io/msn75-p2p/",
-  notes: "Unified single-stream WebRTC pipeline for screen sharing with system audio, removing detached MediaStream race conditions"
+  notes: "Fix critical stream race condition: reuse viewer window on second track arrival and prevent stopping live remote tracks"
 };

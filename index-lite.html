@@ -1789,7 +1789,7 @@ window.MSN_ASSETS = null;
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.4.3';
+const APP_VERSION = '2.4.4';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -5721,7 +5721,20 @@ function handleIncomingScreen(call) {
 }
 
 function showViewer(pid, stream) {
-  closeViewer(pid);
+  // Ha már nyitva van a nézőablak ehhez a partnerhez (pl. a 2. track érkezésekor),
+  // NEM szabad bezárni vagy a trackeket leállítani — csak frissítjük a streamet!
+  if (viewers.has(pid)) {
+    const v = viewers.get(pid);
+    v.stream = stream;
+    const video = v.win.querySelector('video');
+    if (video) {
+      if (video.srcObject !== stream) video.srcObject = stream;
+      video.play().catch(() => {});
+    }
+    if (v.checkAudioTracks) v.checkAudioTracks();
+    return;
+  }
+
   const win = el('div', 'win viewerwin');
   win.style.left = (Math.max(20, window.innerWidth / 2 - 320) + (cascade % 4) * 20) + 'px';
   win.style.top = (50 + (cascade % 4) * 20) + 'px';
@@ -5856,7 +5869,7 @@ function showViewer(pid, stream) {
   $('.vfull', win).addEventListener('click', () => video.requestFullscreen?.());
   $('.tbtn.close', win).addEventListener('click', e => { e.stopPropagation(); closeViewer(pid); });
 
-  viewers.set(pid, { win, stream, kfInterval });
+  viewers.set(pid, { win, stream, kfInterval, checkAudioTracks });
   sysMsg(pid, tf('streamGot', dispName(pid)));
   bringToFront(win);
   mobileShow(win);
@@ -5867,7 +5880,6 @@ function closeViewer(pid) {
   const v = viewers.get(pid);
   if (!v) return;
   if (v.kfInterval) clearInterval(v.kfInterval);
-  try { v.stream.getTracks().forEach(tk => tk.stop()); } catch {}
   v.win.remove();
   viewers.delete(pid);
 }

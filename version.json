@@ -1,5 +1,5 @@
 {
-  "version": "2.4.2",
+  "version": "2.4.3",
   "url": "https://sid14925.github.io/msn75-p2p/",
-  "notes": "Stream: echoCancellation/noiseSuppression/autoGainControl:false rendszerhanghoz; forceKeyFrame async+await video-sender-on; unmute handler video-only srcObject fix"
+  "notes": "Unified single-stream WebRTC pipeline for screen sharing with system audio, removing detached MediaStream race conditions"
 }

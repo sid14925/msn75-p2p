@@ -1789,7 +1789,7 @@ window.MSN_ASSETS = null;
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.4.2';
+const APP_VERSION = '2.4.3';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -5541,25 +5541,29 @@ async function startStream(pid) {
     const vt = screenStream ? screenStream.getVideoTracks()[0] : null;
     if (!screenStream || !screenStream.active || !vt || vt.readyState !== 'live') {
       const profile = STREAM_PROFILES[quality] || STREAM_PROFILES.high;
-      // Először megpróbáljuk hanggal, ha a felhasználó kérte
       if (wantAudio) {
         try {
           screenStream = await navigator.mediaDevices.getDisplayMedia({
             video: profile,
-            // Rendszerhang: kötelező kikapcsolni a feldolgozást,
-            // különben a böngésző echo-cancellere torzítja/halkítja a hangot.
             audio: {
               echoCancellation: false,
               noiseSuppression: false,
               autoGainControl: false,
+              suppressLocalAudioPlayback: false
             }
           });
         } catch {
-          // Ha az audio engedély megtagadásra került, csak videóval próbálkozunk
-          screenStream = await navigator.mediaDevices.getDisplayMedia({
-            video: profile,
-            audio: false
-          });
+          try {
+            screenStream = await navigator.mediaDevices.getDisplayMedia({
+              video: profile,
+              audio: true
+            });
+          } catch {
+            screenStream = await navigator.mediaDevices.getDisplayMedia({
+              video: profile,
+              audio: false
+            });
+          }
         }
       } else {
         screenStream = await navigator.mediaDevices.getDisplayMedia({
@@ -5589,11 +5593,9 @@ function placeStreamCall(pid) {
   if (!screenStream || !screenStream.active) return;
   const old = outCalls.get(pid);
   if (old) { try { old.close(); } catch {} }
-  // Külön video- és audio track-ek, de EGY MediaStream-be csomagolva.
-  // A fogadó oldal (showViewer) a video.srcObject-be CSAK a videót teszi
-  // (fekete kép ellenőrzés), az audio-t külön <audio> elembe.
-  const allTracks = new MediaStream(screenStream.getTracks());
-  const call = peer.call(conns.get(pid)?.peer || pid, allTracks, { metadata: { kind: 'screen', name: me.name } });
+
+  // Közvetlenül az aktív screenStream-et adjuk át a peer.call-nak
+  const call = peer.call(conns.get(pid)?.peer || pid, screenStream, { metadata: { kind: 'screen', name: me.name } });
   watchIce(call, pid);
   outCalls.set(pid, call);
   const w = chatWins.get(pid);
@@ -5606,9 +5608,10 @@ function placeStreamCall(pid) {
   call.on('error', () => { if (outCalls.get(pid) === call) cleanupOutCall(pid); });
 
   // Kulcsképkocka kérése a WebRTC kódolótól a csatlakozáskor
-  setTimeout(() => forceKeyFrame(call), 400);
-  setTimeout(() => forceKeyFrame(call), 1200);
-  setTimeout(() => forceKeyFrame(call), 2500);
+  setTimeout(() => forceKeyFrame(call), 300);
+  setTimeout(() => forceKeyFrame(call), 800);
+  setTimeout(() => forceKeyFrame(call), 1500);
+  setTimeout(() => forceKeyFrame(call), 3000);
 }
 
 async function forceKeyFrame(call) {
@@ -5616,12 +5619,9 @@ async function forceKeyFrame(call) {
   try {
     const pc = call.peerConnection;
     if (!pc || !pc.getSenders) return;
-    // FONTOS: csak a video sender-en hívjuk, mert audio track hozzáadásakor
-    // a sender-index eltolódik, és a [0] lehet az audio → generateKeyFrame
-    // hibát dob vagy nem csinál semmit → a fogadó nem kap I-frame-et → fekete kép.
     const vSender = pc.getSenders().find(s => s.track && s.track.kind === 'video');
     if (vSender && typeof vSender.generateKeyFrame === 'function') {
-      try { await vSender.generateKeyFrame(); } catch (e) { /* nem minden böngésző támogatja */ }
+      try { await vSender.generateKeyFrame(); } catch (e) {}
     }
   } catch {}
 }
@@ -5668,6 +5668,25 @@ function handleIncomingScreen(call) {
   call.on('close', () => closeViewer(pid));
   call.on('error', () => closeViewer(pid));
 
+  // Biztonsági bekötés az underlying PeerConnection-höz
+  if (call.peerConnection) {
+    call.peerConnection.addEventListener('track', event => {
+      if (event.streams && event.streams[0]) {
+        remoteStream = event.streams[0];
+        if (decided && viewers.has(pid)) {
+          const v = viewers.get(pid);
+          if (v && v.win) {
+            const vid = v.win.querySelector('video');
+            if (vid && vid.srcObject !== remoteStream) {
+              vid.srcObject = remoteStream;
+              vid.play().catch(() => {});
+            }
+          }
+        }
+      }
+    });
+  }
+
   const ask = el('div', 'ask-box');
   const ic = A ? '<span class="emo" style="background-position:-' + (63 * 19) + 'px 0"></span> ' : '🖥️ ';
   const span = el('span');
@@ -5694,7 +5713,7 @@ function handleIncomingScreen(call) {
           if (c && c.open) c.send({ t: 'stream-retry' });
           sysMsg(pid, t('streamWaiting'));
         }
-      }, 10000);
+      }, 8000);
     }
   });
   no.addEventListener('click', () => { decided = true; ask.remove(); try { call.close(); } catch {} });
@@ -5726,24 +5745,11 @@ function showViewer(pid, stream) {
   const video = document.createElement('video');
   video.autoplay = true;
   video.playsInline = true;
-  video.muted = true;
+  video.muted = true; // Kezdetben némítva: garantálja az azonnali videó-lejátszást autoplay-tiltás nélkül
   video.setAttribute('playsinline', '');
   video.setAttribute('webkit-playsinline', '');
-  // FONTOS: a video.srcObject-be csak video track-et teszünk!
-  // Ez garantálja hogy a videókép mindig megjelenjen, függetlenül az audio track állapotától.
-  const videoTracks = stream.getVideoTracks();
-  video.srcObject = videoTracks.length > 0 ? new MediaStream(videoTracks) : stream;
+  video.srcObject = stream;
   $('.win-body', win).appendChild(video);
-
-  const audioTracks = stream.getAudioTracks();
-  let audioEl = null;
-  if (audioTracks.length > 0) {
-    audioEl = document.createElement('audio');
-    audioEl.autoplay = true;
-    audioEl.srcObject = new MediaStream(audioTracks);
-    audioEl.muted = true;  // autoplay-védelem: a Hang gombbal kapcsolja be a user
-    win.appendChild(audioEl);
-  }
 
   document.body.appendChild(win);
   makeDraggable(win, $('.titlebar', win));
@@ -5755,9 +5761,22 @@ function showViewer(pid, stream) {
   const unmuteBtn = $('.vunmute', win);
   const retryBtn = $('.vretry', win);
 
-  if (audioTracks.length > 0) {
-    unmuteBtn.style.display = 'inline-block';
-  }
+  const checkAudioTracks = () => {
+    const hasAudio = stream.getAudioTracks().length > 0;
+    if (hasAudio) {
+      unmuteBtn.style.display = 'inline-block';
+      unmuteBtn.textContent = video.muted ? t('unmute') : ('🔇 ' + (lang === 'hu' ? 'Némítás' : 'Mute'));
+    } else {
+      unmuteBtn.style.display = 'none';
+    }
+  };
+
+  checkAudioTracks();
+  stream.addEventListener('addtrack', () => {
+    checkAudioTracks();
+    playVideo();
+  });
+  stream.addEventListener('removetrack', checkAudioTracks);
 
   const updateStats = () => {
     if (video.videoWidth > 0 && video.videoHeight > 0) {
@@ -5770,13 +5789,11 @@ function showViewer(pid, stream) {
   };
 
   const playVideo = () => {
+    if (video.srcObject !== stream) video.srcObject = stream;
     video.play().then(updateStats).catch(() => {
       video.muted = true;
       video.play().then(updateStats).catch(() => {});
     });
-    if (audioEl) {
-      audioEl.play().catch(() => {});
-    }
   };
 
   playVideo();
@@ -5799,14 +5816,17 @@ function showViewer(pid, stream) {
       clearInterval(kfInterval);
       updateStats();
     }
-  }, 1500);
+  }, 1000);
 
   unmuteBtn.addEventListener('click', () => {
-    if (audioEl) {
-      audioEl.muted = false;
-      audioEl.play().catch(() => {});
+    if (video.muted) {
+      video.muted = false;
+      video.volume = 1.0;
+      video.play().catch(() => {});
+    } else {
+      video.muted = true;
     }
-    unmuteBtn.style.display = 'none';
+    checkAudioTracks();
   });
 
   const requestRetry = () => {
@@ -5827,10 +5847,7 @@ function showViewer(pid, stream) {
     });
     videoTrack.addEventListener('unmute', () => {
       vstate.textContent = '';
-      // FONTOS: NE a teljes stream-et tegyük vissza, mert az audio track
-      // visszakerülne a video elembe → fekete kép. Mindig csak video-track.
-      const vTracks = stream.getVideoTracks();
-      video.srcObject = vTracks.length > 0 ? new MediaStream(vTracks) : stream;
+      if (video.srcObject !== stream) video.srcObject = stream;
       playVideo();
     });
     videoTrack.addEventListener('ended', () => closeViewer(pid));
@@ -5839,7 +5856,7 @@ function showViewer(pid, stream) {
   $('.vfull', win).addEventListener('click', () => video.requestFullscreen?.());
   $('.tbtn.close', win).addEventListener('click', e => { e.stopPropagation(); closeViewer(pid); });
 
-  viewers.set(pid, { win, stream, audioEl, kfInterval });
+  viewers.set(pid, { win, stream, kfInterval });
   sysMsg(pid, tf('streamGot', dispName(pid)));
   bringToFront(win);
   mobileShow(win);
@@ -5851,7 +5868,6 @@ function closeViewer(pid) {
   if (!v) return;
   if (v.kfInterval) clearInterval(v.kfInterval);
   try { v.stream.getTracks().forEach(tk => tk.stop()); } catch {}
-  if (v.audioEl) { try { v.audioEl.pause(); v.audioEl.srcObject = null; v.audioEl.remove(); } catch {} }
   v.win.remove();
   viewers.delete(pid);
 }

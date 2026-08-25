@@ -1789,7 +1789,7 @@ window.MSN_ASSETS = null;
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.4.5';
+const APP_VERSION = '2.4.6';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -2089,7 +2089,7 @@ const me = { name: '', id: '', baseId: '', status: 'online', pm: '' };
 // Ugyanaz a fiók több eszközön: a tenyleges Peer ID kaphat eszköz-utótagot
 // (pl. "sid", "sid--d2", "sid--d3"). A partnerek minden helyet végigpróbálnak,
 // így a telefon és a gép egyszerre lehet bent ütközés nélkül.
-const DEVICE_SLOTS = 4;
+const DEVICE_SLOTS = 8;
 function slotId(base, n) { return n <= 1 ? base : base + '_dev' + n; }
 function baseOf(peerId) {
   const m = /^(.*)_dev\d+$/.exec(String(peerId));
@@ -3103,9 +3103,29 @@ function startPeerWithSlot(base, slot) {
   const err = $('#loginErr');
   const actual = slotId(base, slot);
   me.id = actual;
+
+  // Ha korábbi peer objektum létezik, zárjuk le
+  if (peer && !peer.destroyed) {
+    try { peer.destroy(); } catch {}
+  }
+
   peer = new Peer(actual, { debug: 1, config: RTC_CONFIG });
 
+  // Biztonsági időzítő: ha 9 mp-en belül nem érkezik válasz a signaling szervertől, feloldjuk a gombot
+  let loginTimer = setTimeout(() => {
+    if ($('#loginWin').style.display !== 'none') {
+      $('#loginBtn').disabled = false;
+      $('#loginStatus').textContent = '';
+      if (slot < DEVICE_SLOTS) {
+        startPeerWithSlot(base, slot + 1);
+      } else {
+        err.textContent = t('errNet') + ' (időtúllépés / timeout)';
+      }
+    }
+  }, 9000);
+
   peer.on('open', () => {
+    clearTimeout(loginTimer);
     $('#loginWin').style.display = 'none';
     $('#mainWin').style.display = 'flex';
     mobileStack.length = 0;
@@ -3139,22 +3159,24 @@ function startPeerWithSlot(base, slot) {
   });
 
   peer.on('error', e => {
+    clearTimeout(loginTimer);
     if (e.type === 'unavailable-id') {
       try { peer.destroy(); } catch {}
       peer = null;
       if (slot < DEVICE_SLOTS) {
         // másik eszközünk már használja — a következő helyre lépünk
-        $('#loginStatus').textContent = t('connecting');
+        $('#loginStatus').textContent = t('connecting') + ' (' + (slot + 1) + ')';
         startPeerWithSlot(base, slot + 1);
       } else {
-        $('#loginBtn').disabled = false;
-        $('#loginStatus').textContent = '';
-        err.textContent = t('errTaken');
+        // Végső véletlenszerű slot próba (hogy sose ragadjon be a bejelentkezés)
+        const randSlot = Math.floor(Math.random() * 899) + 100;
+        startPeerWithSlot(base, randSlot);
       }
     } else if (e.type === 'peer-unavailable') {
       // a jelenlét-figyelő újrapróbálja
     } else if (!peer || peer.destroyed) {
       $('#loginBtn').disabled = false;
+      $('#loginStatus').textContent = '';
       err.textContent = t('errNet') + e.type;
     }
   });

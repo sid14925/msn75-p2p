@@ -1803,7 +1803,7 @@ window.MSN_ASSETS = {
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.4.9';
+const APP_VERSION = '2.5.0';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -3111,6 +3111,43 @@ function doLogin() {
   startPeerWithSlot(id, 1);
 }
 
+let reconnectAttempts = 0;
+let isRebuildingPeer = false;
+
+function handlePeerDisconnect() {
+  setNetState(false);
+  if (isRebuildingPeer) return;
+  if (!me.baseId) return;
+
+  reconnectAttempts++;
+  if (peer && !peer.destroyed && reconnectAttempts <= 2) {
+    try { peer.reconnect(); } catch {}
+  } else {
+    rebuildPeerConnection();
+  }
+}
+
+function rebuildPeerConnection() {
+  if (isRebuildingPeer) return;
+  if (!me.baseId) return;
+  isRebuildingPeer = true;
+  reconnectAttempts = 0;
+  setNetState(false);
+
+  const n = $('#netState');
+  if (n) { n.textContent = t('connecting'); n.className = 'bad'; }
+
+  if (peer && !peer.destroyed) {
+    try { peer.destroy(); } catch {}
+    peer = null;
+  }
+
+  setTimeout(() => {
+    isRebuildingPeer = false;
+    startPeerWithSlot(me.baseId, 1);
+  }, 250);
+}
+
 // megpróbáljuk a fiók azonosítóját; ha foglalt (másik eszköz már bent
 // van vele), automatikusan a következő eszköz-helyet kapjuk
 function startPeerWithSlot(base, slot) {
@@ -3140,6 +3177,8 @@ function startPeerWithSlot(base, slot) {
 
   peer.on('open', () => {
     clearTimeout(loginTimer);
+    reconnectAttempts = 0;
+    isRebuildingPeer = false;
     $('#loginWin').style.display = 'none';
     $('#mainWin').style.display = 'flex';
     mobileStack.length = 0;
@@ -3168,8 +3207,7 @@ function startPeerWithSlot(base, slot) {
   peer.on('call', call => handleIncomingCall(call));
 
   peer.on('disconnected', () => {
-    setNetState(false);
-    try { peer.reconnect(); } catch {}
+    handlePeerDisconnect();
   });
 
   peer.on('error', e => {
@@ -3203,14 +3241,10 @@ function setNetState(ok) {
   if (!n) return;
   n.textContent = ok ? t('netOk') : t('netBad');
   n.className = ok ? 'ok' : 'bad';
-  n.title = ok ? '' : 'Kattints az újracsatlakozáshoz';
+  n.title = ok ? '' : (lang === 'hu' ? 'Kattints az újracsatlakozáshoz' : 'Click to reconnect');
 }
 $('#netState')?.addEventListener('click', () => {
-  if (peer && !peer.destroyed) {
-    const n = $('#netState');
-    if (n) { n.textContent = t('connecting'); n.className = 'bad'; }
-    try { peer.reconnect(); } catch {}
-  }
+  rebuildPeerConnection();
 });
 
 // ---------- saját állapot / pm / kép ----------
@@ -3516,8 +3550,7 @@ function startPresenceLoop() {
     // 1. PeerJS kapcsolat ellenőrzése és újracsatlakozás ha megszakadt a háttérben
     if (peer && !peer.destroyed) {
       if (peer.disconnected) {
-        setNetState(false);
-        try { peer.reconnect(); } catch {}
+        handlePeerDisconnect();
       } else {
         setNetState(true);
       }

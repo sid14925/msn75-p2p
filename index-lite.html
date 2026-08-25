@@ -1789,7 +1789,7 @@ window.MSN_ASSETS = null;
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.4.7';
+const APP_VERSION = '2.4.8';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -3111,18 +3111,18 @@ function startPeerWithSlot(base, slot) {
 
   peer = new Peer(actual, { debug: 1, config: RTC_CONFIG });
 
-  // Biztonsági időzítő: ha 9 mp-en belül nem érkezik válasz a signaling szervertől, feloldjuk a gombot
+  // Biztonsági időzítő: ha 8 mp-en belül nem érkezik válasz a signaling szervertől, próbálkozunk
   let loginTimer = setTimeout(() => {
     if ($('#loginWin').style.display !== 'none') {
-      $('#loginBtn').disabled = false;
-      $('#loginStatus').textContent = '';
       if (slot < DEVICE_SLOTS) {
         startPeerWithSlot(base, slot + 1);
       } else {
+        $('#loginBtn').disabled = false;
+        $('#loginStatus').textContent = '';
         err.textContent = t('errNet') + ' (időtúllépés / timeout)';
       }
     }
-  }, 9000);
+  }, 8000);
 
   peer.on('open', () => {
     clearTimeout(loginTimer);
@@ -3166,18 +3166,20 @@ function startPeerWithSlot(base, slot) {
       if (slot < DEVICE_SLOTS) {
         // másik eszközünk már használja — a következő helyre lépünk
         $('#loginStatus').textContent = t('connecting') + ' (' + (slot + 1) + ')';
-        startPeerWithSlot(base, slot + 1);
+        setTimeout(() => startPeerWithSlot(base, slot + 1), 100);
       } else {
         // Végső véletlenszerű slot próba (hogy sose ragadjon be a bejelentkezés)
         const randSlot = Math.floor(Math.random() * 899) + 100;
-        startPeerWithSlot(base, randSlot);
+        setTimeout(() => startPeerWithSlot(base, randSlot), 100);
       }
     } else if (e.type === 'peer-unavailable') {
       // a jelenlét-figyelő újrapróbálja
-    } else if (!peer || peer.destroyed) {
+    } else {
       $('#loginBtn').disabled = false;
       $('#loginStatus').textContent = '';
-      err.textContent = t('errNet') + e.type;
+      err.textContent = t('errNet') + (e.type ? ' (' + e.type + ')' : '');
+      try { peer.destroy(); } catch {}
+      peer = null;
     }
   });
 }

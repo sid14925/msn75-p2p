@@ -1789,7 +1789,7 @@ window.MSN_ASSETS = null;
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.4.6';
+const APP_VERSION = '2.4.7';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -5328,15 +5328,32 @@ async function showDevicePicker(kind) {
   });
 }
 
-async function buildMediaConstraints(kind) {
-  const pick = await showDevicePicker(kind);
-  if (!pick) throw new Error('cancelled');
-  const audio = pick.mic ? { deviceId: { exact: pick.mic } } : true;
-  if (kind === 'webcam') {
-    const video = pick.cam ? { deviceId: { exact: pick.cam } } : true;
-    return { video, audio };
+async function getCallUserMedia(kind) {
+  let pick = null;
+  try { pick = await showDevicePicker(kind); } catch {}
+  if (pick === null) {
+    pick = { mic: null, cam: null };
   }
-  return { audio };
+
+  const audioConstraints = pick.mic
+    ? { deviceId: { ideal: pick.mic }, echoCancellation: true, noiseSuppression: true }
+    : { echoCancellation: true, noiseSuppression: true };
+
+  const videoConstraints = kind === 'webcam'
+    ? (pick.cam ? { deviceId: { ideal: pick.cam }, width: { ideal: 640 }, height: { ideal: 480 } } : true)
+    : false;
+
+  try {
+    return await navigator.mediaDevices.getUserMedia({
+      audio: audioConstraints,
+      video: videoConstraints
+    });
+  } catch (e1) {
+    // Fallback egyszerű megszorításokra (ha az eszközazonosító nem érvényes)
+    return await navigator.mediaDevices.getUserMedia(
+      kind === 'webcam' ? { video: true, audio: true } : { audio: true }
+    );
+  }
 }
 
 // ---------- hívások ----------
@@ -5346,8 +5363,7 @@ async function startCall(pid, kind) {
   if (calls.has(pid)) { sysMsg(pid, t('callBusy')); return; }
   let stream;
   try {
-    const constraints = await buildMediaConstraints(kind);
-    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    stream = await getCallUserMedia(kind);
   } catch {
     sysMsg(pid, kind === 'webcam' ? t('camDenied') : t('micDenied'));
     return;
@@ -5387,8 +5403,7 @@ function handleIncomingCall(call) {
     finish();
     let stream;
     try {
-      const constraints = await buildMediaConstraints(kind);
-      stream = await navigator.mediaDevices.getUserMedia(constraints);
+      stream = await getCallUserMedia(kind);
     } catch {
       sysMsg(pid, t('callNoDev'));
       try { call.close(); } catch {}
@@ -5417,7 +5432,7 @@ function openCallWin(pid, kind, call, localStream, outgoing) {
     '<div class="win-body">' +
       '<div class="call-stage">' +
         (kind === 'webcam'
-          ? '<video class="remote" autoplay playsinline></video><video class="self" autoplay playsinline muted></video>'
+          ? '<video class="remote" autoplay playsinline muted></video><video class="self" autoplay playsinline muted></video>'
           : '<div class="voice-face"><div class="dp dp-64">' + dpHtml(pid) + '</div>' +
             '<div>' + escHtml(dispName(pid)) + '</div><div class="callstate">' +
             (outgoing ? t('calling') : t('connectingCall')) + '</div></div>') +
@@ -5435,47 +5450,57 @@ function openCallWin(pid, kind, call, localStream, outgoing) {
   addMobileBack(win);
   mobileShow(win);
 
-  // Minden hívásnak saját, egyedi állapota van — a bezárás mindig
-  // pontosan ezt az ablakot zárja, sosem egy másikét.
   const state = { kind, call, win, localStream, secs: 0, timer: null, done: false };
   if (!calls.has(pid)) calls.set(pid, state);
 
   const closeThis = () => endCallState(pid, state);
 
-  if (kind === 'webcam') $('.self', win).srcObject = localStream;
+  if (kind === 'webcam') {
+    const selfVideo = $('.self', win);
+    if (selfVideo) {
+      selfVideo.muted = true;
+      selfVideo.srcObject = localStream;
+      selfVideo.play().catch(() => {});
+    }
+  }
 
-  call.on('stream', rs => {
+  const setRemoteMedia = (rs) => {
     const unmuteBtn = $('.cunmute', win);
     if (kind === 'webcam') {
       const v = $('.remote', win);
-      v.srcObject = rs;
-      // Autoplay-védelem: ha hangosan nem indulhat, némán indítjuk,
-      // és a Hang bekapcsolása gombbal jön vissza a hang.
-      v.play().catch(() => {
+      if (v) {
+        if (v.srcObject !== rs) v.srcObject = rs;
         v.muted = true;
         v.play().catch(() => {});
-        unmuteBtn.style.display = 'inline-block';
-        unmuteBtn.addEventListener('click', () => {
-          v.muted = false;
-          v.play().catch(() => {});
-          unmuteBtn.style.display = 'none';
-        });
-      });
+        if (rs.getAudioTracks().length > 0) {
+          unmuteBtn.style.display = 'inline-block';
+          unmuteBtn.textContent = v.muted ? t('unmute') : ('🔇 ' + (lang === 'hu' ? 'Némítás' : 'Mute'));
+          unmuteBtn.onclick = () => {
+            v.muted = !v.muted;
+            unmuteBtn.textContent = v.muted ? t('unmute') : ('🔇 ' + (lang === 'hu' ? 'Némítás' : 'Mute'));
+          };
+        }
+      }
     } else {
-      const a = document.createElement('audio');
-      a.autoplay = true;
-      a.srcObject = rs;
-      win.appendChild(a);
+      let a = win.querySelector('audio.remote-audio');
+      if (!a) {
+        a = document.createElement('audio');
+        a.className = 'remote-audio';
+        a.autoplay = true;
+        win.appendChild(a);
+      }
+      if (a.srcObject !== rs) a.srcObject = rs;
       a.play().catch(() => {
         unmuteBtn.style.display = 'inline-block';
-        unmuteBtn.addEventListener('click', () => {
-          a.play().catch(() => {});
-          unmuteBtn.style.display = 'none';
-        });
+        unmuteBtn.onclick = () => { a.play().catch(() => {}); unmuteBtn.style.display = 'none'; };
       });
       const cs = $('.callstate', win);
       if (cs) cs.textContent = t('inCall');
     }
+  };
+
+  call.on('stream', rs => {
+    setRemoteMedia(rs);
     if (!state.timer) {
       state.timer = setInterval(() => {
         state.secs++;
@@ -5484,6 +5509,15 @@ function openCallWin(pid, kind, call, localStream, outgoing) {
       }, 1000);
     }
   });
+
+  if (call.peerConnection) {
+    call.peerConnection.addEventListener('track', e => {
+      if (e.streams && e.streams[0]) {
+        setRemoteMedia(e.streams[0]);
+      }
+    });
+  }
+
   call.on('close', closeThis);
   call.on('error', closeThis);
 

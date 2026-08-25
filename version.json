@@ -1,5 +1,5 @@
 {
-  "version": "2.4.1",
+  "version": "2.4.2",
   "url": "https://sid14925.github.io/msn75-p2p/",
-  "notes": "Rendszerhang megosztas streamelesnél (audio:true fallback), video-only srcObject a fekete kep ellen, kombinalt minoseg+hang valaszto"
+  "notes": "Stream: echoCancellation/noiseSuppression/autoGainControl:false rendszerhanghoz; forceKeyFrame async+await video-sender-on; unmute handler video-only srcObject fix"
 }

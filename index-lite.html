@@ -1789,7 +1789,7 @@ window.MSN_ASSETS = null;
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.4.1';
+const APP_VERSION = '2.4.2';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -5546,7 +5546,13 @@ async function startStream(pid) {
         try {
           screenStream = await navigator.mediaDevices.getDisplayMedia({
             video: profile,
-            audio: true        // a felhasználó a böngésző dialog-ban választhat forrást
+            // Rendszerhang: kötelező kikapcsolni a feldolgozást,
+            // különben a böngésző echo-cancellere torzítja/halkítja a hangot.
+            audio: {
+              echoCancellation: false,
+              noiseSuppression: false,
+              autoGainControl: false,
+            }
           });
         } catch {
           // Ha az audio engedély megtagadásra került, csak videóval próbálkozunk
@@ -5605,16 +5611,17 @@ function placeStreamCall(pid) {
   setTimeout(() => forceKeyFrame(call), 2500);
 }
 
-function forceKeyFrame(call) {
+async function forceKeyFrame(call) {
   if (!call) return;
   try {
     const pc = call.peerConnection;
-    if (pc && pc.getSenders) {
-      for (const s of pc.getSenders()) {
-        if (s.track && s.track.kind === 'video' && s.generateKeyFrame) {
-          s.generateKeyFrame();
-        }
-      }
+    if (!pc || !pc.getSenders) return;
+    // FONTOS: csak a video sender-en hívjuk, mert audio track hozzáadásakor
+    // a sender-index eltolódik, és a [0] lehet az audio → generateKeyFrame
+    // hibát dob vagy nem csinál semmit → a fogadó nem kap I-frame-et → fekete kép.
+    const vSender = pc.getSenders().find(s => s.track && s.track.kind === 'video');
+    if (vSender && typeof vSender.generateKeyFrame === 'function') {
+      try { await vSender.generateKeyFrame(); } catch (e) { /* nem minden böngésző támogatja */ }
     }
   } catch {}
 }
@@ -5820,7 +5827,10 @@ function showViewer(pid, stream) {
     });
     videoTrack.addEventListener('unmute', () => {
       vstate.textContent = '';
-      video.srcObject = stream;
+      // FONTOS: NE a teljes stream-et tegyük vissza, mert az audio track
+      // visszakerülne a video elembe → fekete kép. Mindig csak video-track.
+      const vTracks = stream.getVideoTracks();
+      video.srcObject = vTracks.length > 0 ? new MediaStream(vTracks) : stream;
       playVideo();
     });
     videoTrack.addEventListener('ended', () => closeViewer(pid));

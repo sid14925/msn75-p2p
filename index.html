@@ -1803,7 +1803,7 @@ window.MSN_ASSETS = {
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.4.4';
+const APP_VERSION = '2.4.5';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -3456,6 +3456,12 @@ function onData(pid, d) {
       }
       break;
     }
+    case 'ping': {
+      const c = conns.get(pid);
+      if (c && c.open) { try { c.send({ t: 'pong' }); } catch {} }
+      break;
+    }
+    case 'pong': break;
     case 'bye': {
       const c = conns.get(pid);
       if (c) { try { c.close(); } catch {} }
@@ -3472,12 +3478,49 @@ function dispName(pid) {
   return (ct && ct.name) || pid;
 }
 
-// ---------- jelenlét ----------
+// ---------- jelenlét és háttér-stabilitás (Web Worker) ----------
 function startPresenceLoop() {
+  const runHeartbeat = () => {
+    // 1. PeerJS kapcsolat ellenőrzése és újracsatlakozás ha megszakadt a háttérben
+    if (peer && peer.disconnected && !peer.destroyed) {
+      try { peer.reconnect(); } catch {}
+    }
+    // 2. Partnerek újracsatlakoztatása
+    for (const ct of contacts) {
+      if (!conns.has(ct.id)) connectTo(ct.id);
+    }
+    // 3. Keepalive ping az aktív adatkapcsolatoknak (tűzfal/NAT ébrentartás háttérben)
+    for (const m of deviceConns.values()) {
+      for (const c of m.values()) {
+        if (c.open) { try { c.send({ t: 'ping' }); } catch {} }
+      }
+    }
+  };
+
+  // Azonnali első csatlakozás
   for (const ct of contacts) connectTo(ct.id);
-  setInterval(() => {
-    for (const ct of contacts) if (!conns.has(ct.id)) connectTo(ct.id);
-  }, 12000);
+
+  // Háttérbeli Web Worker: a böngésző NEM fojtja le (throttling) más ablakban végzett munka közben
+  try {
+    const workerBlob = new Blob([
+      'setInterval(function() { postMessage("tick"); }, 4000);'
+    ], { type: 'application/javascript' });
+    const bgWorker = new Worker(URL.createObjectURL(workerBlob));
+    bgWorker.onmessage = runHeartbeat;
+  } catch {
+    setInterval(runHeartbeat, 5000);
+  }
+
+  // Lap-aktivitási és ablak-fókusz események kezelése
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') runHeartbeat();
+  });
+  window.addEventListener('focus', runHeartbeat);
+  window.addEventListener('online', () => {
+    setNetState(true);
+    if (peer && !peer.destroyed) { try { peer.reconnect(); } catch {} }
+    runHeartbeat();
+  });
 }
 
 // ---------- partnerlista ----------
@@ -5555,36 +5598,7 @@ async function startStream(pid) {
     const vt = screenStream ? screenStream.getVideoTracks()[0] : null;
     if (!screenStream || !screenStream.active || !vt || vt.readyState !== 'live') {
       const profile = STREAM_PROFILES[quality] || STREAM_PROFILES.high;
-      if (wantAudio) {
-        try {
-          screenStream = await navigator.mediaDevices.getDisplayMedia({
-            video: profile,
-            audio: {
-              echoCancellation: false,
-              noiseSuppression: false,
-              autoGainControl: false,
-              suppressLocalAudioPlayback: false
-            }
-          });
-        } catch {
-          try {
-            screenStream = await navigator.mediaDevices.getDisplayMedia({
-              video: profile,
-              audio: true
-            });
-          } catch {
-            screenStream = await navigator.mediaDevices.getDisplayMedia({
-              video: profile,
-              audio: false
-            });
-          }
-        }
-      } else {
-        screenStream = await navigator.mediaDevices.getDisplayMedia({
-          video: profile,
-          audio: false
-        });
-      }
+      screenStream = await captureDisplayMediaWithFallback(profile, wantAudio);
       const vTrack = screenStream.getVideoTracks()[0];
       if (vTrack) {
         if ('contentHint' in vTrack) vTrack.contentHint = 'motion';
@@ -5594,12 +5608,60 @@ async function startStream(pid) {
         });
       }
     }
-  } catch {
+  } catch (err) {
+    console.error('getDisplayMedia failed:', err);
     sysMsg(pid, t('streamDenied'));
     return;
   }
   placeStreamCall(pid);
   sysMsg(pid, t('streamStarted'));
+}
+
+async function captureDisplayMediaWithFallback(profile, wantAudio) {
+  // 1. Próba: profil szerinti videó + részletes audió megszorítások
+  if (wantAudio) {
+    try {
+      return await navigator.mediaDevices.getDisplayMedia({
+        video: profile,
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          suppressLocalAudioPlayback: false
+        }
+      });
+    } catch {}
+
+    // 2. Próba: profil szerinti videó + egyszerű audio: true
+    try {
+      return await navigator.mediaDevices.getDisplayMedia({
+        video: profile,
+        audio: true
+      });
+    } catch {}
+
+    // 3. Próba (Linux PipeWire / Wayland portál): video: true + audio: true
+    try {
+      return await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: true
+      });
+    } catch {}
+  }
+
+  // 4. Próba: profil szerinti videó hang nélkül
+  try {
+    return await navigator.mediaDevices.getDisplayMedia({
+      video: profile,
+      audio: false
+    });
+  } catch {}
+
+  // 5. Próba (Végső Linux / Android / szabványos fallback): video: true, audio: false
+  return await navigator.mediaDevices.getDisplayMedia({
+    video: true,
+    audio: false
+  });
 }
 
 // a stream-hívás tényleges felépítése (első indításkor és újrapróbáláskor)

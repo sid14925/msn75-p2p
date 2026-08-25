@@ -1,5 +1,5 @@
 {
-  "version": "2.4.4",
+  "version": "2.4.5",
   "url": "https://sid14925.github.io/msn75-p2p/",
-  "notes": "Fix critical stream race condition: reuse viewer window on second track arrival and prevent stopping live remote tracks"
+  "notes": "Linux Wayland/PipeWire getDisplayMedia 5-stage progressive fallback; Web Worker background heartbeat keepalive; DataChannel ping/pong"
 }

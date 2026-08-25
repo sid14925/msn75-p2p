@@ -1,5 +1,5 @@
 window.__msnLatest = {
-  version: "2.4.4",
+  version: "2.5.1",
   url: "https://sid14925.github.io/msn75-p2p/",
-  notes: "Fix critical stream race condition: reuse viewer window on second track arrival and prevent stopping live remote tracks"
+  notes: "Guaranteed login: 8 slots + auto random fallback, 6s timeout, clean peer destruction"
 };

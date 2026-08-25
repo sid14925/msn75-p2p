@@ -1,5 +1,5 @@
 {
-  "version": "2.4.8",
+  "version": "2.4.9",
   "url": "https://sid14925.github.io/msn75-p2p/",
-  "notes": "Fix login error handling: immediately unlock login button on any socket/network failure and delay slot retries cleanly"
+  "notes": "NetState active sync in heartbeat and click-to-reconnect"
 }

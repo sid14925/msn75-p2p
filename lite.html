@@ -1789,7 +1789,7 @@ window.MSN_ASSETS = null;
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.4.8';
+const APP_VERSION = '2.4.9';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -3189,7 +3189,15 @@ function setNetState(ok) {
   if (!n) return;
   n.textContent = ok ? t('netOk') : t('netBad');
   n.className = ok ? 'ok' : 'bad';
+  n.title = ok ? '' : 'Kattints az újracsatlakozáshoz';
 }
+$('#netState')?.addEventListener('click', () => {
+  if (peer && !peer.destroyed) {
+    const n = $('#netState');
+    if (n) { n.textContent = t('connecting'); n.className = 'bad'; }
+    try { peer.reconnect(); } catch {}
+  }
+});
 
 // ---------- saját állapot / pm / kép ----------
 $('#meLine').addEventListener('click', () => {
@@ -3492,8 +3500,13 @@ function dispName(pid) {
 function startPresenceLoop() {
   const runHeartbeat = () => {
     // 1. PeerJS kapcsolat ellenőrzése és újracsatlakozás ha megszakadt a háttérben
-    if (peer && peer.disconnected && !peer.destroyed) {
-      try { peer.reconnect(); } catch {}
+    if (peer && !peer.destroyed) {
+      if (peer.disconnected) {
+        setNetState(false);
+        try { peer.reconnect(); } catch {}
+      } else {
+        setNetState(true);
+      }
     }
     // 2. Partnerek újracsatlakoztatása
     for (const ct of contacts) {

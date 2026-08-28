@@ -1942,7 +1942,7 @@ window.MSN_ASSETS = null;
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.7.0';
+const APP_VERSION = '2.7.1';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -2380,25 +2380,63 @@ function geminiBotSvg(size = 46) {
   '</svg>';
 }
 
+const HU_IMAGE_MAP = [
+  [/macsk[aá](r[oó]l|val|nak|t)?|cic[aá](r[oó]l|val|nak|t)?/i, 'cute fluffy domestic cat, adorable kitten close up portrait'],
+  [/kuty[aá](r[oó]l|val|nak|t)?|kutyus(r[oó]l|sal|nak|t)?|eb/i, 'cute playful golden retriever dog, adorable puppy in nature'],
+  [/aut[oó](r[oó]l|val|nak|t)?|kocsi(r[oó]l|val|nak|t)?/i, 'sleek modern luxury sports car driving on a scenic mountain road'],
+  [/tenger(part|partr[oó]l|partot)?|óceán/i, 'gorgeous tropical beach sunset with crystal clear turquoise ocean waves and palm trees'],
+  [/naplement[eé](r[oó]l|t)?/i, 'dramatic golden hour sunset over picturesque nature scenery with vibrant warm colors'],
+  [/hegy(ek|r[oó]l|et)?/i, 'majestic snow-capped alpine mountain range under clear blue skies'],
+  [/erd[oő](r[oó]l|ben|t)?/i, 'enchanted lush green sunlit forest with sunlight rays passing through misty trees'],
+  [/v[aá]ros(r[oó]l|ban|t)?/i, 'vibrant futuristic cyberpunk city skyline at night with glowing neon lights'],
+  [/robot(r[oó]l|tal|ot)?/i, 'friendly high-tech humanoid AI robot with expressive glowing eyes in modern laboratory'],
+  [/űr|galaxis|bolyg[oó]|rak[eé]t[aá]/i, 'deep cosmic space galaxy with glowing nebula stars, planets and cosmic dust'],
+  [/vir[aá]g(ok|r[oó]l|ot)?/i, 'vibrant blooming colorful exotic flowers in stunning macro photography'],
+  [/s[aá]rk[aá]ny(r[oó]l|t)?/i, 'majestic mythical fantasy dragon with detailed scales breathing magical light'],
+  [/mad[aá]r(r[oó]l|at)?|sas|papag[aá]j/i, 'colorful majestic exotic bird sitting on branch in high detail'],
+  [/oroszl[aá]n(r[oó]l|t)?/i, 'majestic male lion with magnificent mane resting in golden savannah sunlight'],
+  [/foci|futball|labd[aá]/i, 'professional soccer ball sitting on pristine stadium grass under floodlights'],
+  [/rep[uü]l[oő](r[oó]l|t)?/i, 'modern supersonic jet aircraft soaring through dramatic clouds in sky'],
+  [/pizza|burger|étel|kaja/i, 'delicious gourmet artisan food presentation close-up food photography'],
+  [/torta|süti|desszert/i, 'exquisite chocolate birthday cake with berries and chocolate dripping decoration']
+];
+
 function isImagePrompt(text) {
-  return /\b(kép|képet|rajz|rajzolj|rajzold|generálj.*kép|készíts.*kép|csinálj.*kép|fotó|image|picture|draw|generate.*image|paint)\b/i.test(text);
+  return /\b(kép|képet|rajz|rajzolj|rajzold|generálj.*kép|készíts.*kép|csinálj.*kép|mutass.*kép|fotó|image|picture|draw|generate.*image|paint)\b/i.test(text);
 }
 
-function extractImagePrompt(prompt) {
-  let clean = prompt
+function translateAndEnhancePrompt(rawInput) {
+  let clean = rawInput
     .replace(/@(gemini|ai)\b/gi, '')
     .replace(/\b(kérlek|légyszi|tudnál|generálj|készíts|rajzolj|rajzold|csinálj|mutass|adj|egy|képet|rajzot|fotót|erről|arról|róla|nekem)\b/gi, '')
     .replace(/\b(please|generate|draw|create|make|show|an?|image|picture|photo|drawing|of)\b/gi, '')
     .trim();
   clean = clean.replace(/^[,\s:\-]+|[,\s:\-]+$/g, '').trim();
-  return clean || prompt.replace(/@(gemini|ai)\b/gi, '').trim() || 'cute kitten high quality digital art';
+
+  // Magyar szótáras illeszkedés
+  for (const [regex, en] of HU_IMAGE_MAP) {
+    if (regex.test(clean) || regex.test(rawInput)) {
+      return en;
+    }
+  }
+
+  // Ha nem volt szótári találat
+  if (!clean || clean.length < 2) return 'cute fluffy kitten, high quality photorealistic art';
+  return clean + ', photorealistic, 4k, highly detailed digital art';
 }
 
 async function generateAiImage(rawPrompt) {
-  const prompt = extractImagePrompt(rawPrompt);
-  const seed = Math.floor(Math.random() * 1000000);
-  const imageUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=600&height=600&nologo=true&seed=' + seed;
-  return { prompt, imageUrl };
+  const englishPrompt = translateAndEnhancePrompt(rawPrompt);
+  const seed = Math.floor(Math.random() * 10000000);
+  const imageUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(englishPrompt) + '?width=768&height=768&model=flux&nologo=true&seed=' + seed;
+  
+  let displayDesc = rawPrompt
+    .replace(/@(gemini|ai)\b/gi, '')
+    .replace(/\b(kérlek|légyszi|tudnál|generálj|készíts|rajzolj|rajzold|csinálj|mutass|adj|egy|képet|rajzot|fotót|nekem)\b/gi, '')
+    .trim();
+  displayDesc = displayDesc.replace(/^[,\s:\-]+|[,\s:\-]+$/g, '').trim() || 'kép';
+
+  return { prompt: displayDesc, englishPrompt, imageUrl };
 }
 
 async function askGemini(prompt, history = [], options = {}) {

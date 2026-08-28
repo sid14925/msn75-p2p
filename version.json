@@ -1,5 +1,5 @@
 {
-  "version": "2.6.0",
+  "version": "2.6.1",
   "url": "https://sid14925.github.io/msn75-p2p/",
-  "notes": "Google Gemini 3.7 Flash integration (Low/High thinking modes, group chat @gemini support, dedicated bot buddy, and full settings UI)"
+  "notes": "Gemini browser fetch fix with explicit CORS mode and credentials omit for NewAPI/Cloudflare"
 }

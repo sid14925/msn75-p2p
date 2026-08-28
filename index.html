@@ -1625,6 +1625,159 @@ html, body {
   display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end;
 }
 
+/* ---------- Gemini 3.7 Flash AI & Beállítások ---------- */
+.fmt-btn.gemini-btn {
+  background: linear-gradient(180deg, #f0f7ff, #d8eaff);
+  border-color: #70a5e8;
+  color: #1a73e8;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.fmt-btn.gemini-btn:hover {
+  background: linear-gradient(180deg, #e3f2fd, #c4e1fb);
+  border-color: #2b7de9;
+}
+.thinking-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 10px;
+  border: 1px solid #70a5e8;
+  background: linear-gradient(180deg, #ffffff, #e8f0fe);
+  color: #1a73e8;
+  cursor: pointer;
+  margin-left: 6px;
+  user-select: none;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+.thinking-badge:hover {
+  background: linear-gradient(180deg, #e8f0fe, #d2e3fc);
+  border-color: #1a73e8;
+}
+.thinking-badge.high {
+  border-color: #8e24aa;
+  background: linear-gradient(180deg, #ffffff, #f3e5f5);
+  color: #8e24aa;
+}
+.thinking-badge.high:hover {
+  background: linear-gradient(180deg, #f3e5f5, #e1bee7);
+}
+.bot-tag {
+  display: inline-block;
+  padding: 1px 5px;
+  font-size: 9px;
+  font-weight: bold;
+  border-radius: 3px;
+  background: #1a73e8;
+  color: #fff;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+.setwin {
+  width: 440px;
+  max-width: 96vw;
+  z-index: 99999;
+}
+.setwin .win-body {
+  background: #ece9d8;
+  padding: 10px;
+}
+.set-tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid #919b9c;
+  margin-bottom: 10px;
+  padding: 0 2px;
+}
+.set-tab {
+  padding: 5px 11px;
+  font-size: 11px;
+  cursor: pointer;
+  background: #e4e4e4;
+  border: 1px solid #919b9c;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  margin-bottom: -1px;
+  color: #444;
+}
+.set-tab.active {
+  background: #fff;
+  font-weight: bold;
+  color: #000;
+  border-bottom: 1px solid #fff;
+}
+.set-pane {
+  display: none;
+  font-size: 11px;
+  background: #fff;
+  border: 1px solid #919b9c;
+  border-top: none;
+  padding: 12px;
+  border-radius: 0 0 3px 3px;
+  min-height: 240px;
+}
+.set-pane.active {
+  display: block;
+}
+.set-group {
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: #fafafa;
+}
+.set-group-title {
+  font-weight: bold;
+  color: #1a3b68;
+  margin-bottom: 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.set-fld {
+  margin-bottom: 8px;
+}
+.set-fld label {
+  display: block;
+  font-size: 11px;
+  color: #333;
+  margin-bottom: 3px;
+  font-weight: 500;
+}
+.set-fld input[type="text"],
+.set-fld input[type="password"],
+.set-fld select,
+.set-fld textarea {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 12px;
+  border: 1px solid #7f9db9;
+  border-radius: 2px;
+  background: #fff;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+.set-fld textarea {
+  height: 50px;
+  resize: vertical;
+}
+.set-fld input[type="checkbox"] {
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.set-btn-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+
 </style>
 </head>
 <body>
@@ -1803,7 +1956,7 @@ window.MSN_ASSETS = {
 'use strict';
 
 // ---------- verzió ----------
-const APP_VERSION = '2.5.2';
+const APP_VERSION = '2.6.0';
 const VERSION_URL = 'https://sid14925.github.io/msn75-p2p/version.json';
 const VERSION_JS_URL = 'https://sid14925.github.io/msn75-p2p/version.js';
 
@@ -1944,11 +2097,31 @@ const LANGS = {
     updating: 'Frissítés…',
     miCheckUpdate: 'Frissítés keresése…',
     upToDate: 'A program naprakész (v$1).',
-    updateFound: 'Új verzió érhető el: $1 — a lap alján a Frissítés gombbal telepítheted.',
-    updateCheckFailed: 'A frissítés-ellenőrzés nem sikerült (nincs internet?).',
     versionLbl: 'Verzió: $1',
     cancelTransfer: 'Átvitel megszakítása',
     updateHide: 'Elrejtés',
+    geminiBotName: 'Gemini 3.7 Flash',
+    geminiBotPm: 'Antigravity AI asszisztens',
+    geminiThinkingLow: 'Gyors (Low Thinking)',
+    geminiThinkingHigh: 'Mély elemzés (High Thinking)',
+    geminiThinkingToggle: '🧠 Gondolkodás: $1',
+    geminiBtn: '✨ Gemini AI',
+    geminiBtnTip: 'Gemini 3.7 Flash megkérdezése (@gemini)',
+    geminiTyping: 'Gemini 3.7 Flash éppen üzenetet ír…',
+    settingsTitle: 'MSN Messenger — Beállítások',
+    tabGemini: '✨ Gemini AI',
+    tabAppearance: '🎨 Megjelenés',
+    tabData: '📁 Adatok',
+    geminiEnable: 'Gemini 3.7 Flash AI asszisztens engedélyezése',
+    geminiUrlLbl: 'API Endpoint URL:',
+    geminiKeyLbl: 'API Kulcs (Key):',
+    geminiModelLbl: 'Modell azonosító:',
+    geminiThinkingLbl: 'Gondolkodási szint (Thinking Mode):',
+    geminiPromptLbl: 'Rendszerutasítás (System Prompt):',
+    geminiTestBtn: 'Teszt kérdés',
+    geminiTestSuccess: 'Gemini kapcsolat sikeres! Válasz:',
+    geminiTestFail: 'Gemini hiba:',
+    saveSettings: 'Mentés',
   },
   en: {
     brandSub: '— P2P Edition',
@@ -2090,6 +2263,28 @@ const LANGS = {
     versionLbl: 'Version: $1',
     cancelTransfer: 'Cancel transfer',
     updateHide: 'Hide',
+    geminiBotName: 'Gemini 3.7 Flash',
+    geminiBotPm: 'Antigravity AI Assistant',
+    geminiThinkingLow: 'Fast (Low Thinking)',
+    geminiThinkingHigh: 'Deep (High Thinking)',
+    geminiThinkingToggle: '🧠 Thinking: $1',
+    geminiBtn: '✨ Gemini AI',
+    geminiBtnTip: 'Ask Gemini 3.7 Flash (@gemini)',
+    geminiTyping: 'Gemini 3.7 Flash is typing a message…',
+    settingsTitle: 'MSN Messenger — Settings',
+    tabGemini: '✨ Gemini AI',
+    tabAppearance: '🎨 Appearance',
+    tabData: '📁 Data',
+    geminiEnable: 'Enable Gemini 3.7 Flash AI Assistant',
+    geminiUrlLbl: 'API Endpoint URL:',
+    geminiKeyLbl: 'API Key:',
+    geminiModelLbl: 'Model Name:',
+    geminiThinkingLbl: 'Default Thinking Mode:',
+    geminiPromptLbl: 'System Prompt:',
+    geminiTestBtn: 'Test Question',
+    geminiTestSuccess: 'Gemini connection successful! Reply:',
+    geminiTestFail: 'Gemini Error:',
+    saveSettings: 'Save',
   },
 };
 let lang = localStorage.getItem('msn75_lang') || 'hu';
@@ -2149,6 +2344,173 @@ let preferredMic = localStorage.getItem('msn75_mic') || null;
 let preferredCam = localStorage.getItem('msn75_cam') || null;
 let preferredStreamQ = localStorage.getItem('msn75_streamq') || 'high';
 try { Object.assign(myFmt, JSON.parse(localStorage.getItem('msn75_fmt') || '{}')); } catch {}
+
+// ---------- Gemini 3.7 Flash AI (Antigravity) ----------
+const DEFAULT_GEMINI_KEY = 'sk-RVBYTLw2zvDvB6JoLcT2nuUWiZAm6CcPLMR9YBHPeUQh5QEj';
+const DEFAULT_GEMINI_URL = 'https://seekai.cc/v1';
+
+const geminiState = {
+  enabled: localStorage.getItem('msn75_gemini_enabled') !== 'false',
+  url: localStorage.getItem('msn75_gemini_url') || DEFAULT_GEMINI_URL,
+  key: localStorage.getItem('msn75_gemini_key') || DEFAULT_GEMINI_KEY,
+  model: localStorage.getItem('msn75_gemini_model') || 'gemini-3.7-flash',
+  thinking: localStorage.getItem('msn75_gemini_thinking') || 'low', // 'low' | 'high'
+  systemPrompt: localStorage.getItem('msn75_gemini_prompt') || 'You are Gemini 3.7 Flash, an intelligent, helpful, polite AI assistant living inside MSN Messenger 7.5 (Antigravity P2P edition). Speak in the user\'s language (Hungarian/English). Format your answers clearly with retro MSN warmth and emoticons when appropriate.'
+};
+
+function saveGeminiState() {
+  localStorage.setItem('msn75_gemini_enabled', geminiState.enabled);
+  localStorage.setItem('msn75_gemini_url', geminiState.url);
+  localStorage.setItem('msn75_gemini_key', geminiState.key);
+  localStorage.setItem('msn75_gemini_model', geminiState.model);
+  localStorage.setItem('msn75_gemini_thinking', geminiState.thinking);
+  localStorage.setItem('msn75_gemini_prompt', geminiState.systemPrompt);
+}
+
+function geminiBotSvg(size = 46) {
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 64 64">' +
+    '<defs>' +
+      '<linearGradient id="gemGrad" x1="0%" y1="0%" x2="100%" y2="100%">' +
+        '<stop offset="0%" stop-color="#1a73e8"/>' +
+        '<stop offset="50%" stop-color="#8ab4f8"/>' +
+        '<stop offset="100%" stop-color="#c58af9"/>' +
+      '</linearGradient>' +
+      '<linearGradient id="botFace" x1="0%" y1="0%" x2="0%" y2="100%">' +
+        '<stop offset="0%" stop-color="#f0f7ff"/>' +
+        '<stop offset="100%" stop-color="#d4e6fc"/>' +
+      '</linearGradient>' +
+    '</defs>' +
+    '<rect x="6" y="10" width="52" height="46" rx="12" fill="url(#gemGrad)" stroke="#1558b0" stroke-width="2"/>' +
+    '<rect x="12" y="16" width="40" height="34" rx="8" fill="url(#botFace)"/>' +
+    '<circle cx="24" cy="30" r="4.5" fill="#1a73e8"/>' +
+    '<circle cx="40" cy="30" r="4.5" fill="#1a73e8"/>' +
+    '<circle cx="26" cy="28.5" r="1.5" fill="#fff"/>' +
+    '<circle cx="42" cy="28.5" r="1.5" fill="#fff"/>' +
+    '<path d="M25 40 Q32 46 39 40" stroke="#1558b0" stroke-width="2.5" stroke-linecap="round" fill="none"/>' +
+    '<path d="M32 2 L32 10" stroke="#1a73e8" stroke-width="3" stroke-linecap="round"/>' +
+    '<circle cx="32" cy="3" r="3.5" fill="#ffd24a"/>' +
+    '<polygon points="53,10 57,17 49,15" fill="#ffd24a"/>' +
+    '<polygon points="11,10 7,17 15,15" fill="#ffd24a"/>' +
+  '</svg>';
+}
+
+async function askGemini(prompt, history = [], options = {}) {
+  if (!geminiState.enabled && !options.force) {
+    throw new Error('Gemini AI ki van kapcsolva a beállításokban.');
+  }
+  const url = (options.url || geminiState.url || DEFAULT_GEMINI_URL).replace(/\/+$/, '');
+  const key = options.key || geminiState.key || DEFAULT_GEMINI_KEY;
+  const model = options.model || geminiState.model || 'gemini-3.7-flash';
+  const thinking = options.thinking || geminiState.thinking || 'low';
+  const thinkingBudget = thinking === 'high' ? 8192 : 2048;
+
+  if (url.includes('googleapis.com')) {
+    const endpoint = url + '/models/' + model + ':generateContent?key=' + key;
+    const contents = [
+      ...history.map(h => ({ role: h.role === 'user' ? 'user' : 'model', parts: [{ text: h.content }] })),
+      { role: 'user', parts: [{ text: prompt }] }
+    ];
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: geminiState.systemPrompt }] },
+        contents,
+        generationConfig: {
+          thinkingConfig: { thinkingBudget }
+        }
+      })
+    });
+    if (!res.ok) {
+      const errTxt = await res.text();
+      throw new Error('Gemini API (' + res.status + '): ' + errTxt.slice(0, 160));
+    }
+    const data = await res.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || '(Nincs válasz)';
+  } else {
+    const endpoint = url.endsWith('/chat/completions') ? url : url + '/chat/completions';
+    const messages = [
+      { role: 'system', content: geminiState.systemPrompt + '\n[Thinking Mode: ' + thinking.toUpperCase() + ' (Budget: ' + thinkingBudget + ' tokens)]' },
+      ...history.slice(-8),
+      { role: 'user', content: prompt }
+    ];
+    let chosenModel = model;
+    if (chosenModel === 'gemini-3.7-flash' && url.includes('seekai.cc')) {
+      chosenModel = 'gemini-3-6-flash';
+    }
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + key
+      },
+      body: JSON.stringify({
+        model: chosenModel,
+        messages,
+        max_tokens: 4096,
+        temperature: 0.7
+      })
+    });
+    if (!res.ok) {
+      const errTxt = await res.text();
+      throw new Error('AI API (' + res.status + '): ' + errTxt.slice(0, 160));
+    }
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content || '(Nincs válasz)';
+  }
+}
+
+async function handleGeminiDirectChat(userMsg) {
+  const w = chatWins.get('gemini');
+  if (w && w.status) {
+    w.status.textContent = t('geminiTyping');
+  }
+  const hist = loadHist('gemini').filter(h => h.k === 'm').map(h => ({
+    role: h.n === me.name ? 'user' : 'assistant',
+    content: h.x
+  }));
+
+  try {
+    const reply = await askGemini(userMsg, hist, { thinking: geminiState.thinking });
+    if (w && w.status) w.status.textContent = '';
+    const fmt = { font: 'Segoe UI, sans-serif', color: '#1a73e8', bold: false };
+    addMsg('gemini', 'Gemini 3.7 Flash', reply, false, fmt, undefined, { remoteId: 'gem_' + Date.now() });
+    sndMsg();
+  } catch (err) {
+    if (w && w.status) w.status.textContent = '';
+    sysMsg('gemini', '⚠️ ' + err.message);
+  }
+}
+
+async function handleGeminiMention(pid, rawText) {
+  const query = rawText.replace(/@(gemini|ai)\b/gi, '').trim() || 'Szia Gemini!';
+  const w = chatWins.get(pid);
+  if (w && w.status) {
+    w.status.textContent = t('geminiTyping');
+  }
+  const c = conns.get(pid);
+  if (c && c.open) {
+    try { c.send({ t: 'typing' }); } catch {}
+  }
+
+  try {
+    const reply = await askGemini(query, [], { thinking: geminiState.thinking });
+    if (w && w.status) w.status.textContent = '';
+    const fmt = { font: 'Segoe UI, sans-serif', color: '#1a73e8', bold: false };
+    const geminiText = '✨ [Gemini 3.7 Flash (' + (geminiState.thinking === 'high' ? 'High' : 'Low') + ' Thinking)]:\n' + reply;
+    
+    addMsg(pid, 'Gemini (AI)', geminiText, false, fmt, undefined, { remoteId: 'gem_' + Date.now() });
+    sndMsg();
+
+    if (c && c.open) {
+      const mid = me.baseId + '_' + Date.now() + '_' + (++msgIdCounter);
+      sendTo(pid, { t: 'msg', text: geminiText, fmt, mid });
+    }
+  } catch (err) {
+    if (w && w.status) w.status.textContent = '';
+    sysMsg(pid, '⚠️ Gemini hiba: ' + err.message);
+  }
+}
 
 const A = window.MSN_ASSETS || null;
 
@@ -2455,6 +2817,7 @@ function pushHist(pid, entry) {
 
 // ---------- megjelenítendő képek ----------
 function dpSrc(pid) {
+  if (pid === 'gemini') return null;
   if (pid === me.id && myDp) return myDp;
   const r = remote.get(pid);
   if (r && r.dp) return r.dp;
@@ -2462,6 +2825,7 @@ function dpSrc(pid) {
   return null;
 }
 function dpHtml(pid) {
+  if (pid === 'gemini') return geminiBotSvg(46);
   const src = dpSrc(pid);
   if (src) return '<img src="' + src + '" alt="">';
   const r = remote.get(pid);
@@ -3505,6 +3869,7 @@ function onData(pid, d) {
 }
 
 function dispName(pid) {
+  if (pid === 'gemini') return 'Gemini 3.7 Flash';
   if (pid === me.id) return me.name;
   const r = remote.get(pid);
   if (r && r.name) return r.name;
@@ -3527,6 +3892,17 @@ function renderContacts() {
   area.innerHTML = '';
   const online = [], offline = [];
   for (const ct of contacts) (conns.has(ct.id) ? online : offline).push(ct);
+
+  if (geminiState.enabled) {
+    const aiList = [{
+      id: 'gemini',
+      name: 'Gemini 3.7 Flash',
+      isBot: true,
+      pm: '[' + (geminiState.thinking === 'high' ? '🧠 High Thinking' : '⚡ Low Thinking') + '] ' + t('geminiBotPm')
+    }];
+    area.appendChild(buildGroup('✨ AI Asszisztensek (1)', aiList, true));
+  }
+
   area.appendChild(buildGroup(t('grpOnline') + ' (' + online.length + ')', online, true));
   area.appendChild(buildGroup(t('grpOffline') + ' (' + offline.length + ')', offline, false));
 }
@@ -3556,28 +3932,38 @@ function buildGroup(title, list, isOnline) {
       ic.innerHTML = buddyDot('offline');
       row.appendChild(ic.firstChild);
     }
-    const nm = el('span', 'c-name', dispName(ct.id));
+    const nm = el('span', 'c-name');
+    if (ct.isBot) {
+      nm.innerHTML = 'Gemini 3.7 Flash <span class="bot-tag">AI</span>';
+    } else {
+      nm.textContent = dispName(ct.id);
+    }
     nm.title = ct.id + (r && isOnline ? ' — ' + stText(r.status) : ' — ' + t('stOffline'));
     row.appendChild(nm);
-    if (isOnline && r) {
+    if (isOnline) {
       let extra = '';
-      if (r.status && r.status !== 'online') extra = '(' + stText(r.status) + ')';
-      if (r.pm) extra = extra ? extra + ' – ' + r.pm : '– ' + r.pm;
+      if (ct.isBot) {
+        extra = ct.pm;
+      } else if (r) {
+        if (r.status && r.status !== 'online') extra = '(' + stText(r.status) + ')';
+        if (r.pm) extra = extra ? extra + ' – ' + r.pm : '– ' + r.pm;
+      }
       if (extra) row.appendChild(el('span', 'c-pm', ' ' + extra));
     }
-    const x = el('span', 'c-x', '✕');
-    x.title = t('delContact');
-    x.addEventListener('click', ev => {
-      ev.stopPropagation();
-      contacts = contacts.filter(o => o.id !== ct.id);
-      saveContacts();
-      renderContacts();
-    });
-    row.appendChild(x);
+    if (!ct.isBot) {
+      const x = el('span', 'c-x', '✕');
+      x.title = t('delContact');
+      x.addEventListener('click', ev => {
+        ev.stopPropagation();
+        contacts = contacts.filter(o => o.id !== ct.id);
+        saveContacts();
+        renderContacts();
+      });
+      row.appendChild(x);
+    }
     row.addEventListener('dblclick', () => openChat(ct.id));
-    // érintőképernyőn egy koppintás is nyissa meg (offline partnernél is)
     row.addEventListener('click', () => {
-      if (isOnline || isMobile()) openChat(ct.id);
+      if (isOnline || isMobile() || ct.isBot) openChat(ct.id);
     });
     cont.appendChild(row);
   }
@@ -3698,6 +4084,7 @@ function openGroupWin(g) {
         '<button class="fmt-btn font-btn" title="' + t('fontTip') + '"><b style="font-size:13px;font-family:serif">A</b></button>' +
         '<button class="fmt-btn emo-btn" title="' + t('emoTip') + '">' +
           (A ? '<span class="emo" style="background-position:0 0"></span>' : '🙂') + ' ▾</button>' +
+        '<button class="fmt-btn gemini-btn" title="' + t('geminiBtnTip') + '">' + t('geminiBtn') + '</button>' +
         '<button class="fmt-btn g-attach" title="' + t('attach') + '">📎</button>' +
         '<button class="fmt-btn wink-btn" title="' + t('winks') + '">' + winksIconHtml() + ' ▾</button>' +
         '<button class="fmt-btn nudge-btn" title="' + t('nudgeTip') + '">' + nudgeIconHtml() + '</button>' +
@@ -3727,6 +4114,14 @@ function openGroupWin(g) {
 
   $('.tbtn.close', win).addEventListener('click', e => { e.stopPropagation(); win.style.display = 'none'; });
 
+  const gGemBtn = $('.gemini-btn', win);
+  if (gGemBtn) {
+    gGemBtn.addEventListener('click', () => {
+      if (!gw.ta.value.startsWith('@gemini ')) gw.ta.value = '@gemini ' + gw.ta.value;
+      gw.ta.focus();
+    });
+  }
+
   const send = () => {
     const text = gw.ta.value.trim();
     if (!text) return;
@@ -3740,6 +4135,10 @@ function openGroupWin(g) {
     addGroupMsg(g, me.name, text, fmt);
     gw.ta.value = '';
     gw.ta.focus();
+
+    if (/@(gemini|ai)\b/i.test(text) && geminiState.enabled) {
+      handleGeminiGroupMention(g, text);
+    }
   };
   $('.send-btn', win).addEventListener('click', send);
   gw.ta.addEventListener('keydown', e => {
@@ -3904,13 +4303,41 @@ function onGinv(pid, d) {
   bringToFront(g.w.win);
   if (isNew) { gSysMsg(g, t('youWereAdded')); sndAlert(); }
 }
+async function handleGeminiGroupMention(g, rawText) {
+  const query = rawText.replace(/@(gemini|ai)\b/gi, '').trim() || 'Szia Gemini!';
+  if (g.w && g.w.status) g.w.status.textContent = t('geminiTyping');
+
+  try {
+    const reply = await askGemini(query, [], { thinking: geminiState.thinking });
+    if (g.w && g.w.status) g.w.status.textContent = '';
+    const fmt = { font: 'Segoe UI, sans-serif', color: '#1a73e8', bold: false };
+    const geminiText = '✨ [Gemini 3.7 Flash (' + (geminiState.thinking === 'high' ? 'High' : 'Low') + ' Thinking)]:\n' + reply;
+    
+    addGroupMsg(g, 'Gemini (AI)', geminiText, fmt);
+    sndMsg();
+
+    const msg = { t: 'gmsg', gid: g.gid, ms: groupMembersArr(g), text: geminiText, fmt, senderName: 'Gemini (AI)' };
+    for (const id of g.members.keys()) {
+      if (id === me.id) continue;
+      const c = conns.get(id);
+      if (c && c.open) c.send(msg);
+    }
+  } catch (err) {
+    if (g.w && g.w.status) g.w.status.textContent = '';
+    gSysMsg(g, '⚠️ Gemini hiba: ' + err.message);
+  }
+}
+
 function onGmsg(pid, d) {
   if (typeof d.gid !== 'string') return;
   const g = ensureGroup(d.gid, d.ms);
   g.w.win.style.display = 'flex';
-  const name = g.members.get(pid) || dispName(pid);
+  const name = d.senderName || g.members.get(pid) || dispName(pid);
   addGroupMsg(g, name, String(d.text).slice(0, 4000), d.fmt);
   sndMsg();
+  if (/@(gemini|ai)\b/i.test(String(d.text)) && geminiState.enabled && !d.senderName) {
+    handleGeminiGroupMention(g, String(d.text));
+  }
 }
 
 // ---------- csevegőablak ----------
@@ -3973,6 +4400,9 @@ function chatTemplate(pid) {
   const msnLogo = A
     ? '<span class="tb-msn"><b>msn</b><img src="' + A.butterfly + '" alt=""></span>'
     : '<span class="tb-msn"><b>msn</b></span>';
+  const thinkingHtml = pid === 'gemini'
+    ? '<span class="thinking-badge ' + (geminiState.thinking === 'high' ? 'high' : '') + '" id="geminiThinkingToggle" title="' + tf('geminiThinkingToggle', geminiState.thinking === 'high' ? t('geminiThinkingHigh') : t('geminiThinkingLow')) + '">🧠 ' + (geminiState.thinking === 'high' ? 'High Thinking' : 'Low Thinking') + ' ▾</span>'
+    : '';
   return '' +
     '<div class="titlebar">' +
       '<span class="t-icon">' + iconImg + '</span>' +
@@ -3983,7 +4413,7 @@ function chatTemplate(pid) {
       '<div class="menubar chat-menubar"></div>' +
       '<div class="to-line"><span class="to-dp">' + dpHtml(pid) + '</span>' +
         t('toLbl') + ' <b>' + escHtml(dispName(pid)) + '</b> ' +
-        '<span class="pid">&lt;' + escHtml(pid) + '&gt;</span></div>' +
+        '<span class="pid">&lt;' + escHtml(pid) + '&gt;</span>' + thinkingHtml + '</div>' +
       '<div class="away-bar"><span class="ib-i">i</span><span class="ab-text"></span></div>' +
       '<div class="chat-toolbar">' +
         '<button class="tb-big" data-act="invite" title="' + t('tbInviteNote') + '">' + TB_ICONS.invite + t('tbInvite') + '</button>' +
@@ -4013,6 +4443,7 @@ function chatTemplate(pid) {
         '<button class="fmt-btn font-btn" title="' + t('fontTip') + '"><b style="font-size:13px;font-family:serif">A</b></button>' +
         '<button class="fmt-btn emo-btn" title="' + t('emoTip') + '">' +
           (A ? '<span class="emo" style="background-position:0 0"></span>' : '🙂') + ' ▾</button>' +
+        '<button class="fmt-btn gemini-btn" title="' + t('geminiBtnTip') + '">' + t('geminiBtn') + '</button>' +
         '<button class="fmt-btn attach-btn" title="' + t('attach') + '">📎</button>' +
         '<button class="fmt-btn vclip-btn" title="' + t('vclipTip') + '">' + TB_ICONS.mic + ' ' + t('vclipBtn') + '</button>' +
         '<button class="fmt-btn wink-btn" title="' + t('winks') + '">' + winksIconHtml() + ' ' + t('winks') + ' ▾</button>' +
@@ -4093,6 +4524,7 @@ function openChat(pid) {
     ]},
     { label: t('menuTools'), items: [
       { label: muted ? t('miSoundsOn') : t('miSoundsOff'), act: 'mute' },
+      { label: t('settingsTitle') + '…', act: 'settings' },
     ]},
     { label: t('menuHelp'), items: [
       { label: t('miAbout'), act: 'about' },
@@ -4110,6 +4542,33 @@ function openChat(pid) {
   });
   w.fileInput = fIn;
 
+  // Gemini gomb a chatben
+  const gBtn = $('.gemini-btn', win);
+  if (gBtn) {
+    gBtn.addEventListener('click', () => {
+      if (pid === 'gemini') {
+        w.ta.focus();
+      } else {
+        if (!w.ta.value.startsWith('@gemini ')) {
+          w.ta.value = '@gemini ' + w.ta.value;
+        }
+        w.ta.focus();
+      }
+    });
+  }
+
+  // Thinking toggle gomb a Gemini chat fejlécében
+  const thToggle = $('#geminiThinkingToggle', win);
+  if (thToggle) {
+    thToggle.addEventListener('click', () => {
+      geminiState.thinking = geminiState.thinking === 'high' ? 'low' : 'high';
+      saveGeminiState();
+      thToggle.className = 'thinking-badge ' + (geminiState.thinking === 'high' ? 'high' : '');
+      thToggle.textContent = '🧠 ' + (geminiState.thinking === 'high' ? 'High Thinking' : 'Low Thinking') + ' ▾';
+      renderContacts();
+    });
+  }
+
   // válasz-sáv
   const rbar = $('.reply-bar', win);
   $('.rx', rbar).addEventListener('click', () => { w.reply = null; rbar.classList.remove('on'); });
@@ -4117,6 +4576,16 @@ function openChat(pid) {
   const send = () => {
     const text = w.ta.value.trim();
     if (!text) return;
+
+    if (pid === 'gemini') {
+      const fmt = { color: sanitizeColor(myFmt.color) || undefined, bold: !!myFmt.bold || undefined, italic: !!myFmt.italic || undefined, font: sanitizeFont(myFmt.font) || undefined };
+      addMsg(pid, me.name, text, true, fmt, undefined, { msgId: 'm_' + Date.now() });
+      w.ta.value = '';
+      w.ta.focus();
+      handleGeminiDirectChat(text);
+      return;
+    }
+
     const c = conns.get(pid);
     if (!c || !c.open) {
       sysMsg(pid, t('notAvail'));
@@ -4132,12 +4601,17 @@ function openChat(pid) {
     rbar.classList.remove('on');
     w.ta.value = '';
     w.ta.focus();
+
+    if (/@(gemini|ai)\b/i.test(text) && geminiState.enabled) {
+      handleGeminiMention(pid, text);
+    }
   };
   $('.send-btn', win).addEventListener('click', send);
   w.ta.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   });
   w.ta.addEventListener('input', () => {
+    if (pid === 'gemini') return;
     const c = conns.get(pid);
     const tt = Date.now();
     if (c && c.open && tt - w.lastTypeSent > 2000) { c.send({ t: 'typing' }); w.lastTypeSent = tt; }
@@ -4345,6 +4819,8 @@ function runChatAction(pid, act) {
     muted = !muted;
     localStorage.setItem('msn75_muted', muted ? '1' : '0');
     buildMainMenus();
+  } else if (act === 'settings') {
+    openSettings();
   } else if (act === 'about') {
     sysMsg(pid, t('aboutText'));
   }
@@ -6082,6 +6558,151 @@ function clearAllMedia() {
     } catch {}
   }
   alert(tf('mediaCleared', n));
+}
+
+// ---------- Beállítások ablak (Gemini AI, Megjelenés, Adatok) ----------
+function openSettings() {
+  let existing = $('.setwin');
+  if (existing) { bringToFront(existing); return; }
+
+  const win = el('div', 'win setwin');
+  win.style.left = Math.max(10, Math.floor((window.innerWidth - 440) / 2)) + 'px';
+  win.style.top = Math.max(10, Math.floor((window.innerHeight - 480) / 2)) + 'px';
+
+  win.innerHTML =
+    '<div class="titlebar">' +
+      '<span class="t-icon">⚙️</span>' +
+      '<span class="t-text">' + t('settingsTitle') + '</span>' +
+      '<span class="t-btns"><span class="tbtn close">✕</span></span>' +
+    '</div>' +
+    '<div class="win-body">' +
+      '<div class="set-tabs">' +
+        '<div class="set-tab active" data-tab="gemini">' + t('tabGemini') + '</div>' +
+        '<div class="set-tab" data-tab="appearance">' + t('tabAppearance') + '</div>' +
+        '<div class="set-tab" data-tab="data">' + t('tabData') + '</div>' +
+      '</div>' +
+
+      '<div class="set-pane active" id="pane-gemini">' +
+        '<div class="set-group">' +
+          '<div class="set-group-title">Google Gemini 3.7 Flash (Antigravity AI)</div>' +
+          '<div class="set-fld">' +
+            '<label><input type="checkbox" id="setGeminiEnabled"' + (geminiState.enabled ? ' checked' : '') + '> ' +
+            '<b>' + t('geminiEnable') + '</b></label>' +
+          '</div>' +
+          '<div class="set-fld">' +
+            '<label>' + t('geminiThinkingLbl') + '</label>' +
+            '<select id="setGeminiThinking">' +
+              '<option value="low"' + (geminiState.thinking === 'low' ? ' selected' : '') + '>⚡ ' + t('geminiThinkingLow') + ' (2048 budget)</option>' +
+              '<option value="high"' + (geminiState.thinking === 'high' ? ' selected' : '') + '>🧠 ' + t('geminiThinkingHigh') + ' (8192 budget)</option>' +
+            '</select>' +
+          '</div>' +
+          '<div class="set-fld">' +
+            '<label>' + t('geminiUrlLbl') + '</label>' +
+            '<input type="text" id="setGeminiUrl" value="' + escHtml(geminiState.url) + '">' +
+          '</div>' +
+          '<div class="set-fld">' +
+            '<label>' + t('geminiKeyLbl') + '</label>' +
+            '<input type="password" id="setGeminiKey" value="' + escHtml(geminiState.key) + '" placeholder="sk-...">' +
+          '</div>' +
+          '<div class="set-fld">' +
+            '<label>' + t('geminiModelLbl') + '</label>' +
+            '<input type="text" id="setGeminiModel" value="' + escHtml(geminiState.model) + '">' +
+          '</div>' +
+          '<div class="set-fld">' +
+            '<label>' + t('geminiPromptLbl') + '</label>' +
+            '<textarea id="setGeminiPrompt">' + escHtml(geminiState.systemPrompt) + '</textarea>' +
+          '</div>' +
+          '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">' +
+            '<button class="xp-btn" id="btnTestGemini">' + t('geminiTestBtn') + '</button>' +
+            '<span id="geminiTestStatus" style="font-size:11px; color:#555; max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="set-pane" id="pane-appearance">' +
+        '<div class="set-group">' +
+          '<div class="set-group-title">' + t('tabAppearance') + '</div>' +
+          '<div class="set-fld">' +
+            '<label>' + t('uiScale') + '</label>' +
+            '<select id="setUiScale">' +
+              '<option value="1">100% (' + (lang === 'en' ? 'Default' : 'Normál') + ')</option>' +
+              '<option value="1.15">115% (' + (lang === 'en' ? 'Medium' : 'Közepes') + ')</option>' +
+              '<option value="1.25">125% (' + (lang === 'en' ? 'Large' : 'Nagy') + ')</option>' +
+            '</select>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="set-pane" id="pane-data">' +
+        '<div class="set-group">' +
+          '<div class="set-group-title">' + t('tabData') + '</div>' +
+          '<div style="margin-bottom:10px;">' + tf('versionLbl', APP_VERSION) + '</div>' +
+          '<button class="xp-btn" id="btnClearHist" style="margin-bottom:8px; display:block; width:100%;">' + t('clearMsgs') + '</button>' +
+          '<button class="xp-btn" id="btnClearMedia" style="display:block; width:100%;">' + t('clearMedia') + '</button>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="set-btn-row">' +
+        '<button class="xp-btn primary" id="btnSaveSettings">' + t('saveSettings') + '</button>' +
+        '<button class="xp-btn" id="btnCancelSettings">' + t('cancel') + '</button>' +
+      '</div>' +
+    '</div>';
+
+  document.body.appendChild(win);
+  makeDraggable(win, $('.titlebar', win));
+  bringToFront(win);
+  addMobileBack(win);
+  mobileShow(win);
+
+  win.querySelectorAll('.set-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      win.querySelectorAll('.set-tab').forEach(t2 => t2.classList.remove('active'));
+      win.querySelectorAll('.set-pane').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      const pane = win.querySelector('#pane-' + tab.dataset.tab);
+      if (pane) pane.classList.add('active');
+    });
+  });
+
+  $('#btnTestGemini', win).addEventListener('click', async () => {
+    const st = $('#geminiTestStatus', win);
+    st.textContent = '⏳ ' + (lang === 'en' ? 'Testing...' : 'Kapcsolódás…');
+    try {
+      const reply = await askGemini('Szia! Működik a Gemini kapcsolat az MSN-ben? Válaszolj 1 rövid mondatban.', [], {
+        url: $('#setGeminiUrl', win).value.trim(),
+        key: $('#setGeminiKey', win).value.trim(),
+        model: $('#setGeminiModel', win).value.trim(),
+        thinking: $('#setGeminiThinking', win).value,
+        force: true
+      });
+      st.textContent = '✅ ' + reply.slice(0, 35) + '…';
+      st.title = reply;
+    } catch (e) {
+      st.textContent = '❌ ' + e.message.slice(0, 35);
+      st.title = e.message;
+    }
+  });
+
+  $('#btnClearHist', win).addEventListener('click', () => clearAllHistory());
+  $('#btnClearMedia', win).addEventListener('click', () => clearAllMedia());
+
+  $('#btnSaveSettings', win).addEventListener('click', () => {
+    geminiState.enabled = $('#setGeminiEnabled', win).checked;
+    geminiState.thinking = $('#setGeminiThinking', win).value;
+    geminiState.url = $('#setGeminiUrl', win).value.trim();
+    geminiState.key = $('#setGeminiKey', win).value.trim();
+    geminiState.model = $('#setGeminiModel', win).value.trim();
+    geminiState.systemPrompt = $('#setGeminiPrompt', win).value.trim();
+    saveGeminiState();
+    renderContacts();
+    refreshChatHead('gemini');
+    win.remove();
+    mobileBack();
+  });
+
+  const closeSet = () => { win.remove(); mobileBack(); };
+  $('.tbtn.close', win).addEventListener('click', closeSet);
+  $('#btnCancelSettings', win).addEventListener('click', closeSet);
 }
 
 // Frissítés egy gombbal:
